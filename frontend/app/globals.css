@@ -1,0 +1,198 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* IBM Plex Sans Arabic font import */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap');
+
+@layer base {
+  :root {
+    /* Primary Colors */
+    --color-primary: #0D7377;
+    --color-primary-light: #14919B;
+    --color-primary-dark: #0A5A5E;
+
+    /* Secondary Colors */
+    --color-secondary: #D4A574;
+    --color-secondary-light: #E5C49A;
+    --color-secondary-dark: #B8885A;
+
+    /* Semantic Colors */
+    --color-success: #2ECC71;
+    --color-warning: #F39C12;
+    --color-error: #E74C3C;
+    --color-info: #3498DB;
+
+    /* Game Score Colors */
+    --color-score-excellent: #2ECC71;
+    --color-score-good: #F1C40F;
+    --color-score-okay: #E67E22;
+    --color-score-far: #E74C3C;
+    --color-score-wrong: #2C3E50;
+
+    /* Neutral Colors */
+    --color-background: #FAFAFA;
+    --color-surface: #FFFFFF;
+    --color-border: #E0E0E0;
+    --color-text-primary: #1A1A1A;
+    --color-text-secondary: #666666;
+    --color-text-muted: #999999;
+
+    /* Spacing */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+
+    /* Border Radius */
+    --radius-sm: 0.25rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+    --radius-full: 9999px;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  }
+
+  /* Dark mode variables */
+  .dark {
+    --color-background: #121212;
+    --color-surface: #1E1E1E;
+    --color-border: #333333;
+    --color-text-primary: #FFFFFF;
+    --color-text-secondary: #B0B0B0;
+    --color-text-muted: #808080;
+  }
+
+  /* Base styles */
+  html {
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+  }
+
+  body {
+    @apply bg-background text-text-primary;
+    font-feature-settings: 'ss01' on, 'ss02' on;
+  }
+
+  /* RTL specific styles */
+  [dir="rtl"] {
+    text-align: right;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400;
+  }
+}
+
+@layer components {
+  /* Button base */
+  .btn {
+    @apply inline-flex items-center justify-center rounded-lg font-medium transition-colors;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
+    @apply disabled:pointer-events-none disabled:opacity-50;
+  }
+
+  .btn-primary {
+    @apply bg-primary text-white hover:bg-primary-light;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary text-white hover:bg-secondary-light;
+  }
+
+  .btn-outline {
+    @apply border-2 border-primary text-primary hover:bg-primary/10;
+  }
+
+  /* Card */
+  .card {
+    @apply bg-surface rounded-xl border border-border p-6 shadow-sm;
+  }
+
+  .card-hover {
+    @apply hover:shadow-md hover:border-primary/30 transition-all cursor-pointer;
+  }
+
+  /* Input */
+  .input {
+    @apply w-full h-12 px-4 rounded-lg border bg-surface text-text-primary;
+    @apply placeholder:text-text-muted;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Score emoji badges */
+  .score-badge {
+    @apply inline-flex items-center justify-center rounded-full border-2 text-2xl;
+  }
+
+  .score-excellent {
+    @apply bg-score-excellent/20 border-score-excellent;
+  }
+
+  .score-good {
+    @apply bg-score-good/20 border-score-good;
+  }
+
+  .score-okay {
+    @apply bg-score-okay/20 border-score-okay;
+  }
+
+  .score-far {
+    @apply bg-score-far/20 border-score-far;
+  }
+
+  .score-wrong {
+    @apply bg-score-wrong/20 border-score-wrong;
+  }
+}
+
+@layer utilities {
+  /* RTL utilities */
+  .flip-x {
+    transform: scaleX(-1);
+  }
+
+  /* Animation utilities */
+  .animate-bounce-in {
+    animation: bounceIn 0.5s ease-out;
+  }
+
+  @keyframes bounceIn {
+    0% {
+      transform: scale(0);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1.2);
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  /* Gradient text */
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary;
+  }
+}

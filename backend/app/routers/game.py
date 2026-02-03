@@ -1,0 +1,247 @@
+"""
+Game-related API endpoints for daily challenges.
+"""
+
+from datetime import date
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.core.deps import DBSession, OptionalUser, CurrentUser
+from app.crud.game import daily_challenge_crud, game_result_crud
+from app.models.user import Profile
+from app.schemas.game import (
+    DailyChallengeResponse,
+    GameCompleteResponse,
+    GameStatsResponse,
+    GuessRequest,
+    GuessResponse,
+    HintRequest,
+    HintResponse,
+    UserProgress,
+)
+from app.schemas.country import CountryBrief
+from app.services.path_finder import PathFinderService
+from app.services.score_calculator import ScoreCalculator
+
+router = APIRouter()
+
+# Service instances
+path_finder_service = PathFinderService()
+score_calculator = ScoreCalculator()
+
+
+@router.get("/daily", response_model=DailyChallengeResponse)
+async def get_daily_challenge(
+    db: DBSession,
+    current_user: OptionalUser,
+    challenge_date: date | None = None,
+):
+    """
+    Get today's daily challenge.
+
+    Returns the start and end countries, shortest path length,
+    and user's existing progress if logged in.
+    """
+    target_date = challenge_date or date.today()
+    challenge = await daily_challenge_crud.get_by_date(db, target_date)
+
+    if not challenge:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="لا يوجد تحدٍ لهذا اليوم",  # No challenge for this day
+        )
+
+    # Get user's existing progress if logged in
+    user_progress = None
+    if current_user:
+        result = await game_result_crud.get_by_user_and_challenge(
+            db, current_user.id, challenge.id
+        )
+        if result:
+            user_progress = UserProgress(
+                guesses=result.guesses,
+                hints_used=result.hints_used,
+                completed=result.completed,
+                score=result.score,
+            )
+
+    return DailyChallengeResponse(
+        id=challenge.id,
+        challenge_date=challenge.challenge_date,
+        start_country=CountryBrief(
+            id=challenge.start_country.id,
+            code=challenge.start_country.code,
+            name_ar=challenge.start_country.name_ar,
+            name_en=challenge.start_country.name_en,
+            flag_emoji=challenge.start_country.flag_emoji,
+        ),
+        end_country=CountryBrief(
+            id=challenge.end_country.id,
+            code=challenge.end_country.code,
+            name_ar=challenge.end_country.name_ar,
+            name_en=challenge.end_country.name_en,
+            flag_emoji=challenge.end_country.flag_emoji,
+        ),
+        shortest_path=challenge.shortest_path,
+        user_progress=user_progress,
+    )
+
+
+@router.post("/guess", response_model=GuessResponse)
+async def submit_guess(
+    request: GuessRequest,
+    db: DBSession,
+    current_user: OptionalUser,
+):
+    """
+    Submit a country guess for the daily challenge.
+
+    Returns emoji feedback and whether the game is complete.
+    """
+    # Validate challenge exists
+    challenge = await daily_challenge_crud.get(db, request.challenge_id)
+    if not challenge:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="التحدي غير موجود",  # Challenge not found
+        )
+
+    # Get or create game result
+    game_result = await game_result_crud.get_or_create_for_user(
+        db, current_user.id if current_user else None, challenge.id
+    )
+
+    # Check if already completed
+    if game_result.completed:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="لقد أكملت هذا التحدي بالفعل",  # Already completed
+        )
+
+    # Check for duplicate guess
+    guessed_ids = {g["country_id"] for g in game_result.guesses}
+    if str(request.country_id) in guessed_ids:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="لقد خمنت هذه الدولة من قبل",  # Already guessed this country
+        )
+
+    # Calculate score for this guess
+    score_result = await score_calculator.calculate_guess_score(
+        db=db,
+        challenge=challenge,
+        guessed_country_id=request.country_id,
+        previous_guesses=game_result.guesses,
+    )
+
+    # Update game result
+    new_guess = score_result.to_guess_entry()
+    new_guess["order"] = len(game_result.guesses) + 1
+    game_result.guesses = game_result.guesses + [new_guess]  # Create new list
+    game_result.total_guesses += 1
+
+    if score_result.is_destination:
+        game_result.completed = True
+        game_result.score = score_calculator.calculate_final_score(
+            game_result.total_guesses,
+            game_result.hints_used,
+            challenge.shortest_path,
+        )
+
+    await db.flush()
+
+    return GuessResponse(
+        country=CountryBrief(
+            id=score_result.country.id,
+            code=score_result.country.code,
+            name_ar=score_result.country.name_ar,
+            name_en=score_result.country.name_en,
+            flag_emoji=score_result.country.flag_emoji,
+        ),
+        score_emoji=score_result.emoji,
+        score_description=score_result.description_ar,
+        is_on_shortest_path=score_result.is_on_shortest_path,
+        is_destination=score_result.is_destination,
+        game_complete=game_result.completed,
+        total_guesses=game_result.total_guesses,
+    )
+
+
+@router.post("/hint", response_model=HintResponse)
+async def use_hint(
+    request: HintRequest,
+    db: DBSession,
+    current_user: OptionalUser,
+):
+    """
+    Use a hint for the daily challenge.
+
+    Hint types:
+    - border_hint: Show neighbors of a country on the path
+    - all_borders_hint: Show all countries on shortest path
+    - first_letter_hint: Show first letters of remaining countries
+    """
+    challenge = await daily_challenge_crud.get(db, request.challenge_id)
+    if not challenge:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="التحدي غير موجود",
+        )
+
+    game_result = await game_result_crud.get_or_create_for_user(
+        db, current_user.id if current_user else None, challenge.id
+    )
+
+    if game_result.hints_used >= 3:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="استخدمت جميع التلميحات المتاحة",  # All hints used
+        )
+
+    if game_result.completed:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="لقد أكملت هذا التحدي بالفعل",
+        )
+
+    # Generate hint
+    hint_data = await path_finder_service.generate_hint(
+        db=db,
+        challenge=challenge,
+        hint_type=request.hint_type,
+        previous_guesses=game_result.guesses,
+    )
+
+    game_result.hints_used += 1
+    await db.flush()
+
+    return HintResponse(
+        hint_type=request.hint_type,
+        hint_data=hint_data,
+        hints_remaining=3 - game_result.hints_used,
+    )
+
+
+@router.get("/stats", response_model=GameStatsResponse)
+async def get_game_stats(
+    db: DBSession,
+    current_user: CurrentUser,
+):
+    """
+    Get user's game statistics.
+
+    Requires authentication.
+    """
+    stats = await game_result_crud.get_user_stats(db, current_user.id)
+
+    return GameStatsResponse(
+        games_played=stats["games_played"],
+        games_won=stats["games_won"],
+        win_rate=stats["win_rate"],
+        current_streak=current_user.current_streak,
+        max_streak=current_user.max_streak,
+        average_guesses=stats["average_guesses"],
+        hints_used_total=stats["hints_used_total"],
+        last_played=stats["last_played"],
+    )

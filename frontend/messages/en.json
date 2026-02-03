@@ -1,0 +1,178 @@
+{
+  "common": {
+    "appName": "Rahal",
+    "tagline": "Discover the World Through Play",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "close": "Close",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "share": "Share",
+    "copy": "Copy",
+    "copied": "Copied!"
+  },
+  "nav": {
+    "home": "Home",
+    "game": "Path Game",
+    "quiz": "Quiz",
+    "stats": "Statistics",
+    "profile": "Profile",
+    "settings": "Settings",
+    "leaderboard": "Leaderboard"
+  },
+  "home": {
+    "welcomeTitle": "Welcome to Rahal!",
+    "welcomeDescription": "Test your geography knowledge and discover the world",
+    "dailyChallenge": "Daily Challenge",
+    "startGame": "Start Playing",
+    "quickQuiz": "Quick Quiz",
+    "yourStats": "Your Stats",
+    "currentStreak": "Current Streak",
+    "gamesPlayed": "Games",
+    "accuracy": "Accuracy"
+  },
+  "game": {
+    "title": "Path Game",
+    "subtitle": "Navigate from one country to another",
+    "from": "From",
+    "to": "To",
+    "enterCountry": "Enter country name...",
+    "guesses": "Guesses",
+    "noGuessesYet": "No guesses yet",
+    "startTyping": "Start typing a country name",
+    "hints": "Hints",
+    "hintsRemaining": "hints remaining",
+    "hintTypes": {
+      "border": "Border Hint",
+      "allBorders": "All Borders",
+      "firstLetter": "First Letters"
+    },
+    "completed": "Congratulations! 🎉",
+    "completedMessage": "You completed today's challenge",
+    "score": "Score",
+    "totalGuesses": "Total Guesses",
+    "shortestPath": "Shortest Path",
+    "optimal": "Optimal!",
+    "shareResult": "Share Result",
+    "playAgainTomorrow": "Play again tomorrow",
+    "emojiDescriptions": {
+      "excellent": "Excellent",
+      "good": "Good",
+      "okay": "Okay",
+      "far": "Far",
+      "wrongContinent": "Wrong Continent"
+    }
+  },
+  "quiz": {
+    "title": "Quiz",
+    "subtitle": "Test your geography knowledge",
+    "categories": {
+      "capitals": "Capitals",
+      "flags": "Flags",
+      "landmarks": "Landmarks",
+      "attractions": "Attractions",
+      "geography": "Geography",
+      "borders": "Borders",
+      "population": "Population",
+      "arab_world": "Arab World"
+    },
+    "difficulty": {
+      "easy": "Easy",
+      "medium": "Medium",
+      "hard": "Hard"
+    },
+    "questionOf": "Question {current} of {total}",
+    "correct": "Correct! ✓",
+    "incorrect": "Incorrect ✗",
+    "correctAnswer": "Correct Answer",
+    "points": "points",
+    "useHint": "Use Hint",
+    "nextQuestion": "Next Question",
+    "quizComplete": "Quiz Complete!",
+    "finalScore": "Final Score",
+    "questionsCorrect": "correct answers",
+    "tryAgain": "Try Again",
+    "selectCategory": "Select Category",
+    "selectDifficulty": "Select Difficulty",
+    "startQuiz": "Start Quiz",
+    "dailyQuiz": "Daily Quiz"
+  },
+  "stats": {
+    "title": "Statistics",
+    "gameStats": "Game Statistics",
+    "quizStats": "Quiz Statistics",
+    "gamesPlayed": "Games",
+    "gamesWon": "Won",
+    "winRate": "Win Rate",
+    "currentStreak": "Current Streak",
+    "maxStreak": "Max Streak",
+    "averageGuesses": "Average Guesses",
+    "totalQuestions": "Total Questions",
+    "correctAnswers": "Correct Answers",
+    "accuracy": "Accuracy",
+    "byCategory": "By Category",
+    "byDifficulty": "By Difficulty"
+  },
+  "profile": {
+    "title": "Profile",
+    "username": "Username",
+    "displayName": "Display Name",
+    "memberSince": "Member since",
+    "achievements": "Achievements",
+    "noAchievements": "No achievements yet",
+    "editProfile": "Edit Profile",
+    "signOut": "Sign Out"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "theme": "Theme",
+    "themes": {
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
+    "notifications": "Notifications",
+    "dailyReminder": "Daily Reminder",
+    "soundEffects": "Sound Effects"
+  },
+  "leaderboard": {
+    "title": "Leaderboard",
+    "rank": "Rank",
+    "player": "Player",
+    "score": "Score",
+    "games": "Games",
+    "yourRank": "Your Rank",
+    "types": {
+      "streak": "Longest Streak",
+      "wins": "Wins",
+      "accuracy": "Accuracy"
+    }
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signOut": "Sign Out",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "continueAsGuest": "Continue as Guest"
+  },
+  "errors": {
+    "general": "An error occurred, please try again",
+    "network": "Network connection error",
+    "notFound": "Page not found",
+    "unauthorized": "Please sign in",
+    "alreadyGuessed": "You already guessed this country",
+    "noHintsLeft": "All hints used",
+    "gameCompleted": "You already completed this challenge"
+  }
+}

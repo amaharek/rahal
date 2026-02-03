@@ -1,0 +1,153 @@
+{
+  "questions": [
+    {
+      "category": "capitals",
+      "difficulty": "easy",
+      "question_type": "multiple_choice",
+      "question_ar": "ما هي عاصمة مصر؟",
+      "correct_answer": "القاهرة",
+      "options": ["القاهرة", "الإسكندرية", "الجيزة", "أسوان"],
+      "hint": "أكبر مدينة في أفريقيا",
+      "tags": ["arab_world", "africa", "capitals"]
+    },
+    {
+      "category": "capitals",
+      "difficulty": "easy",
+      "question_type": "multiple_choice",
+      "question_ar": "ما هي عاصمة السعودية؟",
+      "correct_answer": "الرياض",
+      "options": ["الرياض", "جدة", "مكة المكرمة", "المدينة المنورة"],
+      "hint": "تقع في وسط المملكة",
+      "tags": ["arab_world", "gulf", "capitals"]
+    },
+    {
+      "category": "capitals",
+      "difficulty": "easy",
+      "question_type": "multiple_choice",
+      "question_ar": "ما هي عاصمة الإمارات؟",
+      "correct_answer": "أبوظبي",
+      "options": ["أبوظبي", "دبي", "الشارقة", "العين"],
+      "hint": "ليست دبي",
+      "tags": ["arab_world", "gulf", "capitals"]
+    },
+    {
+      "category": "capitals",
+      "difficulty": "medium",
+      "question_type": "multiple_choice",
+      "question_ar": "ما هي عاصمة المغرب؟",
+      "correct_answer": "الرباط",
+      "options": ["الرباط", "الدار البيضاء", "مراكش", "فاس"],
+      "hint": "ليست الدار البيضاء",
+      "tags": ["arab_world", "north_africa", "capitals"]
+    },
+    {
+      "category": "capitals",
+      "difficulty": "medium",
+      "question_type": "autocomplete",
+      "question_ar": "ما هي عاصمة تركيا؟",
+      "correct_answer": "أنقرة",
+      "hint": "ليست إسطنبول",
+      "tags": ["middle_east", "capitals"]
+    },
+    {
+      "category": "flags",
+      "difficulty": "easy",
+      "question_type": "multiple_choice",
+      "question_ar": "لأي دولة ينتمي هذا العلم؟ 🇸🇦",
+      "correct_answer": "السعودية",
+      "options": ["السعودية", "الإمارات", "الكويت", "قطر"],
+      "hint": "أكبر دولة في الخليج مساحة",
+      "tags": ["flags", "arab_world", "gulf"]
+    },
+    {
+      "category": "flags",
+      "difficulty": "easy",
+      "question_type": "multiple_choice",
+      "question_ar": "لأي دولة ينتمي هذا العلم؟ 🇪🇬",
+      "correct_answer": "مصر",
+      "options": ["مصر", "السودان", "ليبيا", "الجزائر"],
+      "hint": "أرض الفراعنة",
+      "tags": ["flags", "arab_world", "north_africa"]
+    },
+    {
+      "category": "geography",
+      "difficulty": "easy",
+      "question_type": "multiple_choice",
+      "question_ar": "أي دولة عربية هي الأكبر مساحة؟",
+      "correct_answer": "الجزائر",
+      "options": ["الجزائر", "السعودية", "السودان", "ليبيا"],
+      "hint": "تقع في شمال أفريقيا",
+      "tags": ["geography", "arab_world", "area"]
+    },
+    {
+      "category": "geography",
+      "difficulty": "medium",
+      "question_type": "multiple_choice",
+      "question_ar": "ما هو أطول نهر في العالم؟",
+      "correct_answer": "النيل",
+      "options": ["النيل", "الأمازون", "المسيسيبي", "اليانغتسي"],
+      "hint": "يمر عبر مصر",
+      "tags": ["geography", "rivers", "world"]
+    },
+    {
+      "category": "borders",
+      "difficulty": "medium",
+      "question_type": "multiple_choice",
+      "question_ar": "كم دولة تحد السعودية؟",
+      "correct_answer": "7",
+      "options": ["7", "5", "6", "8"],
+      "hint": "من الخليج إلى البحر الأحمر",
+      "tags": ["borders", "arab_world", "gulf"]
+    },
+    {
+      "category": "landmarks",
+      "difficulty": "easy",
+      "question_type": "multiple_choice",
+      "question_ar": "أين تقع الأهرامات؟",
+      "correct_answer": "مصر",
+      "options": ["مصر", "السودان", "العراق", "الأردن"],
+      "hint": "إحدى عجائب الدنيا السبع",
+      "tags": ["landmarks", "arab_world", "egypt"]
+    },
+    {
+      "category": "landmarks",
+      "difficulty": "medium",
+      "question_type": "multiple_choice",
+      "question_ar": "أين يقع برج خليفة؟",
+      "correct_answer": "دبي",
+      "options": ["دبي", "أبوظبي", "الرياض", "الدوحة"],
+      "hint": "أطول برج في العالم",
+      "tags": ["landmarks", "arab_world", "uae"]
+    },
+    {
+      "category": "population",
+      "difficulty": "hard",
+      "question_type": "multiple_choice",
+      "question_ar": "أي دولة عربية الأكثر سكاناً؟",
+      "correct_answer": "مصر",
+      "options": ["مصر", "الجزائر", "السعودية", "العراق"],
+      "hint": "أكثر من 100 مليون نسمة",
+      "tags": ["population", "arab_world"]
+    },
+    {
+      "category": "arab_world",
+      "difficulty": "easy",
+      "question_type": "multiple_choice",
+      "question_ar": "كم عدد الدول العربية؟",
+      "correct_answer": "22",
+      "options": ["22", "20", "24", "18"],
+      "hint": "أعضاء جامعة الدول العربية",
+      "tags": ["arab_world", "general"]
+    },
+    {
+      "category": "arab_world",
+      "difficulty": "medium",
+      "question_type": "multiple_choice",
+      "question_ar": "أي دولة خليجية لا تطل على البحر؟",
+      "correct_answer": "لا توجد",
+      "options": ["لا توجد", "قطر", "البحرين", "الكويت"],
+      "hint": "جميع دول الخليج ساحلية",
+      "tags": ["arab_world", "gulf", "geography"]
+    }
+  ]
+}

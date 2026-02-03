@@ -1,0 +1,192 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database (Supabase local)
+  db:
+    image: supabase/postgres:15.1.0.117
+    container_name: rahal-db
+    ports:
+      - "54322:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./supabase/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - rahal-network
+
+  # Redis for caching
+  redis:
+    image: redis:7-alpine
+    container_name: rahal-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - rahal-network
+
+  # Backend FastAPI
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: rahal-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL_ASYNC=postgresql+asyncpg://postgres:postgres@db:5432/postgres
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
+      - REDIS_URL=redis://redis:6379/0
+      - SUPABASE_URL=http://kong:8000
+      - SUPABASE_KEY=${SUPABASE_ANON_KEY:-your-anon-key}
+      - SUPABASE_JWT_SECRET=${SUPABASE_JWT_SECRET:-your-jwt-secret}
+      - ENVIRONMENT=development
+      - DEBUG=true
+    volumes:
+      - ./backend:/app
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - rahal-network
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # Frontend Next.js
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: development
+    container_name: rahal-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000/api
+      - NEXT_PUBLIC_SUPABASE_URL=${SUPABASE_URL:-http://localhost:54321}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY:-your-anon-key}
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - backend
+    networks:
+      - rahal-network
+    command: npm run dev
+
+  # Supabase Studio (optional - for database management)
+  studio:
+    image: supabase/studio:20231123-64a766a
+    container_name: rahal-studio
+    ports:
+      - "54323:3000"
+    environment:
+      STUDIO_PG_META_URL: http://meta:8080
+      POSTGRES_PASSWORD: postgres
+      DEFAULT_ORGANIZATION_NAME: Rahal
+      DEFAULT_PROJECT_NAME: Rahal Development
+      SUPABASE_URL: http://kong:8000
+      SUPABASE_PUBLIC_URL: http://localhost:54321
+      SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY:-your-anon-key}
+      SUPABASE_SERVICE_KEY: ${SUPABASE_SERVICE_KEY:-your-service-key}
+    depends_on:
+      - db
+    networks:
+      - rahal-network
+
+  # Kong API Gateway (Supabase)
+  kong:
+    image: kong:2.8.1
+    container_name: rahal-kong
+    ports:
+      - "54321:8000"
+      - "54324:8443"
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /var/lib/kong/kong.yml
+      KONG_DNS_ORDER: LAST,A,CNAME
+      KONG_PLUGINS: request-transformer,cors,key-auth,acl
+    volumes:
+      - ./supabase/kong.yml:/var/lib/kong/kong.yml:ro
+    networks:
+      - rahal-network
+
+  # Supabase Auth
+  auth:
+    image: supabase/gotrue:v2.99.0
+    container_name: rahal-auth
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      GOTRUE_API_HOST: 0.0.0.0
+      GOTRUE_API_PORT: 9999
+      API_EXTERNAL_URL: http://localhost:54321
+      GOTRUE_DB_DRIVER: postgres
+      GOTRUE_DB_DATABASE_URL: postgres://supabase_auth_admin:postgres@db:5432/postgres
+      GOTRUE_SITE_URL: http://localhost:3000
+      GOTRUE_URI_ALLOW_LIST: "*"
+      GOTRUE_DISABLE_SIGNUP: "false"
+      GOTRUE_JWT_ADMIN_ROLES: service_role
+      GOTRUE_JWT_AUD: authenticated
+      GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
+      GOTRUE_JWT_EXP: 3600
+      GOTRUE_JWT_SECRET: ${SUPABASE_JWT_SECRET:-super-secret-jwt-token-with-at-least-32-characters-long}
+      GOTRUE_EXTERNAL_EMAIL_ENABLED: "true"
+      GOTRUE_MAILER_AUTOCONFIRM: "true"
+      GOTRUE_SMTP_ADMIN_EMAIL: admin@rahal.app
+      GOTRUE_SMTP_HOST: inbucket
+      GOTRUE_SMTP_PORT: 2500
+      GOTRUE_SMTP_SENDER_NAME: Rahal
+    networks:
+      - rahal-network
+
+  # Supabase Meta (for Studio)
+  meta:
+    image: supabase/postgres-meta:v0.68.0
+    container_name: rahal-meta
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PG_META_PORT: 8080
+      PG_META_DB_HOST: db
+      PG_META_DB_PORT: 5432
+      PG_META_DB_NAME: postgres
+      PG_META_DB_USER: postgres
+      PG_META_DB_PASSWORD: postgres
+    networks:
+      - rahal-network
+
+  # Inbucket (email testing)
+  inbucket:
+    image: inbucket/inbucket:3.0.3
+    container_name: rahal-inbucket
+    ports:
+      - "54325:9000"  # Web UI
+      - "54326:2500"  # SMTP
+    networks:
+      - rahal-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  rahal-network:
+    driver: bridge

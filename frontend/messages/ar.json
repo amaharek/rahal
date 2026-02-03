@@ -1,0 +1,178 @@
+{
+  "common": {
+    "appName": "رحال",
+    "tagline": "اكتشف العالم من خلال اللعب",
+    "loading": "جاري التحميل...",
+    "error": "حدث خطأ",
+    "retry": "إعادة المحاولة",
+    "close": "إغلاق",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "confirm": "تأكيد",
+    "back": "رجوع",
+    "next": "التالي",
+    "previous": "السابق",
+    "submit": "إرسال",
+    "share": "مشاركة",
+    "copy": "نسخ",
+    "copied": "تم النسخ!"
+  },
+  "nav": {
+    "home": "الرئيسية",
+    "game": "لعبة المسار",
+    "quiz": "الأسئلة",
+    "stats": "الإحصائيات",
+    "profile": "الملف الشخصي",
+    "settings": "الإعدادات",
+    "leaderboard": "لوحة المتصدرين"
+  },
+  "home": {
+    "welcomeTitle": "مرحباً بك في رحال!",
+    "welcomeDescription": "اختبر معلوماتك الجغرافية واكتشف العالم",
+    "dailyChallenge": "تحدي اليوم",
+    "startGame": "ابدأ اللعب",
+    "quickQuiz": "اختبار سريع",
+    "yourStats": "إحصائياتك",
+    "currentStreak": "السلسلة الحالية",
+    "gamesPlayed": "الألعاب",
+    "accuracy": "الدقة"
+  },
+  "game": {
+    "title": "لعبة المسار",
+    "subtitle": "انتقل من دولة إلى أخرى",
+    "from": "من",
+    "to": "إلى",
+    "enterCountry": "اكتب اسم الدولة...",
+    "guesses": "التخمينات",
+    "noGuessesYet": "لم تقم بأي تخمين بعد",
+    "startTyping": "ابدأ بكتابة اسم دولة",
+    "hints": "التلميحات",
+    "hintsRemaining": "تلميحات متبقية",
+    "hintTypes": {
+      "border": "تلميح الحدود",
+      "allBorders": "جميع الحدود",
+      "firstLetter": "الحروف الأولى"
+    },
+    "completed": "تهانينا! 🎉",
+    "completedMessage": "لقد أكملت تحدي اليوم",
+    "score": "النتيجة",
+    "totalGuesses": "عدد التخمينات",
+    "shortestPath": "أقصر مسار",
+    "optimal": "مثالي!",
+    "shareResult": "مشاركة النتيجة",
+    "playAgainTomorrow": "العب مرة أخرى غداً",
+    "emojiDescriptions": {
+      "excellent": "ممتاز",
+      "good": "جيد",
+      "okay": "مقبول",
+      "far": "بعيد",
+      "wrongContinent": "قارة مختلفة"
+    }
+  },
+  "quiz": {
+    "title": "الأسئلة",
+    "subtitle": "اختبر معلوماتك الجغرافية",
+    "categories": {
+      "capitals": "العواصم",
+      "flags": "الأعلام",
+      "landmarks": "المعالم",
+      "attractions": "معالم الجذب",
+      "geography": "الجغرافيا",
+      "borders": "الحدود",
+      "population": "السكان",
+      "arab_world": "العالم العربي"
+    },
+    "difficulty": {
+      "easy": "سهل",
+      "medium": "متوسط",
+      "hard": "صعب"
+    },
+    "questionOf": "السؤال {current} من {total}",
+    "correct": "صحيح! ✓",
+    "incorrect": "خطأ ✗",
+    "correctAnswer": "الإجابة الصحيحة",
+    "points": "نقطة",
+    "useHint": "استخدم تلميح",
+    "nextQuestion": "السؤال التالي",
+    "quizComplete": "انتهى الاختبار!",
+    "finalScore": "النتيجة النهائية",
+    "questionsCorrect": "إجابات صحيحة",
+    "tryAgain": "حاول مرة أخرى",
+    "selectCategory": "اختر فئة",
+    "selectDifficulty": "اختر المستوى",
+    "startQuiz": "ابدأ الاختبار",
+    "dailyQuiz": "اختبار اليوم"
+  },
+  "stats": {
+    "title": "الإحصائيات",
+    "gameStats": "إحصائيات اللعبة",
+    "quizStats": "إحصائيات الأسئلة",
+    "gamesPlayed": "الألعاب",
+    "gamesWon": "الفوز",
+    "winRate": "نسبة الفوز",
+    "currentStreak": "السلسلة الحالية",
+    "maxStreak": "أطول سلسلة",
+    "averageGuesses": "متوسط التخمينات",
+    "totalQuestions": "مجموع الأسئلة",
+    "correctAnswers": "الإجابات الصحيحة",
+    "accuracy": "الدقة",
+    "byCategory": "حسب الفئة",
+    "byDifficulty": "حسب المستوى"
+  },
+  "profile": {
+    "title": "الملف الشخصي",
+    "username": "اسم المستخدم",
+    "displayName": "الاسم المعروض",
+    "memberSince": "عضو منذ",
+    "achievements": "الإنجازات",
+    "noAchievements": "لا إنجازات بعد",
+    "editProfile": "تعديل الملف",
+    "signOut": "تسجيل الخروج"
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "language": "اللغة",
+    "theme": "المظهر",
+    "themes": {
+      "light": "فاتح",
+      "dark": "داكن",
+      "system": "حسب النظام"
+    },
+    "notifications": "الإشعارات",
+    "dailyReminder": "تذكير يومي",
+    "soundEffects": "المؤثرات الصوتية"
+  },
+  "leaderboard": {
+    "title": "لوحة المتصدرين",
+    "rank": "الترتيب",
+    "player": "اللاعب",
+    "score": "النتيجة",
+    "games": "الألعاب",
+    "yourRank": "ترتيبك",
+    "types": {
+      "streak": "أطول سلسلة",
+      "wins": "الانتصارات",
+      "accuracy": "الدقة"
+    }
+  },
+  "auth": {
+    "signIn": "تسجيل الدخول",
+    "signUp": "إنشاء حساب",
+    "signOut": "تسجيل الخروج",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "noAccount": "ليس لديك حساب؟",
+    "hasAccount": "لديك حساب بالفعل؟",
+    "continueAsGuest": "المتابعة كضيف"
+  },
+  "errors": {
+    "general": "حدث خطأ، يرجى المحاولة مرة أخرى",
+    "network": "خطأ في الاتصال بالشبكة",
+    "notFound": "الصفحة غير موجودة",
+    "unauthorized": "يرجى تسجيل الدخول",
+    "alreadyGuessed": "لقد خمنت هذه الدولة من قبل",
+    "noHintsLeft": "استخدمت جميع التلميحات",
+    "gameCompleted": "لقد أكملت هذا التحدي بالفعل"
+  }
+}
