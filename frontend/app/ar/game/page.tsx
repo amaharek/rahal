@@ -1,15 +1,27 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
+import { ChevronDown, ChevronUp, Map } from 'lucide-react';
 import { getDailyChallenge, submitGuess } from '@/lib/api/game';
 import { useGameStore } from '@/lib/stores/gameStore';
 import { CountryInput } from '@/components/game/CountryInput';
 import { EmojiScore } from '@/components/game/EmojiScore';
+import { MapSkeleton } from '@/components/game/GameMap';
 import { Card, CardHeader, CardTitle, CardContent, Button } from '@/components/ui';
 import type { Country, GuessEntry } from '@/types/game';
+
+// Lazy load GameMap (SSR disabled due to react-simple-maps)
+const GameMap = dynamic(
+  () => import('@/components/game/GameMap').then((mod) => mod.GameMap),
+  {
+    ssr: false,
+    loading: () => <MapSkeleton />,
+  }
+);
 
 export default function GamePage() {
   const t = useTranslations();
@@ -19,11 +31,16 @@ export default function GamePage() {
     hintsUsed,
     isCompleted,
     score,
+    showMap,
+    mapZoom,
+    mapCenter,
     setChallenge,
     addGuess,
     completeGame,
-    setLoading,
     setError,
+    toggleMap,
+    setMapZoom,
+    setMapCenter,
   } = useGameStore();
 
   // Fetch daily challenge
@@ -38,6 +55,14 @@ export default function GamePage() {
       setChallenge(data);
     }
   }, [data, setChallenge]);
+
+  // Convert guesses to map format
+  const guessedCountryCodes = useMemo(() => {
+    return guesses.map((guess) => ({
+      code: guess.country_id.toUpperCase(),
+      isOnPath: guess.emoji === '🟢' || guess.emoji === '🟡',
+    }));
+  }, [guesses]);
 
   // Submit guess mutation
   const guessMutation = useMutation({
@@ -111,7 +136,7 @@ export default function GamePage() {
     <main className="min-h-screen pb-20">
       {/* Header */}
       <header className="bg-primary text-white py-4 px-4">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <Link href="/ar" className="text-white/80 text-sm mb-2 inline-block">
             ← {t('common.back')}
           </Link>
@@ -120,7 +145,7 @@ export default function GamePage() {
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Challenge Display */}
         <Card className="mb-6">
           <CardContent>
@@ -157,121 +182,160 @@ export default function GamePage() {
           </CardContent>
         </Card>
 
-        {/* Game Completed */}
-        {isCompleted ? (
-          <Card className="mb-6 bg-success/10 border-success">
-            <CardContent className="text-center">
-              <div className="text-4xl mb-2">🎉</div>
-              <h2 className="text-xl font-bold text-success mb-2">
-                {t('game.completed')}
-              </h2>
-              <p className="text-text-secondary mb-4">
-                {t('game.completedMessage')}
-              </p>
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <div className="text-2xl font-bold text-primary">{score}</div>
-                  <div className="text-sm text-text-secondary">
-                    {t('game.score')}
-                  </div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-primary">
-                    {guesses.length}
-                  </div>
-                  <div className="text-sm text-text-secondary">
-                    {t('game.totalGuesses')}
-                  </div>
-                </div>
-              </div>
-              <Button variant="primary" className="w-full">
-                {t('game.shareResult')}
+        {/* Two-column layout for desktop */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Map Section - First on mobile (order-1), First on desktop (lg:order-1) */}
+          <div className="order-2 lg:order-1">
+            {/* Mobile: Collapsible Map */}
+            <div className="lg:hidden mb-4">
+              <Button
+                variant="outline"
+                onClick={toggleMap}
+                className="w-full flex items-center justify-center gap-2"
+              >
+                <Map className="w-4 h-4" />
+                {showMap ? t('game.map.hideMap') : t('game.map.showMap')}
+                {showMap ? (
+                  <ChevronUp className="w-4 h-4" />
+                ) : (
+                  <ChevronDown className="w-4 h-4" />
+                )}
               </Button>
-            </CardContent>
-          </Card>
-        ) : (
-          /* Country Input */
-          <div className="mb-6">
-            <CountryInput
-              onSelect={handleCountrySelect}
-              placeholder={t('game.enterCountry')}
-              disabled={guessMutation.isPending}
-              autoFocus
-            />
+            </div>
+
+            {/* Map Component */}
+            <div className={`${showMap ? 'block' : 'hidden'} lg:block`}>
+              <GameMap
+                startCountryCode={challenge.start_country.code}
+                endCountryCode={challenge.end_country.code}
+                guessedCountryCodes={guessedCountryCodes}
+                zoom={mapZoom}
+                center={mapCenter}
+                onZoomChange={setMapZoom}
+                onCenterChange={setMapCenter}
+              />
+            </div>
           </div>
-        )}
 
-        {/* Hints */}
-        {!isCompleted && (
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle className="text-base">
-                {t('game.hints')} ({3 - hintsUsed} {t('game.hintsRemaining')})
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={hintsUsed >= 3}
-                  className="flex-1"
-                >
-                  {t('game.hintTypes.border')}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={hintsUsed >= 3}
-                  className="flex-1"
-                >
-                  {t('game.hintTypes.allBorders')}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={hintsUsed >= 3}
-                  className="flex-1"
-                >
-                  {t('game.hintTypes.firstLetter')}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Guesses History */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">
-              {t('game.guesses')} ({guesses.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {guesses.length === 0 ? (
-              <div className="text-center py-8 text-text-secondary">
-                <p>{t('game.noGuessesYet')}</p>
-                <p className="text-sm mt-2">{t('game.startTyping')}</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {guesses.map((guess, index) => (
-                  <div
-                    key={guess.country_id}
-                    className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg"
-                  >
-                    <span className="text-lg font-bold text-text-secondary w-8">
-                      {index + 1}.
-                    </span>
-                    <span className="text-2xl">{guess.flag_emoji}</span>
-                    <span className="flex-1 font-medium">{guess.name_ar}</span>
-                    <EmojiScore emoji={guess.emoji} size="sm" animate={false} />
+          {/* Game Controls Section - Second on mobile (order-2), Second on desktop (lg:order-2) */}
+          <div className="order-1 lg:order-2 space-y-6">
+            {/* Game Completed */}
+            {isCompleted ? (
+              <Card className="bg-success/10 border-success">
+                <CardContent className="text-center">
+                  <div className="text-4xl mb-2">🎉</div>
+                  <h2 className="text-xl font-bold text-success mb-2">
+                    {t('game.completed')}
+                  </h2>
+                  <p className="text-text-secondary mb-4">
+                    {t('game.completedMessage')}
+                  </p>
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <div className="text-2xl font-bold text-primary">{score}</div>
+                      <div className="text-sm text-text-secondary">
+                        {t('game.score')}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-primary">
+                        {guesses.length}
+                      </div>
+                      <div className="text-sm text-text-secondary">
+                        {t('game.totalGuesses')}
+                      </div>
+                    </div>
                   </div>
-                ))}
+                  <Button variant="primary" className="w-full">
+                    {t('game.shareResult')}
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
+              /* Country Input */
+              <div>
+                <CountryInput
+                  onSelect={handleCountrySelect}
+                  placeholder={t('game.enterCountry')}
+                  disabled={guessMutation.isPending}
+                  autoFocus
+                />
               </div>
             )}
-          </CardContent>
-        </Card>
+
+            {/* Hints */}
+            {!isCompleted && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">
+                    {t('game.hints')} ({3 - hintsUsed} {t('game.hintsRemaining')})
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={hintsUsed >= 3}
+                      className="flex-1"
+                    >
+                      {t('game.hintTypes.border')}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={hintsUsed >= 3}
+                      className="flex-1"
+                    >
+                      {t('game.hintTypes.allBorders')}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={hintsUsed >= 3}
+                      className="flex-1"
+                    >
+                      {t('game.hintTypes.firstLetter')}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Guesses History */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">
+                  {t('game.guesses')} ({guesses.length})
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {guesses.length === 0 ? (
+                  <div className="text-center py-8 text-text-secondary">
+                    <p>{t('game.noGuessesYet')}</p>
+                    <p className="text-sm mt-2">{t('game.startTyping')}</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3 max-h-[300px] overflow-y-auto">
+                    {guesses.map((guess, index) => (
+                      <div
+                        key={guess.country_id}
+                        className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg"
+                      >
+                        <span className="text-lg font-bold text-text-secondary w-8">
+                          {index + 1}.
+                        </span>
+                        <span className="text-2xl">{guess.flag_emoji}</span>
+                        <span className="flex-1 font-medium">{guess.name_ar}</span>
+                        <EmojiScore emoji={guess.emoji} size="sm" animate={false} />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     </main>
   );

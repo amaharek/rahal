@@ -75,13 +75,13 @@ CREATE POLICY "Users can view all game results"
 DROP POLICY IF EXISTS "Users can insert own game results" ON game_results;
 CREATE POLICY "Users can insert own game results"
     ON game_results FOR INSERT
-    WITH CHECK (profile_id IN (SELECT id FROM profiles WHERE user_id = auth.uid()));
+    WITH CHECK (user_id IN (SELECT id FROM profiles WHERE user_id = auth.uid()));
 
 -- Allow users to update their own game results
 DROP POLICY IF EXISTS "Users can update own game results" ON game_results;
 CREATE POLICY "Users can update own game results"
     ON game_results FOR UPDATE
-    USING (profile_id IN (SELECT id FROM profiles WHERE user_id = auth.uid()));
+    USING (user_id IN (SELECT id FROM profiles WHERE user_id = auth.uid()));
 
 -- ============================================
 -- QUIZ RESULTS POLICIES
@@ -97,7 +97,7 @@ CREATE POLICY "Users can view all quiz results"
 DROP POLICY IF EXISTS "Users can insert own quiz results" ON quiz_results;
 CREATE POLICY "Users can insert own quiz results"
     ON quiz_results FOR INSERT
-    WITH CHECK (profile_id IN (SELECT id FROM profiles WHERE user_id = auth.uid()));
+    WITH CHECK (user_id IN (SELECT id FROM profiles WHERE user_id = auth.uid()));
 
 -- ============================================
 -- GRANT TABLE PERMISSIONS TO ROLES

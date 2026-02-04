@@ -63,17 +63,9 @@ GRANT USAGE ON SCHEMA auth TO anon, authenticated;
 -- AUTH HELPER FUNCTIONS
 -- ============================================
 
--- Create auth.uid() function to get current user's ID from JWT
--- This function is typically provided by Supabase GoTrue but we create it
--- explicitly to ensure it exists before RLS policies are created.
-CREATE OR REPLACE FUNCTION auth.uid() RETURNS uuid AS $$
-  SELECT COALESCE(
-    NULLIF(current_setting('request.jwt.claim.sub', true), '')::uuid,
-    NULLIF(current_setting('request.jwt.claims', true)::jsonb->>'sub', '')::uuid
-  );
-$$ LANGUAGE SQL STABLE;
-
-COMMENT ON FUNCTION auth.uid() IS 'Returns the user ID from the current JWT token';
+-- NOTE: The auth.uid() function is created by GoTrue during its migrations.
+-- We do NOT create it here to avoid ownership conflicts.
+-- GoTrue will create it as supabase_auth_admin, which is the correct owner.
 
 -- ============================================
 -- ENABLE REQUIRED EXTENSIONS
@@ -92,6 +84,7 @@ CREATE EXTENSION IF NOT EXISTS "pg_trgm";
 -- Grant permissions on public schema to roles
 GRANT USAGE ON SCHEMA public TO anon, authenticated;
 GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO supabase_auth_admin;
 
 -- Allow roles to access sequences for auto-incrementing IDs
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT USAGE ON SEQUENCES TO anon, authenticated;

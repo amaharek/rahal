@@ -67,6 +67,14 @@
       "okay": "Okay",
       "far": "Far",
       "wrongContinent": "Wrong Continent"
+    },
+    "map": {
+      "start": "Start",
+      "end": "End",
+      "onPath": "On Path",
+      "offPath": "Off Path",
+      "showMap": "Show Map",
+      "hideMap": "Hide Map"
     }
   },
   "quiz": {

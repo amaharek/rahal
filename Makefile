@@ -43,7 +43,7 @@ help:
 
 install:
 	@echo "Installing backend dependencies..."
-	cd backend && pip install -e .
+	cd backend && uv pip install -e .
 	@echo "Installing frontend dependencies..."
 	cd frontend && npm install
 	@echo "Done!"

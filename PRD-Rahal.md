@@ -562,11 +562,7 @@ Suggestions:
 | Styling | Tailwind CSS + RTL plugin | Fast, RTL native support |
 | State | Zustand | Simple, performant |
 | Backend | **FastAPI (Python)** | Easy to learn, async support, great docs |
-| ORM | **SQLAlchemy 2.0** | Powerful ORM, async support, type hints |
-| Migrations | **Alembic** | Database version control, auto-generation |
 | Database | **Supabase** | PostgreSQL + Auth + Realtime + Storage |
-| Package Manager | **uv** | Fast Python package manager (Rust-based) |
-| CMS | **Strapi** | Headless CMS for content management |
 | Local Dev | Docker Compose | Consistent across Mac/Windows |
 | Hosting (Later) | Vercel (FE) + Railway/Render (BE) | Easy deployment |
 | CDN | Cloudflare | Global, MENA presence |
@@ -580,24 +576,6 @@ Suggestions:
 - Pydantic for data validation
 - Large ecosystem for Arabic text processing (e.g., `arabic-reshaper`, `python-bidi`)
 
-**SQLAlchemy + Alembic Benefits:**
-- SQLAlchemy 2.0 with async support for non-blocking DB operations
-- Type-safe ORM with Python type hints
-- Alembic handles schema migrations with version control
-- Auto-generate migrations from model changes
-- Easy rollback and upgrade paths
-- Works seamlessly with Supabase PostgreSQL
-
-**Strapi CMS Benefits:**
-- Open-source headless CMS with admin UI out of the box
-- Content types: Questions, Countries, Landmarks, Attractions
-- Built-in media library for images (flags, landmarks)
-- User roles & permissions (admin, editor, viewer)
-- REST & GraphQL APIs auto-generated
-- Internationalization (i18n) plugin for Arabic content
-- Bulk import/export via plugins
-- No custom admin panel code needed
-
 **Supabase Benefits:**
 - PostgreSQL database with a nice UI
 - Built-in authentication (email, social, magic links)
@@ -610,31 +588,10 @@ Suggestions:
 ### Project Structure
 ```
 rahal/
-├── frontend/                 # Next.js frontend (User-facing)
+├── frontend/                 # Next.js frontend
 │   ├── app/                  # App router pages
-│   │   ├── [locale]/         # i18n routes (ar, en)
-│   │   ├── game/             # Path game pages
-│   │   ├── quiz/             # Quiz pages
-│   │   └── profile/          # User profile
 │   ├── components/           # React components
 │   ├── lib/                  # Utilities & Supabase client
-│   ├── public/               # Static assets
-│   └── package.json
-│
-├── cms/                      # Strapi CMS
-│   ├── src/
-│   │   ├── api/              # Content type APIs
-│   │   │   ├── question/     # Question content type
-│   │   │   ├── country/      # Country content type
-│   │   │   ├── landmark/     # Landmark content type
-│   │   │   ├── border/       # Border content type
-│   │   │   └── challenge/    # Daily challenge content type
-│   │   ├── components/       # Reusable components
-│   │   └── plugins/          # Custom plugins
-│   ├── config/               # Strapi configuration
-│   │   ├── database.js       # PostgreSQL connection
-│   │   ├── plugins.js        # Plugin config
-│   │   └── server.js         # Server config
 │   ├── public/               # Static assets
 │   └── package.json
 │
@@ -645,61 +602,19 @@ rahal/
 │   │   ├── routers/          # API routes
 │   │   │   ├── game.py       # Path game endpoints
 │   │   │   ├── quiz.py       # Quiz endpoints
-│   │   │   ├── users.py      # User endpoints
-│   │   │   └── admin.py      # Admin/CMS endpoints
-│   │   ├── models/           # SQLAlchemy ORM models
-│   │   │   ├── __init__.py
-│   │   │   ├── base.py       # Base model class
-│   │   │   ├── country.py    # Country & Border models
-│   │   │   ├── question.py   # Question model
-│   │   │   ├── challenge.py  # Daily challenge model
-│   │   │   ├── user.py       # User profile model
-│   │   │   └── game.py       # Game & quiz result models
-│   │   ├── schemas/          # Pydantic schemas (request/response)
-│   │   │   ├── country.py
-│   │   │   ├── question.py
-│   │   │   ├── game.py
-│   │   │   └── user.py
+│   │   │   └── users.py      # User endpoints
+│   │   ├── models/           # Pydantic models
 │   │   ├── services/         # Business logic
 │   │   │   ├── path_finder.py
-│   │   │   ├── quiz_engine.py
-│   │   │   └── challenge_generator.py
-│   │   ├── crud/             # Database CRUD operations
-│   │   │   ├── country.py
-│   │   │   ├── question.py
-│   │   │   └── user.py
-│   │   ├── core/             # Config, dependencies
-│   │   │   ├── config.py     # Settings & env vars
-│   │   │   ├── database.py   # SQLAlchemy async engine
-│   │   │   ├── security.py   # Auth helpers
-│   │   │   └── deps.py       # FastAPI dependencies
-│   │   └── utils/            # Utilities
-│   │       └── arabic.py     # Arabic text processing
-│   ├── alembic/              # Alembic migrations
-│   │   ├── versions/         # Migration files
-│   │   ├── env.py            # Alembic environment
-│   │   └── script.py.mako    # Migration template
-│   ├── alembic.ini           # Alembic config
-│   ├── pyproject.toml        # Python dependencies (uv)
-│   ├── uv.lock               # Lock file
+│   │   │   └── quiz_engine.py
+│   │   └── core/             # Config, dependencies
+│   ├── requirements.txt
 │   └── Dockerfile
 │
 ├── supabase/                 # Supabase local config
-│   ├── config.toml
-│   └── seed.sql              # Initial seed data (optional)
-│
-├── scripts/                  # Utility scripts
-│   ├── seed_countries.py     # Populate countries & borders
-│   ├── seed_questions.py     # Import questions from CSV/JSON
-│   └── generate_challenge.py # Generate daily challenges
-│
-├── data/                     # Static data files
-│   ├── countries.json        # Country data with Arabic names
-│   ├── borders.json          # Border connections
-│   └── questions/            # Question bank CSVs
-│       ├── capitals.csv
-│       ├── flags.csv
-│       └── landmarks.csv
+│   ├── migrations/           # Database migrations
+│   ├── seed.sql              # Initial data
+│   └── config.toml
 │
 ├── docker-compose.yml        # Local development setup
 ├── .env.example              # Environment variables template
@@ -709,17 +624,8 @@ rahal/
 ### Local Development Setup
 
 #### Prerequisites
-- **Mac:** Homebrew, Docker Desktop, Node.js 20+, Python 3.11+, uv (Python package manager)
-- **Windows:** WSL2, Docker Desktop, Node.js 20+, Python 3.11+, uv (Python package manager)
-
-#### Install uv (Fast Python Package Manager)
-```bash
-# Mac/Linux
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Windows (PowerShell)
-powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
-```
+- **Mac:** Homebrew, Docker Desktop, Node.js 20+, Python 3.11+
+- **Windows:** WSL2, Docker Desktop, Node.js 20+, Python 3.11+
 
 #### Quick Start (Both Mac & Windows)
 ```bash
@@ -732,58 +638,20 @@ cp .env.example .env
 
 # 3. Start Supabase locally (runs PostgreSQL, Auth, etc.)
 npx supabase start
-# Note the DB URL output, add to .env as DATABASE_URL
 
 # 4. Start the backend (FastAPI)
 cd backend
-uv sync                   # Create venv & install dependencies from pyproject.toml
-source .venv/bin/activate # Windows: .venv\Scripts\activate
-
-# 5. Run Alembic migrations
-alembic upgrade head
-
-# 6. Seed initial data (countries, sample questions)
-python ../scripts/seed_countries.py
-python ../scripts/seed_questions.py
-
-# 7. Start FastAPI server
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000
 
-# 8. Start the frontend (Next.js) - in another terminal
+# 5. Start the frontend (Next.js) - in another terminal
 cd frontend
 npm install
 npm run dev
 
-# 9. Start Strapi CMS - in another terminal
-cd cms
-npm install
-npm run develop
-
-# 10. Access the apps:
-#     - Frontend: http://localhost:3000
-#     - Strapi CMS: http://localhost:1337/admin
-#     - Strapi API: http://localhost:1337/api
-#     - FastAPI Docs: http://localhost:8000/docs
-```
-
-#### Alembic Migration Commands
-```bash
-cd backend
-
-# Create a new migration (after changing SQLAlchemy models)
-alembic revision --autogenerate -m "Add new field to questions"
-
-# Apply all pending migrations
-alembic upgrade head
-
-# Rollback one migration
-alembic downgrade -1
-
-# View migration history
-alembic history
-
-# View current revision
-alembic current
+# 6. Open http://localhost:3000
 ```
 
 #### Docker Compose (Alternative - Recommended)
@@ -792,22 +660,18 @@ alembic current
 version: '3.8'
 
 services:
-  # Supabase runs separately via CLI (npx supabase start)
+  # Supabase runs separately via CLI
 
   backend:
     build: ./backend
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=${DATABASE_URL}
       - SUPABASE_URL=${SUPABASE_URL}
       - SUPABASE_KEY=${SUPABASE_KEY}
-      - STRAPI_URL=http://cms:1337
     volumes:
       - ./backend:/app
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-    depends_on:
-      - cms
 
   frontend:
     build: ./frontend
@@ -821,19 +685,6 @@ services:
       - ./frontend:/app
       - /app/node_modules
     command: npm run dev
-
-  cms:
-    build: ./cms
-    ports:
-      - "1337:1337"
-    environment:
-      - DATABASE_CLIENT=postgres
-      - DATABASE_URL=${DATABASE_URL}
-      - STRAPI_ADMIN_BACKEND_URL=http://localhost:1337
-    volumes:
-      - ./cms:/app
-      - /app/node_modules
-    command: npm run develop
 ```
 
 ```bash
@@ -842,9 +693,6 @@ docker-compose up
 
 # Stop everything
 docker-compose down
-
-# View logs for specific service
-docker-compose logs -f backend
 ```
 
 ### Database Schema (Supabase/PostgreSQL)
@@ -1011,240 +859,6 @@ CREATE POLICY "Users can update own profile" ON profiles
 | GET | `/api/users/achievements` | Get user achievements |
 | GET | `/api/users/leaderboard` | Get leaderboard |
 
-### Strapi CMS Content Types
-
-Strapi will manage all content that needs to be editable by non-developers.
-
-#### Content Types
-
-| Content Type | Fields | Purpose |
-|--------------|--------|---------|
-| **Question** | category, difficulty, question_type, question_ar, correct_answer, options (JSON), hint, image, tags | Quiz questions |
-| **Country** | code, name_ar, name_en, continent, region, population, area_km2, capital_ar, capital_en, flag_emoji, flag_image | Country data |
-| **Border** | country_a (relation), country_b (relation), border_type | Country connections |
-| **Landmark** | name_ar, name_en, description_ar, country (relation), city, image, category, coordinates | Tourist attractions |
-| **DailyChallenge** | challenge_date, start_country (relation), end_country (relation), shortest_path | Pre-scheduled challenges |
-
-#### Strapi Admin Workflow
-1. **Content Editors** add/edit questions, landmarks via Strapi admin UI
-2. **Data Sync** - Cron job syncs Strapi content to Supabase (or use Strapi as primary DB)
-3. **Media** - Images stored in Strapi media library (can use Cloudinary provider)
-
-#### Option A: Strapi as Content Source (Recommended)
-```
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│   Strapi    │────►│   FastAPI   │────►│   Frontend  │
-│  (Content)  │     │  (Game API) │     │  (Next.js)  │
-└─────────────┘     └─────────────┘     └─────────────┘
-       │                   │
-       ▼                   ▼
-┌─────────────────────────────────────┐
-│         Supabase (PostgreSQL)        │
-│    - User data, game results, auth   │
-└─────────────────────────────────────┘
-```
-
-- Strapi manages: Questions, Countries, Landmarks (content)
-- Supabase manages: Users, Game Results, Achievements (user data)
-- FastAPI: Reads from both, handles game logic
-
-#### Option B: Strapi for Editing, Sync to Supabase
-- Edit content in Strapi
-- Webhook/cron syncs to Supabase
-- FastAPI reads only from Supabase
-
-### SQLAlchemy Models
-
-```python
-# backend/app/models/base.py
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import DateTime, func
-from datetime import datetime
-import uuid
-
-class Base(DeclarativeBase):
-    pass
-
-class TimestampMixin:
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
-    )
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
-    )
-```
-
-```python
-# backend/app/models/country.py
-from sqlalchemy import String, BigInteger, Numeric, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.dialects.postgresql import UUID
-from .base import Base, TimestampMixin
-import uuid
-
-class Country(Base, TimestampMixin):
-    __tablename__ = "countries"
-
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    code: Mapped[str] = mapped_column(String(3), unique=True, nullable=False)
-    name_ar: Mapped[str] = mapped_column(String(100), nullable=False)
-    name_en: Mapped[str] = mapped_column(String(100), nullable=False)
-    continent: Mapped[str | None] = mapped_column(String(50))
-    region: Mapped[str | None] = mapped_column(String(100))
-    population: Mapped[int | None] = mapped_column(BigInteger)
-    area_km2: Mapped[float | None] = mapped_column(Numeric)
-    capital_ar: Mapped[str | None] = mapped_column(String(100))
-    capital_en: Mapped[str | None] = mapped_column(String(100))
-    flag_emoji: Mapped[str | None] = mapped_column(String(10))
-
-    # Relationships
-    borders_from: Mapped[list["Border"]] = relationship(
-        "Border", foreign_keys="Border.country_a_id", back_populates="country_a"
-    )
-    borders_to: Mapped[list["Border"]] = relationship(
-        "Border", foreign_keys="Border.country_b_id", back_populates="country_b"
-    )
-
-
-class Border(Base):
-    __tablename__ = "borders"
-
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    country_a_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("countries.id"))
-    country_b_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("countries.id"))
-    border_type: Mapped[str] = mapped_column(String(50), default="land")
-
-    # Relationships
-    country_a: Mapped["Country"] = relationship("Country", foreign_keys=[country_a_id])
-    country_b: Mapped["Country"] = relationship("Country", foreign_keys=[country_b_id])
-```
-
-```python
-# backend/app/models/question.py
-from sqlalchemy import String, Text, Enum
-from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy.dialects.postgresql import UUID, JSONB, ARRAY
-from .base import Base, TimestampMixin
-import uuid
-import enum
-
-class QuestionCategory(str, enum.Enum):
-    CAPITALS = "capitals"
-    FLAGS = "flags"
-    LANDMARKS = "landmarks"
-    ATTRACTIONS = "attractions"
-    GEOGRAPHY = "geography"
-    BORDERS = "borders"
-    POPULATION = "population"
-    ARAB_WORLD = "arab_world"
-
-class QuestionDifficulty(str, enum.Enum):
-    EASY = "easy"
-    MEDIUM = "medium"
-    HARD = "hard"
-
-class QuestionType(str, enum.Enum):
-    MULTIPLE_CHOICE = "multiple_choice"
-    AUTOCOMPLETE = "autocomplete"
-
-class Question(Base, TimestampMixin):
-    __tablename__ = "questions"
-
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    category: Mapped[QuestionCategory] = mapped_column(Enum(QuestionCategory), nullable=False)
-    difficulty: Mapped[QuestionDifficulty] = mapped_column(Enum(QuestionDifficulty), nullable=False)
-    question_type: Mapped[QuestionType] = mapped_column(Enum(QuestionType), nullable=False)
-    question_ar: Mapped[str] = mapped_column(Text, nullable=False)
-    correct_answer: Mapped[str] = mapped_column(Text, nullable=False)
-    options: Mapped[dict | None] = mapped_column(JSONB)  # For multiple choice
-    hint: Mapped[str | None] = mapped_column(Text)
-    image_url: Mapped[str | None] = mapped_column(Text)
-    tags: Mapped[list[str] | None] = mapped_column(ARRAY(String))
-```
-
-```python
-# backend/app/models/user.py
-from sqlalchemy import String, Integer, ForeignKey, Boolean
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.dialects.postgresql import UUID, JSONB
-from .base import Base, TimestampMixin
-import uuid
-
-class Profile(Base, TimestampMixin):
-    __tablename__ = "profiles"
-
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)  # Links to auth.users
-    username: Mapped[str | None] = mapped_column(String(50), unique=True)
-    display_name: Mapped[str | None] = mapped_column(String(100))
-    avatar_url: Mapped[str | None] = mapped_column(String(500))
-    current_streak: Mapped[int] = mapped_column(Integer, default=0)
-    max_streak: Mapped[int] = mapped_column(Integer, default=0)
-    games_played: Mapped[int] = mapped_column(Integer, default=0)
-    games_won: Mapped[int] = mapped_column(Integer, default=0)
-    total_questions_answered: Mapped[int] = mapped_column(Integer, default=0)
-
-    # Relationships
-    game_results: Mapped[list["GameResult"]] = relationship(back_populates="user")
-    quiz_results: Mapped[list["QuizResult"]] = relationship(back_populates="user")
-```
-
-```python
-# backend/app/models/game.py
-from sqlalchemy import Integer, Boolean, ForeignKey, Date
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.dialects.postgresql import UUID, JSONB
-from .base import Base, TimestampMixin
-import uuid
-from datetime import date
-
-class DailyChallenge(Base, TimestampMixin):
-    __tablename__ = "daily_challenges"
-
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    challenge_date: Mapped[date] = mapped_column(Date, unique=True, nullable=False)
-    start_country_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("countries.id"))
-    end_country_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("countries.id"))
-    shortest_path: Mapped[int] = mapped_column(Integer, nullable=False)
-
-    # Relationships
-    start_country: Mapped["Country"] = relationship(foreign_keys=[start_country_id])
-    end_country: Mapped["Country"] = relationship(foreign_keys=[end_country_id])
-    game_results: Mapped[list["GameResult"]] = relationship(back_populates="challenge")
-
-
-class GameResult(Base, TimestampMixin):
-    __tablename__ = "game_results"
-
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("profiles.id"))
-    challenge_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("daily_challenges.id"))
-    guesses: Mapped[dict] = mapped_column(JSONB, nullable=False)
-    total_guesses: Mapped[int] = mapped_column(Integer, nullable=False)
-    hints_used: Mapped[int] = mapped_column(Integer, default=0)
-    completed: Mapped[bool] = mapped_column(Boolean, default=False)
-    score: Mapped[int | None] = mapped_column(Integer)
-
-    # Relationships
-    user: Mapped["Profile"] = relationship(back_populates="game_results")
-    challenge: Mapped["DailyChallenge"] = relationship(back_populates="game_results")
-
-
-class QuizResult(Base, TimestampMixin):
-    __tablename__ = "quiz_results"
-
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("profiles.id"))
-    question_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("questions.id"))
-    user_answer: Mapped[str] = mapped_column(String(500), nullable=False)
-    is_correct: Mapped[bool] = mapped_column(Boolean, nullable=False)
-    hints_used: Mapped[int] = mapped_column(Integer, default=0)
-    time_taken_ms: Mapped[int | None] = mapped_column(Integer)
-
-    # Relationships
-    user: Mapped["Profile"] = relationship(back_populates="quiz_results")
-    question: Mapped["Question"] = relationship()
-```
-
 ### Key Technical Considerations
 1. **Arabic Text Processing**
    - Unicode normalization (NFKC)
@@ -1265,10 +879,10 @@ class QuizResult(Base, TimestampMixin):
 
 4. **Deployment Strategy (Later Phase)**
    - **Frontend:** Vercel (automatic from GitHub)
-   - **Backend (FastAPI):** Railway or Render (Docker deploy)
-   - **CMS (Strapi):** Railway or Render (separate service)
+   - **Backend:** Railway or Render (Docker deploy)
    - **Database:** Supabase Cloud (free tier → paid)
    - **Domain:** Custom domain with Cloudflare DNS
+
 
 ---
 

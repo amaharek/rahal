@@ -15,18 +15,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+
 WORKDIR /app
 
-# Install Python dependencies
+# Install Python dependencies with uv
 COPY pyproject.toml ./
-RUN pip install --upgrade pip && \
-    pip install .
+RUN uv pip install --system .
 
 # Development stage
 FROM base as development
 
 # Install development dependencies
-RUN pip install pytest pytest-asyncio pytest-cov httpx ruff mypy
+RUN uv pip install --system pytest pytest-asyncio pytest-cov httpx ruff mypy
 
 # Copy application code
 COPY . .
