@@ -26,6 +26,18 @@ An Arabic-first geography game platform where players discover the world through
 - Node.js 20+ (for local frontend development)
 - Python 3.11+ (for local backend development)
 
+### Database Architecture
+
+**Hybrid Approach**: This project uses a hybrid database setup:
+- **Supabase**: Authentication (GoTrue) + JWT verification + RLS policies
+- **Alembic**: Application schema management (tables, functions, triggers)
+- **FastAPI**: Direct PostgreSQL connection via SQLAlchemy (not PostgREST)
+
+**Migration Execution Order**:
+1. **Supabase migrations** (`supabase/migrations/`) - Creates auth infrastructure, roles, extensions
+2. **Alembic migrations** (`backend/alembic/versions/`) - Creates application tables
+3. **Manual RLS setup** (`supabase/migrations-manual/`) - Applied after tables exist
+
 ### Option 1: Docker (Recommended)
 
 ```bash
@@ -36,17 +48,24 @@ cd Rahal-workspace
 # Copy environment file
 cp .env.example .env
 
-# Start all services
+# Start all services (Supabase migration runs automatically)
 docker-compose up
 
-# In another terminal, seed the database
+# In another terminal, run Alembic migrations
+docker exec rahal-backend alembic upgrade head
+
+# Apply RLS policies (after Alembic creates tables)
+docker exec -i rahal-db psql -U postgres -d postgres < supabase/migrations-manual/00000000000001_rls_policies.sql
+
+# Seed the database
 make seed
 ```
 
 Access the application:
-- **Frontend**: http://localhost:3000
+- **Frontend**: http://localhost:3000 (Next.js 15.5)
 - **Backend API**: http://localhost:8000/docs
 - **Supabase Studio**: http://localhost:54323
+- **Database**: postgresql://postgres:postgres@localhost:54322/postgres
 
 ### Option 2: Manual Setup
 
@@ -68,8 +87,11 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 # Install dependencies
 pip install -e .
 
-# Run migrations
+# Run Alembic migrations (creates application tables)
 alembic upgrade head
+
+# Apply RLS policies from manual migrations
+psql -U postgres -h localhost -p 54322 -d postgres < ../supabase/migrations-manual/00000000000001_rls_policies.sql
 
 # Seed database
 python ../scripts/seed_database.py
@@ -112,6 +134,8 @@ Rahal-workspace/
 ├── data/                   # Seed data (countries, borders, questions)
 ├── scripts/                # Utility scripts
 ├── supabase/              # Supabase configuration
+│   ├── migrations/        # Auto-run: Auth setup only
+│   └── migrations-manual/ # Manual: RLS policies (run after Alembic)
 └── docker-compose.yml     # Docker services
 ```
 

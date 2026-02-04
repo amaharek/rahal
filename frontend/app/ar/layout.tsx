@@ -32,7 +32,7 @@ export default async function ArabicLayout({
   const messages = await getMessages();
 
   return (
-    <html lang="ar" dir="rtl" className={ibmPlexArabic.variable}>
+    <html lang="ar" dir="rtl" className={ibmPlexArabic.variable} suppressHydrationWarning>
       <body className="font-arabic bg-background text-text-primary min-h-screen">
         <NextIntlClientProvider messages={messages}>
           <Providers>{children}</Providers>

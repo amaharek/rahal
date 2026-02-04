@@ -94,7 +94,7 @@ migrate-new:
 	cd backend && alembic revision --autogenerate -m "$$name"
 
 seed:
-	cd backend && python ../scripts/seed_database.py
+	cd backend && uv run python ../scripts/seed_database.py
 
 db-reset:
 	docker-compose down -v

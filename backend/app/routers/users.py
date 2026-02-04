@@ -4,7 +4,7 @@ User-related API endpoints.
 
 from fastapi import APIRouter, HTTPException, status
 
-from app.core.deps import DBSession, CurrentUser
+from app.core.deps import DBSession, CurrentUser, OptionalUser
 from app.crud.user import profile_crud, user_achievement_crud
 from app.schemas.user import (
     AchievementResponse,
@@ -128,7 +128,7 @@ async def get_user_achievements(
 @router.get("/leaderboard", response_model=LeaderboardResponse)
 async def get_leaderboard(
     db: DBSession,
-    current_user: CurrentUser | None = None,
+    current_user: OptionalUser = None,
     type: str = "max_streak",
     limit: int = 100,
 ):

@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: 'class',
   content: [
     './app/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -37,13 +38,13 @@ module.exports = {
         warning: '#F39C12',
         error: '#E74C3C',
         info: '#3498DB',
-        // Neutral Colors
-        background: '#FAFAFA',
-        surface: '#FFFFFF',
-        border: '#E0E0E0',
-        'text-primary': '#1A1A1A',
-        'text-secondary': '#666666',
-        'text-muted': '#999999',
+        // Neutral Colors (using CSS variables for dark mode support)
+        background: 'var(--color-background)',
+        surface: 'var(--color-surface)',
+        border: 'var(--color-border)',
+        'text-primary': 'var(--color-text-primary)',
+        'text-secondary': 'var(--color-text-secondary)',
+        'text-muted': 'var(--color-text-muted)',
       },
       borderRadius: {
         'xl': '1rem',

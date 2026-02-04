@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Rahal Database Seeding Script
-Seeds countries, borders, questions, and achievements.
+Seeds countries, borders, questions, achievements, daily challenges, and daily quizzes.
 
 Usage:
     cd backend
@@ -12,6 +12,7 @@ Usage:
 import asyncio
 import json
 import os
+import random
 import re
 import sys
 import unicodedata
@@ -160,7 +161,7 @@ async def seed_database():
                         options, hint, tags, is_active)
                     VALUES (:category, :difficulty, :question_type,
                         :question_ar, :correct_answer, :correct_answer_normalized,
-                        :options::jsonb, :hint, :tags, true)
+                        CAST(:options AS jsonb), :hint, :tags, true)
                 """),
                 {
                     "category": q["category"],
@@ -207,39 +208,97 @@ async def seed_database():
         await session.commit()
         print(f"✅ Seeded {len(achievements)} achievements\n")
 
-        # Create sample daily challenge
-        print("📅 Creating sample daily challenge...")
+        # Create multiple daily challenges
+        print("📅 Creating daily challenges...")
         today = date.today()
+        
+        # Get all country IDs for random selection
+        result = await session.execute(text("SELECT id, code FROM countries"))
+        all_countries = {row[1]: row[0] for row in result.fetchall()}
+        country_codes = list(all_countries.keys())
+        
+        # Generate challenges for 60 days (30 past, 30 future)
+        challenges_created = 0
+        for days_offset in range(-30, 31):
+            challenge_date = today + timedelta(days=days_offset)
+            
+            # Select random start and end countries
+            start_code = random.choice(country_codes)
+            end_code = random.choice([c for c in country_codes if c != start_code])
+            
+            start_id = all_countries[start_code]
+            end_id = all_countries[end_code]
+            
+            # Estimate shortest path (simplified - between 1 and 6)
+            shortest_path = random.randint(2, 6)
+            
+            try:
+                await session.execute(
+                    text("""
+                        INSERT INTO daily_challenges (challenge_date, start_country_id, end_country_id, shortest_path)
+                        VALUES (:challenge_date, :start_id, :end_id, :shortest_path)
+                        ON CONFLICT (challenge_date) DO NOTHING
+                    """),
+                    {
+                        "challenge_date": challenge_date,
+                        "start_id": start_id,
+                        "end_id": end_id,
+                        "shortest_path": shortest_path,
+                    }
+                )
+                challenges_created += 1
+            except Exception as e:
+                print(f"  ⚠ Error creating challenge for {challenge_date}: {e}")
+        
+        await session.commit()
+        print(f"✅ Created {challenges_created} daily challenges (from {today - timedelta(days=30)} to {today + timedelta(days=30)})\n")
 
-        # Get two countries for challenge
-        result = await session.execute(
-            text("SELECT id FROM countries WHERE code = 'SAU'")
-        )
-        start_id = result.scalar()
-
-        result = await session.execute(
-            text("SELECT id FROM countries WHERE code = 'EGY'")
-        )
-        end_id = result.scalar()
-
-        if start_id and end_id:
-            await session.execute(
-                text("""
-                    INSERT INTO daily_challenges (challenge_date, start_country_id, end_country_id, shortest_path)
-                    VALUES (:challenge_date, :start_id, :end_id, :shortest_path)
-                    ON CONFLICT (challenge_date) DO NOTHING
-                """),
-                {
-                    "challenge_date": today,
-                    "start_id": start_id,
-                    "end_id": end_id,
-                    "shortest_path": 3,  # SAU -> JOR -> ISR/PSE -> EGY
-                }
-            )
+        # Create daily quizzes
+        print("🧩 Creating daily quizzes...")
+        
+        # Get all question IDs
+        result = await session.execute(text("SELECT id FROM questions"))
+        all_question_ids = [row[0] for row in result.fetchall()]
+        
+        if len(all_question_ids) < 5:
+            print("  ⚠ Not enough questions to create quizzes (need at least 5)")
+        else:
+            quizzes_created = 0
+            for days_offset in range(-30, 31):
+                quiz_date = today + timedelta(days=days_offset)
+                
+                # Select 5 random questions for this quiz
+                selected_questions = random.sample(all_question_ids, min(5, len(all_question_ids)))
+                
+                for idx, question_id in enumerate(selected_questions, 1):
+                    try:
+                        await session.execute(
+                            text("""
+                                INSERT INTO daily_quizzes (quiz_date, question_id, question_order)
+                                VALUES (:quiz_date, :question_id, :question_order)
+                                ON CONFLICT (quiz_date, question_id) DO NOTHING
+                            """),
+                            {
+                                "quiz_date": quiz_date,
+                                "question_id": question_id,
+                                "question_order": idx,
+                            }
+                        )
+                        quizzes_created += 1
+                    except Exception as e:
+                        print(f"  ⚠ Error creating quiz for {quiz_date}: {e}")
+            
             await session.commit()
-            print(f"✅ Created daily challenge for {today}\n")
+            print(f"✅ Created {quizzes_created} daily quiz entries (5 questions per day for 61 days)\n")
 
     print("🎉 Database seeding complete!")
+    print("\n📊 Summary:")
+    print(f"  • Countries: Loaded from data/countries.json")
+    print(f"  • Borders: Loaded from data/borders.json")
+    print(f"  • Questions: Loaded from data/questions/sample_questions.json")
+    print(f"  • Achievements: 5 predefined achievements")
+    print(f"  • Daily Challenges: 61 days (30 past + today + 30 future)")
+    print(f"  • Daily Quizzes: 61 days × 5 questions = 305 entries")
 
 
 if __name__ == "__main__":

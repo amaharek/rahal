@@ -148,6 +148,332 @@
       "options": ["لا توجد", "قطر", "البحرين", "الكويت"],
       "hint": "جميع دول الخليج ساحلية",
       "tags": ["arab_world", "gulf", "geography"]
+    },
+    {
+      "category": "capitals",
+      "difficulty": "medium",
+      "question_type": "multiple_choice",
+      "question_ar": "ما هي عاصمة سوريا؟",
+      "correct_answer": "دمشق",
+      "options": ["دمشق", "حلب", "حمص", "اللاذقية"],
+      "hint": "أقدم عاصمة مأهولة في العالم",
+      "tags": ["arab_world", "middle_east", "capitals"]
+    },
+    {
+      "category": "capitals",
+      "difficulty": "easy",
+      "question_type": "autocomplete",
+      "question_ar": "ما هي عاصمة الكويت؟",
+      "correct_answer": "الكويت",
+      "hint": "نفس اسم الدولة",
+      "tags": ["arab_world", "gulf", "capitals"]
+    },
+    {
+      "category": "capitals",
+      "difficulty": "medium",
+      "question_type": "multiple_choice",
+      "question_ar": "ما هي عاصمة العراق؟",
+      "correct_answer": "بغداد",
+      "options": ["بغداد", "البصرة", "الموصل", "أربيل"],
+      "hint": "على نهر دجلة",
+      "tags": ["arab_world", "middle_east", "capitals"]
+    },
+    {
+      "category": "capitals",
+      "difficulty": "hard",
+      "question_type": "autocomplete",
+      "question_ar": "ما هي عاصمة موريتانيا؟",
+      "correct_answer": "نواكشوط",
+      "hint": "تقع على الساحل الأطلسي",
+      "tags": ["arab_world", "africa", "capitals"]
+    },
+    {
+      "category": "capitals",
+      "difficulty": "medium",
+      "question_type": "multiple_choice",
+      "question_ar": "ما هي عاصمة الأردن؟",
+      "correct_answer": "عمّان",
+      "options": ["عمّان", "إربد", "الزرقاء", "العقبة"],
+      "hint": "مدينة التلال السبعة",
+      "tags": ["arab_world", "middle_east", "capitals"]
+    },
+    {
+      "category": "flags",
+      "difficulty": "medium",
+      "question_type": "multiple_choice",
+      "question_ar": "لأي دولة ينتمي هذا العلم؟ 🇦🇪",
+      "correct_answer": "الإمارات",
+      "options": ["الإمارات", "الكويت", "السودان", "اليمن"],
+      "hint": "اتحاد سبع إمارات",
+      "tags": ["flags", "arab_world", "gulf"]
+    },
+    {
+      "category": "flags",
+      "difficulty": "easy",
+      "question_type": "multiple_choice",
+      "question_ar": "لأي دولة ينتمي هذا العلم؟ 🇯🇴",
+      "correct_answer": "الأردن",
+      "options": ["الأردن", "فلسطين", "السودان", "اليمن"],
+      "hint": "تحتوي على نجمة بيضاء",
+      "tags": ["flags", "arab_world", "middle_east"]
+    },
+    {
+      "category": "flags",
+      "difficulty": "hard",
+      "question_type": "multiple_choice",
+      "question_ar": "لأي دولة ينتمي هذا العلم؟ 🇲🇦",
+      "correct_answer": "المغرب",
+      "options": ["المغرب", "تونس", "الجزائر", "ليبيا"],
+      "hint": "نجمة خضراء على خلفية حمراء",
+      "tags": ["flags", "arab_world", "north_africa"]
+    },
+    {
+      "category": "geography",
+      "difficulty": "medium",
+      "question_type": "multiple_choice",
+      "question_ar": "أي دولة عربية تقع في قارتين؟",
+      "correct_answer": "مصر",
+      "options": ["مصر", "تركيا", "السودان", "ليبيا"],
+      "hint": "قناة السويس تفصل بين آسيا وأفريقيا",
+      "tags": ["geography", "arab_world", "continents"]
+    },
+    {
+      "category": "geography",
+      "difficulty": "easy",
+      "question_type": "multiple_choice",
+      "question_ar": "ما هي أصغر دولة عربية مساحة؟",
+      "correct_answer": "البحرين",
+      "options": ["البحرين", "الكويت", "قطر", "لبنان"],
+      "hint": "دولة جزيرة في الخليج",
+      "tags": ["geography", "arab_world", "area"]
+    },
+    {
+      "category": "geography",
+      "difficulty": "medium",
+      "question_type": "multiple_choice",
+      "question_ar": "أي دولة خليجية لها حدود مع عمان واليمن؟",
+      "correct_answer": "السعودية",
+      "options": ["السعودية", "الإمارات", "قطر", "الكويت"],
+      "hint": "أكبر دولة في شبه الجزيرة العربية",
+      "tags": ["geography", "arab_world", "gulf"]
+    },
+    {
+      "category": "borders",
+      "difficulty": "easy",
+      "question_type": "multiple_choice",
+      "question_ar": "أي دولة تحد الأردن من الشمال؟",
+      "correct_answer": "سوريا",
+      "options": ["سوريا", "العراق", "السعودية", "لبنان"],
+      "hint": "عاصمتها دمشق",
+      "tags": ["borders", "arab_world", "middle_east"]
+    },
+    {
+      "category": "borders",
+      "difficulty": "hard",
+      "question_type": "multiple_choice",
+      "question_ar": "كم دولة تحد الجزائر؟",
+      "correct_answer": "7",
+      "options": ["7", "5", "6", "8"],
+      "hint": "أكبر دولة أفريقية",
+      "tags": ["borders", "arab_world", "north_africa"]
+    },
+    {
+      "category": "borders",
+      "difficulty": "medium",
+      "question_type": "multiple_choice",
+      "question_ar": "أي دولة عربية لا تحدها أي دولة عربية أخرى؟",
+      "correct_answer": "موريتانيا",
+      "options": ["موريتانيا", "جزر القمر", "جيبوتي", "الصومال"],
+      "hint": "على الساحل الغربي لأفريقيا",
+      "tags": ["borders", "arab_world", "geography"]
+    },
+    {
+      "category": "landmarks",
+      "difficulty": "medium",
+      "question_type": "multiple_choice",
+      "question_ar": "أين تقع البتراء؟",
+      "correct_answer": "الأردن",
+      "options": ["الأردن", "السعودية", "مصر", "اليمن"],
+      "hint": "المدينة الوردية",
+      "tags": ["landmarks", "arab_world", "jordan"]
+    },
+    {
+      "category": "landmarks",
+      "difficulty": "easy",
+      "question_type": "multiple_choice",
+      "question_ar": "أين يقع المسجد الأقصى؟",
+      "correct_answer": "فلسطين",
+      "options": ["فلسطين", "الأردن", "السعودية", "سوريا"],
+      "hint": "في القدس",
+      "tags": ["landmarks", "arab_world", "palestine"]
+    },
+    {
+      "category": "landmarks",
+      "difficulty": "medium",
+      "question_type": "multiple_choice",
+      "question_ar": "أين تقع تدمر؟",
+      "correct_answer": "سوريا",
+      "options": ["سوريا", "الأردن", "العراق", "لبنان"],
+      "hint": "مدينة أثرية في الصحراء",
+      "tags": ["landmarks", "arab_world", "syria"]
+    },
+    {
+      "category": "population",
+      "difficulty": "medium",
+      "question_type": "multiple_choice",
+      "question_ar": "أي دولة خليجية الأكثر سكاناً؟",
+      "correct_answer": "السعودية",
+      "options": ["السعودية", "الإمارات", "الكويت", "عمان"],
+      "hint": "أكثر من 35 مليون نسمة",
+      "tags": ["population", "arab_world", "gulf"]
+    },
+    {
+      "category": "population",
+      "difficulty": "hard",
+      "question_type": "multiple_choice",
+      "question_ar": "أي دولة عربية الأقل سكاناً؟",
+      "correct_answer": "جزر القمر",
+      "options": ["جزر القمر", "البحرين", "قطر", "جيبوتي"],
+      "hint": "دولة جزيرة في المحيط الهندي",
+      "tags": ["population", "arab_world"]
+    },
+    {
+      "category": "arab_world",
+      "difficulty": "medium",
+      "question_type": "multiple_choice",
+      "question_ar": "متى تأسست جامعة الدول العربية؟",
+      "correct_answer": "1945",
+      "options": ["1945", "1948", "1952", "1960"],
+      "hint": "بعد الحرب العالمية الثانية مباشرة",
+      "tags": ["arab_world", "history"]
+    },
+    {
+      "category": "arab_world",
+      "difficulty": "easy",
+      "question_type": "multiple_choice",
+      "question_ar": "أي دولة عربية عضو في مجموعة العشرين G20؟",
+      "correct_answer": "السعودية",
+      "options": ["السعودية", "الإمارات", "مصر", "قطر"],
+      "hint": "أكبر منتج للنفط",
+      "tags": ["arab_world", "economy"]
+    },
+    {
+      "category": "geography",
+      "difficulty": "hard",
+      "question_type": "multiple_choice",
+      "question_ar": "ما هي أعلى قمة جبلية في العالم العربي؟",
+      "correct_answer": "جبل توبقال",
+      "options": ["جبل توبقال", "جبل كاترين", "جبل شمس", "جبل موسى"],
+      "hint": "في المغرب",
+      "tags": ["geography", "arab_world", "mountains"]
+    },
+    {
+      "category": "geography",
+      "difficulty": "medium",
+      "question_type": "multiple_choice",
+      "question_ar": "ما هي أكبر صحراء في العالم؟",
+      "correct_answer": "الصحراء الكبرى",
+      "options": ["الصحراء الكبرى", "الربع الخالي", "صحراء النفود", "صحراء سيناء"],
+      "hint": "تغطي شمال أفريقيا",
+      "tags": ["geography", "world", "deserts"]
+    },
+    {
+      "category": "capitals",
+      "difficulty": "hard",
+      "question_type": "autocomplete",
+      "question_ar": "ما هي عاصمة الصومال؟",
+      "correct_answer": "مقديشو",
+      "hint": "على الساحل الشرقي لأفريقيا",
+      "tags": ["arab_world", "africa", "capitals"]
+    },
+    {
+      "category": "capitals",
+      "difficulty": "medium",
+      "question_type": "multiple_choice",
+      "question_ar": "ما هي عاصمة ليبيا؟",
+      "correct_answer": "طرابلس",
+      "options": ["طرابلس", "بنغازي", "مصراتة", "سرت"],
+      "hint": "على ساحل البحر المتوسط",
+      "tags": ["arab_world", "north_africa", "capitals"]
+    },
+    {
+      "category": "capitals",
+      "difficulty": "easy",
+      "question_type": "autocomplete",
+      "question_ar": "ما هي عاصمة فلسطين؟",
+      "correct_answer": "القدس",
+      "hint": "مدينة مقدسة للديانات الثلاث",
+      "tags": ["arab_world", "middle_east", "capitals"]
+    },
+    {
+      "category": "flags",
+      "difficulty": "medium",
+      "question_type": "multiple_choice",
+      "question_ar": "لأي دولة ينتمي هذا العلم؟ 🇮🇶",
+      "correct_answer": "العراق",
+      "options": ["العراق", "سوريا", "اليمن", "مصر"],
+      "hint": "ثلاثة ألوان أفقية مع نجوم",
+      "tags": ["flags", "arab_world", "middle_east"]
+    },
+    {
+      "category": "flags",
+      "difficulty": "hard",
+      "question_type": "multiple_choice",
+      "question_ar": "لأي دولة ينتمي هذا العلم؟ 🇱🇧",
+      "correct_answer": "لبنان",
+      "options": ["لبنان", "الأردن", "العراق", "سوريا"],
+      "hint": "يحتوي على شجرة الأرز",
+      "tags": ["flags", "arab_world", "middle_east"]
+    },
+    {
+      "category": "geography",
+      "difficulty": "easy",
+      "question_type": "multiple_choice",
+      "question_ar": "أي بحر يفصل مصر عن السعودية؟",
+      "correct_answer": "البحر الأحمر",
+      "options": ["البحر الأحمر", "البحر المتوسط", "الخليج العربي", "بحر العرب"],
+      "hint": "يربط بين أفريقيا وآسيا",
+      "tags": ["geography", "arab_world", "seas"]
+    },
+    {
+      "category": "landmarks",
+      "difficulty": "hard",
+      "question_type": "multiple_choice",
+      "question_ar": "أين يقع قصر الحمراء؟",
+      "correct_answer": "إسبانيا",
+      "options": ["إسبانيا", "المغرب", "مصر", "سوريا"],
+      "hint": "في غرناطة، أثر إسلامي",
+      "tags": ["landmarks", "world", "history"]
+    },
+    {
+      "category": "geography",
+      "difficulty": "medium",
+      "question_type": "multiple_choice",
+      "question_ar": "ما هي أطول سلسلة جبلية في العالم؟",
+      "correct_answer": "جبال الأنديز",
+      "options": ["جبال الأنديز", "جبال الهيمالايا", "جبال الألب", "جبال روكي"],
+      "hint": "في أمريكا الجنوبية",
+      "tags": ["geography", "world", "mountains"]
+    },
+    {
+      "category": "arab_world",
+      "difficulty": "hard",
+      "question_type": "multiple_choice",
+      "question_ar": "أي دولة عربية لها أطول ساحل على البحر المتوسط؟",
+      "correct_answer": "ليبيا",
+      "options": ["ليبيا", "مصر", "الجزائر", "المغرب"],
+      "hint": "أكثر من 1700 كم",
+      "tags": ["geography", "arab_world", "coastline"]
+    },
+    {
+      "category": "borders",
+      "difficulty": "medium",
+      "question_type": "multiple_choice",
+      "question_ar": "أي دولة تحد لبنان من الشرق؟",
+      "correct_answer": "سوريا",
+      "options": ["سوريا", "فلسطين", "الأردن", "العراق"],
+      "hint": "عاصمتها دمشق",
+      "tags": ["borders", "arab_world", "middle_east"]
     }
   ]
 }

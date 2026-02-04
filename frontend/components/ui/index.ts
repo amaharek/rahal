@@ -8,3 +8,4 @@ export {
   CardContent,
   CardFooter,
 } from './Card';
+export { ThemeToggle, ThemeSelector } from './ThemeToggle';

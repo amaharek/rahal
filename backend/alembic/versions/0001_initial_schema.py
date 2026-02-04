@@ -171,9 +171,9 @@ def upgrade() -> None:
         sa.Column('start_country_id', sa.UUID(), nullable=False),
         sa.Column('end_country_id', sa.UUID(), nullable=False),
         sa.Column('shortest_path', sa.Integer(), nullable=False),
-        sa.Column('hint_countries', postgresql.ARRAY(sa.UUID()), server_default='{}', nullable=True),
-        sa.Column('difficulty', sa.String(20), server_default='medium', nullable=True),
+        sa.Column('solution_path', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
+        sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
         sa.ForeignKeyConstraint(['start_country_id'], ['countries.id']),
         sa.ForeignKeyConstraint(['end_country_id'], ['countries.id']),
         sa.PrimaryKeyConstraint('id'),
@@ -185,55 +185,54 @@ def upgrade() -> None:
     op.create_table(
         'game_results',
         sa.Column('id', sa.UUID(), server_default=sa.text('uuid_generate_v4()'), nullable=False),
-        sa.Column('profile_id', sa.UUID(), nullable=True),
+        sa.Column('user_id', sa.UUID(), nullable=True),
         sa.Column('challenge_id', sa.UUID(), nullable=False),
         sa.Column('guesses', postgresql.JSONB(astext_type=sa.Text()), server_default='[]', nullable=False),
         sa.Column('total_guesses', sa.Integer(), nullable=False),
         sa.Column('hints_used', sa.Integer(), server_default='0', nullable=True),
-        sa.Column('score', sa.Integer(), nullable=False),
+        sa.Column('score', sa.Integer(), nullable=True),
         sa.Column('completed', sa.Boolean(), server_default='false', nullable=True),
-        sa.Column('completed_at', sa.DateTime(timezone=True), nullable=True),
+        sa.Column('played_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
         sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
-        sa.ForeignKeyConstraint(['profile_id'], ['profiles.id'], ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(['user_id'], ['profiles.id'], ondelete='CASCADE'),
         sa.ForeignKeyConstraint(['challenge_id'], ['daily_challenges.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id')
     )
-    op.create_index('idx_game_results_profile', 'game_results', ['profile_id'])
+    op.create_index('idx_game_results_user', 'game_results', ['user_id'])
     op.create_index('idx_game_results_challenge', 'game_results', ['challenge_id'])
     op.create_index('idx_game_results_score', 'game_results', [sa.text('score DESC')])
-    op.execute('CREATE UNIQUE INDEX idx_game_results_profile_challenge ON game_results (profile_id, challenge_id) WHERE profile_id IS NOT NULL')
+    op.execute('CREATE UNIQUE INDEX idx_game_results_user_challenge ON game_results (user_id, challenge_id) WHERE user_id IS NOT NULL')
 
     # Quiz results table
     op.create_table(
         'quiz_results',
         sa.Column('id', sa.UUID(), server_default=sa.text('uuid_generate_v4()'), nullable=False),
-        sa.Column('profile_id', sa.UUID(), nullable=True),
-        sa.Column('session_id', sa.UUID(), nullable=False),
-        sa.Column('category', sa.String(50), nullable=True),
-        sa.Column('difficulty', sa.String(20), nullable=True),
-        sa.Column('total_questions', sa.Integer(), nullable=False),
-        sa.Column('correct_answers', sa.Integer(), nullable=False),
-        sa.Column('score', sa.Integer(), nullable=False),
-        sa.Column('answers', postgresql.JSONB(astext_type=sa.Text()), server_default='[]', nullable=False),
-        sa.Column('completed_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
-        sa.ForeignKeyConstraint(['profile_id'], ['profiles.id'], ondelete='CASCADE'),
+        sa.Column('user_id', sa.UUID(), nullable=True),
+        sa.Column('question_id', sa.UUID(), nullable=False),
+        sa.Column('user_answer', sa.Text(), nullable=False),
+        sa.Column('is_correct', sa.Boolean(), nullable=False),
+        sa.Column('hints_used', sa.Integer(), server_default='0', nullable=True),
+        sa.Column('time_taken_ms', sa.Integer(), nullable=True),
+        sa.Column('answered_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
+        sa.ForeignKeyConstraint(['user_id'], ['profiles.id'], ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(['question_id'], ['questions.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id')
     )
-    op.create_index('idx_quiz_results_profile', 'quiz_results', ['profile_id'])
-    op.create_index('idx_quiz_results_session', 'quiz_results', ['session_id'])
-    op.create_index('idx_quiz_results_category', 'quiz_results', ['category'])
+    op.create_index('idx_quiz_results_user', 'quiz_results', ['user_id'])
+    op.create_index('idx_quiz_results_question', 'quiz_results', ['question_id'])
 
     # Daily quizzes table
     op.create_table(
         'daily_quizzes',
         sa.Column('id', sa.UUID(), server_default=sa.text('uuid_generate_v4()'), nullable=False),
         sa.Column('quiz_date', sa.Date(), nullable=False),
-        sa.Column('questions', postgresql.ARRAY(sa.UUID()), nullable=False),
-        sa.Column('category', sa.String(50), nullable=True),
+        sa.Column('question_id', sa.UUID(), nullable=False),
+        sa.Column('question_order', sa.Integer(), nullable=False),
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
+        sa.ForeignKeyConstraint(['question_id'], ['questions.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id'),
-        sa.UniqueConstraint('quiz_date')
+        sa.UniqueConstraint('quiz_date', 'question_id', name='unique_quiz_date_question')
     )
     op.create_index('idx_daily_quizzes_date', 'daily_quizzes', [sa.text('quiz_date DESC')])
 
@@ -249,7 +248,7 @@ def upgrade() -> None:
     ''')
 
     # Create triggers for updated_at
-    for table in ['countries', 'questions', 'profiles', 'game_results']:
+    for table in ['countries', 'questions', 'profiles', 'game_results', 'daily_challenges']:
         op.execute(f'''
             CREATE TRIGGER update_{table}_updated_at
                 BEFORE UPDATE ON {table}

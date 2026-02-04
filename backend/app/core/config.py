@@ -27,15 +27,15 @@ class Settings(BaseSettings):
     BACKEND_HOST: str = "0.0.0.0"
     BACKEND_PORT: int = 8000
 
-    # Database
+    # Database (Direct PostgreSQL connection)
     DATABASE_URL: str = "postgresql://postgres:postgres@127.0.0.1:54322/postgres"
     DATABASE_URL_ASYNC: str = "postgresql+asyncpg://postgres:postgres@127.0.0.1:54322/postgres"
 
-    # Supabase
+    # Supabase (Auth only - FastAPI connects directly to DB, not via PostgREST)
     SUPABASE_URL: str = "http://127.0.0.1:54321"
-    SUPABASE_ANON_KEY: str = ""
-    SUPABASE_SERVICE_ROLE_KEY: str = ""
-    SUPABASE_JWT_SECRET: str = "super-secret-jwt-token-with-at-least-32-characters-long"
+    SUPABASE_ANON_KEY: str = ""  # For client-side API calls
+    SUPABASE_SERVICE_ROLE_KEY: str = ""  # For server-side admin operations
+    SUPABASE_JWT_SECRET: str = "super-secret-jwt-token-with-at-least-32-characters-long"  # For JWT verification
 
     # CORS
     ALLOWED_ORIGINS: str = "http://localhost:3000,http://127.0.0.1:3000"
