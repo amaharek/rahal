@@ -1,5 +1,13 @@
 # Rahal Testing Documentation - Overview
 
+## 🌍 Locale-Agnostic Testing
+
+All frontend tests use **locale-agnostic approaches** to prevent breaking when translations change. Tests use `data-testid`, semantic queries, and translation keys instead of hardcoded text.
+
+**📖 Full Guide**: [Locale-Agnostic Testing](./LOCALE_AGNOSTIC_TESTING.md)
+
+---
+
 ## Table of Contents
 1. [Introduction](#introduction)
 2. [Testing Philosophy](#testing-philosophy)
