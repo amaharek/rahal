@@ -6,7 +6,7 @@ from datetime import date
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import and_, desc, func, select
+from sqlalchemy import Integer, and_, desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -261,7 +261,7 @@ class CRUDQuizResult(CRUDBase[QuizResult, QuizResult, QuizResult]):
             select(
                 Question.category,
                 func.count(QuizResult.id),
-                func.sum(QuizResult.is_correct.cast(int)),
+                func.sum(QuizResult.is_correct.cast(Integer)),
             )
             .join(Question)
             .where(QuizResult.user_id == user_id)
@@ -282,7 +282,7 @@ class CRUDQuizResult(CRUDBase[QuizResult, QuizResult, QuizResult]):
             select(
                 Question.difficulty,
                 func.count(QuizResult.id),
-                func.sum(QuizResult.is_correct.cast(int)),
+                func.sum(QuizResult.is_correct.cast(Integer)),
             )
             .join(Question)
             .where(QuizResult.user_id == user_id)

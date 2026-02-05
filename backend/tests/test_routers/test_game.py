@@ -57,7 +57,7 @@ class TestGetDailyChallenge:
     @pytest.mark.asyncio
     async def test_get_todays_challenge_success(
         self,
-        async_async_client: AsyncClient,
+        async_client: AsyncClient,
         sample_challenge: DailyChallenge,
     ):
         """Test getting today's challenge without auth."""
@@ -215,15 +215,17 @@ class TestSubmitGuess:
         db_session,
         sample_challenge: DailyChallenge,
         sample_countries: list[Country],
+        sample_user,
+        auth_headers: dict,
     ):
         """Test that duplicate guesses are rejected."""
         jordan = sample_countries[3]
-        
+
         # Create existing game result with Jordan already guessed
         game_result = GameResult(
             id=uuid4(),
             challenge_id=sample_challenge.id,
-            user_id=None,  # Guest
+            user_id=sample_user.id,
             guesses=[
                 {
                     "country_id": str(jordan.id),
@@ -235,16 +237,17 @@ class TestSubmitGuess:
         )
         db_session.add(game_result)
         await db_session.commit()
-        
+
         # Try to guess Jordan again
         response = await async_client.post(
             "/api/game/guess",
+            headers=auth_headers,
             json={
                 "challenge_id": str(sample_challenge.id),
                 "country_id": str(jordan.id),
             }
         )
-        
+
         assert response.status_code == 400
         assert "خمنت هذه الدولة" in response.json()["detail"]
     
@@ -255,15 +258,17 @@ class TestSubmitGuess:
         db_session,
         sample_challenge: DailyChallenge,
         sample_countries: list[Country],
+        sample_user,
+        auth_headers: dict,
     ):
         """Test that guesses after completion are rejected."""
         sudan = sample_countries[1]
-        
+
         # Create completed game result
         game_result = GameResult(
             id=uuid4(),
             challenge_id=sample_challenge.id,
-            user_id=None,
+            user_id=sample_user.id,
             guesses=[{"country_id": str(sudan.id), "emoji": "🟢", "order": 1}],
             completed=True,
             total_guesses=1,
@@ -271,17 +276,18 @@ class TestSubmitGuess:
         )
         db_session.add(game_result)
         await db_session.commit()
-        
+
         # Try to guess again
         jordan = sample_countries[3]
         response = await async_client.post(
             "/api/game/guess",
+            headers=auth_headers,
             json={
                 "challenge_id": str(sample_challenge.id),
                 "country_id": str(jordan.id),
             }
         )
-        
+
         assert response.status_code == 400
         assert "أكملت هذا التحدي" in response.json()["detail"]
     
@@ -310,14 +316,17 @@ class TestSubmitGuess:
         async_client: AsyncClient,
         sample_challenge: DailyChallenge,
         sample_countries: list[Country],
+        sample_user,
+        auth_headers: dict,
     ):
         """Test that multiple guesses are tracked in order."""
         jordan = sample_countries[3]
         syria = sample_countries[4]
-        
-        # First guess
+
+        # First guess (authenticated so state persists)
         response1 = await async_client.post(
             "/api/game/guess",
+            headers=auth_headers,
             json={
                 "challenge_id": str(sample_challenge.id),
                 "country_id": str(jordan.id),
@@ -325,10 +334,11 @@ class TestSubmitGuess:
         )
         assert response1.status_code == 200
         assert response1.json()["total_guesses"] == 1
-        
+
         # Second guess
         response2 = await async_client.post(
             "/api/game/guess",
+            headers=auth_headers,
             json={
                 "challenge_id": str(sample_challenge.id),
                 "country_id": str(syria.id),
@@ -411,19 +421,22 @@ class TestUseHint:
         self,
         async_client: AsyncClient,
         sample_challenge: DailyChallenge,
+        sample_user,
+        auth_headers: dict,
     ):
         """Test using all three hints."""
         hint_types = ["border_hint", "all_borders_hint", "first_letter_hint"]
-        
+
         for i, hint_type in enumerate(hint_types):
             response = await async_client.post(
                 "/api/game/hint",
+                headers=auth_headers,
                 json={
                     "challenge_id": str(sample_challenge.id),
                     "hint_type": hint_type,
                 }
             )
-            
+
             assert response.status_code == 200
             data = response.json()
             assert data["hints_remaining"] == 2 - i
@@ -434,27 +447,30 @@ class TestUseHint:
         async_client: AsyncClient,
         db_session,
         sample_challenge: DailyChallenge,
+        sample_user,
+        auth_headers: dict,
     ):
         """Test that using more than 3 hints is rejected."""
         # Create game result with 3 hints already used
         game_result = GameResult(
             id=uuid4(),
             challenge_id=sample_challenge.id,
-            user_id=None,
+            user_id=sample_user.id,
             guesses=[],
             hints_used=3,
         )
         db_session.add(game_result)
         await db_session.commit()
-        
+
         response = await async_client.post(
             "/api/game/hint",
+            headers=auth_headers,
             json={
                 "challenge_id": str(sample_challenge.id),
                 "hint_type": "border_hint",
             }
         )
-        
+
         assert response.status_code == 400
         assert "جميع التلميحات" in response.json()["detail"]
     
@@ -464,27 +480,30 @@ class TestUseHint:
         async_client: AsyncClient,
         db_session,
         sample_challenge: DailyChallenge,
+        sample_user,
+        auth_headers: dict,
     ):
         """Test that hints cannot be used after completion."""
         game_result = GameResult(
             id=uuid4(),
             challenge_id=sample_challenge.id,
-            user_id=None,
+            user_id=sample_user.id,
             guesses=[{"country_id": str(uuid4()), "emoji": "🟢", "order": 1}],
             completed=True,
             score=1000,
         )
         db_session.add(game_result)
         await db_session.commit()
-        
+
         response = await async_client.post(
             "/api/game/hint",
+            headers=auth_headers,
             json={
                 "challenge_id": str(sample_challenge.id),
                 "hint_type": "border_hint",
             }
         )
-        
+
         assert response.status_code == 400
         assert "أكملت هذا التحدي" in response.json()["detail"]
     
@@ -717,4 +736,5 @@ class TestGameFlow:
         assert response.status_code == 200
         data = response.json()
         assert data["user_progress"] is not None
-        assert data["user_progress"]["total_guesses"] == 1
+        assert len(data["user_progress"]["guesses"]) == 1
+        assert data["user_progress"]["completed"] is False

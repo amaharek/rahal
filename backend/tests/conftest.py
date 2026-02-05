@@ -10,15 +10,17 @@ from uuid import uuid4
 
 import pytest
 from fastapi.testclient import TestClient
-from httpx import AsyncClient
+from httpx import ASGITransport, AsyncClient
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.pool import NullPool
 
 from app.core.config import settings
-from app.core.database import Base, get_db
+from app.core.database import get_db
+from app.models.base import Base
 from app.main import app
-from app.models.country import Country, CountryBorder
-from app.models.user import User
+from app.models.country import Country, Border
+from app.models.user import Profile
 from app.models.game import DailyChallenge, GameResult
 from app.models.question import Question
 
@@ -58,14 +60,21 @@ async def db_session() -> AsyncGenerator[AsyncSession, None]:
     Create a fresh database session for each test.
     Rolls back all changes after the test completes.
     """
-    async with test_engine.begin() as connection:
+    async with test_engine.connect() as connection:
+        # Drop all tables (including non-managed ones like daily_quizzes) with CASCADE
+        await connection.execute(text("DROP SCHEMA public CASCADE"))
+        await connection.execute(text("CREATE SCHEMA public"))
+        await connection.commit()
         await connection.run_sync(Base.metadata.create_all)
-        
-        async with TestSessionLocal() as session:
+        await connection.commit()
+
+        async with AsyncSession(bind=connection, expire_on_commit=False) as session:
             yield session
             await session.rollback()
-        
-        await connection.run_sync(Base.metadata.drop_all)
+
+        await connection.execute(text("DROP SCHEMA public CASCADE"))
+        await connection.execute(text("CREATE SCHEMA public"))
+        await connection.commit()
 
 
 @pytest.fixture
@@ -75,12 +84,12 @@ def client(db_session: AsyncSession) -> TestClient:
     """
     async def override_get_db():
         yield db_session
-    
+
     app.dependency_overrides[get_db] = override_get_db
-    
+
     with TestClient(app) as test_client:
         yield test_client
-    
+
     app.dependency_overrides.clear()
 
 
@@ -91,12 +100,12 @@ async def async_client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, 
     """
     async def override_get_db():
         yield db_session
-    
+
     app.dependency_overrides[get_db] = override_get_db
-    
-    async with AsyncClient(app=app, base_url="http://test") as ac:
+
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
         yield ac
-    
+
     app.dependency_overrides.clear()
 
 
@@ -112,96 +121,87 @@ async def sample_countries(db_session: AsyncSession) -> list[Country]:
             id=uuid4(),
             name_ar="مصر",
             name_en="Egypt",
-            iso_alpha_2="EG",
-            iso_alpha_3="EGY",
+            code="EGY",
+            name_ar_normalized="مصر",
             flag_emoji="🇪🇬",
             continent="Africa",
-            latitude=26.8206,
-            longitude=30.8025,
         ),
         Country(
             id=uuid4(),
             name_ar="السودان",
             name_en="Sudan",
-            iso_alpha_2="SD",
-            iso_alpha_3="SDN",
+            code="SDN",
+            name_ar_normalized="السودان",
             flag_emoji="🇸🇩",
             continent="Africa",
-            latitude=12.8628,
-            longitude=30.2176,
         ),
         Country(
             id=uuid4(),
             name_ar="إثيوبيا",
             name_en="Ethiopia",
-            iso_alpha_2="ET",
-            iso_alpha_3="ETH",
+            code="ETH",
+            name_ar_normalized="اثيوبيا",
             flag_emoji="🇪🇹",
             continent="Africa",
-            latitude=9.145,
-            longitude=40.4897,
         ),
         Country(
             id=uuid4(),
             name_ar="الأردن",
             name_en="Jordan",
-            iso_alpha_2="JO",
-            iso_alpha_3="JOR",
+            code="JOR",
+            name_ar_normalized="الاردن",
             flag_emoji="🇯🇴",
             continent="Asia",
-            latitude=30.5852,
-            longitude=36.2384,
         ),
         Country(
             id=uuid4(),
             name_ar="سوريا",
             name_en="Syria",
-            iso_alpha_2="SY",
-            iso_alpha_3="SYR",
+            code="SYR",
+            name_ar_normalized="سوريا",
             flag_emoji="🇸🇾",
             continent="Asia",
-            latitude=34.8021,
-            longitude=38.9968,
         ),
     ]
-    
+
     for country in countries:
         db_session.add(country)
     await db_session.commit()
-    
+
     # Add borders: Egypt <-> Sudan <-> Ethiopia
     #              Egypt <-> Jordan <-> Syria
+    # Border CHECK constraint requires country_a_id < country_b_id
+    def make_border(id_a, id_b):
+        a, b = (id_a, id_b) if str(id_a) < str(id_b) else (id_b, id_a)
+        return Border(country_a_id=a, country_b_id=b)
+
     borders = [
-        CountryBorder(country_a_id=countries[0].id, country_b_id=countries[1].id),  # Egypt-Sudan
-        CountryBorder(country_a_id=countries[1].id, country_b_id=countries[2].id),  # Sudan-Ethiopia
-        CountryBorder(country_a_id=countries[0].id, country_b_id=countries[3].id),  # Egypt-Jordan
-        CountryBorder(country_a_id=countries[3].id, country_b_id=countries[4].id),  # Jordan-Syria
+        make_border(countries[0].id, countries[1].id),  # Egypt-Sudan
+        make_border(countries[1].id, countries[2].id),  # Sudan-Ethiopia
+        make_border(countries[0].id, countries[3].id),  # Egypt-Jordan
+        make_border(countries[3].id, countries[4].id),  # Jordan-Syria
     ]
-    
+
     for border in borders:
         db_session.add(border)
     await db_session.commit()
-    
+
     # Refresh to load relationships
     for country in countries:
         await db_session.refresh(country)
-    
+
     return countries
 
 
 @pytest.fixture
-async def sample_user(db_session: AsyncSession) -> User:
+async def sample_user(db_session: AsyncSession) -> Profile:
     """
     Create a sample user for testing.
     """
-    user = User(
+    user = Profile(
         id=uuid4(),
-        email="test@example.com",
         username="testuser",
-        hashed_password="$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYC5rvHa.uK",  # "password"
-        full_name="Test User",
-        is_active=True,
-        is_superuser=False,
+        display_name="Test User",
     )
     db_session.add(user)
     await db_session.commit()
@@ -218,51 +218,42 @@ async def sample_questions(db_session: AsyncSession) -> list[Question]:
         Question(
             id=uuid4(),
             question_ar="ما هي عاصمة مصر؟",
-            question_en="What is the capital of Egypt?",
-            correct_answer_ar="القاهرة",
-            correct_answer_en="Cairo",
-            options_ar=["القاهرة", "الإسكندرية", "الجيزة", "الأقصر"],
-            options_en=["Cairo", "Alexandria", "Giza", "Luxor"],
+            correct_answer="القاهرة",
+            correct_answer_normalized="القاهره",
+            options={"options": ["القاهرة", "الإسكندرية", "الجيزة", "الأقصر"]},
             category="capitals",
             difficulty="easy",
             question_type="multiple_choice",
-            points=10,
         ),
         Question(
             id=uuid4(),
             question_ar="ما هو أطول نهر في العالم؟",
-            question_en="What is the longest river in the world?",
-            correct_answer_ar="النيل",
-            correct_answer_en="Nile",
-            options_ar=None,
-            options_en=None,
+            correct_answer="النيل",
+            correct_answer_normalized="النيل",
+            options=None,
             category="geography",
             difficulty="medium",
             question_type="autocomplete",
-            points=15,
         ),
         Question(
             id=uuid4(),
             question_ar="ما هي أكبر قارة في العالم؟",
-            question_en="What is the largest continent in the world?",
-            correct_answer_ar="آسيا",
-            correct_answer_en="Asia",
-            options_ar=["آسيا", "أفريقيا", "أمريكا الشمالية", "أوروبا"],
-            options_en=["Asia", "Africa", "North America", "Europe"],
+            correct_answer="آسيا",
+            correct_answer_normalized="اسيا",
+            options={"options": ["آسيا", "أفريقيا", "أمريكا الشمالية", "أوروبا"]},
             category="geography",
             difficulty="easy",
             question_type="multiple_choice",
-            points=10,
         ),
     ]
-    
+
     for question in questions:
         db_session.add(question)
     await db_session.commit()
-    
+
     for question in questions:
         await db_session.refresh(question)
-    
+
     return questions
 
 
@@ -275,13 +266,13 @@ async def sample_daily_challenge(
     Create a sample daily challenge for testing.
     """
     from datetime import date
-    
+
     challenge = DailyChallenge(
         id=uuid4(),
-        date=date.today(),
+        challenge_date=date.today(),
         start_country_id=sample_countries[0].id,  # Egypt
         end_country_id=sample_countries[2].id,    # Ethiopia
-        optimal_path_length=3,  # Egypt -> Sudan -> Ethiopia
+        shortest_path=3,  # Egypt -> Sudan -> Ethiopia
     )
     db_session.add(challenge)
     await db_session.commit()
@@ -290,14 +281,22 @@ async def sample_daily_challenge(
 
 
 @pytest.fixture
-def auth_headers(sample_user: User) -> dict[str, str]:
+def auth_headers(sample_user: Profile) -> dict[str, str]:
     """
     Generate authentication headers for testing protected endpoints.
+    Uses Supabase JWT secret so verify_supabase_token accepts the token.
     """
-    from app.core.security import create_access_token
-    
-    access_token = create_access_token(subject=str(sample_user.id))
-    return {"Authorization": f"Bearer {access_token}"}
+    from datetime import datetime, timedelta, timezone
+    from jose import jwt
+    from app.core.config import settings
+
+    payload = {
+        "sub": str(sample_user.id),
+        "aud": "authenticated",
+        "exp": datetime.now(timezone.utc) + timedelta(hours=1),
+    }
+    token = jwt.encode(payload, settings.SUPABASE_JWT_SECRET, algorithm="HS256")
+    return {"Authorization": f"Bearer {token}"}
 
 
 # Utility functions for tests
@@ -307,13 +306,13 @@ def assert_country_equal(country1: Country, country2: Country):
     assert country1.id == country2.id
     assert country1.name_ar == country2.name_ar
     assert country1.name_en == country2.name_en
-    assert country1.iso_alpha_2 == country2.iso_alpha_2
+    assert country1.code == country2.code
 
 
 def assert_question_equal(question1: Question, question2: Question):
     """Assert two questions are equal."""
     assert question1.id == question2.id
     assert question1.question_ar == question2.question_ar
-    assert question1.correct_answer_ar == question2.correct_answer_ar
+    assert question1.correct_answer == question2.correct_answer
     assert question1.category == question2.category
     assert question1.difficulty == question2.difficulty

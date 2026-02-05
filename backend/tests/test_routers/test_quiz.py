@@ -140,12 +140,9 @@ class TestGetRandomQuestion:
         async_client: AsyncClient,
     ):
         """Test response when no questions match criteria."""
-        # Empty database
-        response = await async_client.get(
-            "/api/quiz/question",
-            params={"category": "nonexistent_category"}
-        )
-        
+        # Empty database — no sample_questions fixture
+        response = await async_client.get("/api/quiz/question")
+
         assert response.status_code == 404
         assert "لا توجد أسئلة" in response.json()["detail"]
 
@@ -305,7 +302,6 @@ class TestSubmitAnswer:
         question = Question(
             id=uuid4(),
             question_ar="ما هي عاصمة مصر؟",
-            question_en="What is the capital of Egypt?",
             correct_answer="القاهرة",
             correct_answer_normalized="القاهرة",
             category="capitals",
@@ -462,14 +458,12 @@ class TestQuizSession:
         async_client: AsyncClient,
     ):
         """Test session when insufficient questions available."""
+        # Empty database — no sample_questions fixture, request max allowed
         response = await async_client.post(
             "/api/quiz/session",
-            json={
-                "num_questions": 1000,  # More than available
-                "category": "nonexistent"
-            }
+            json={"num_questions": 50}
         )
-        
+
         assert response.status_code == 404
 
 
@@ -506,7 +500,6 @@ class TestDailyQuiz:
                 question = Question(
                     id=uuid4(),
                     question_ar=f"سؤال {difficulty} {i}",
-                    question_en=f"Question {difficulty} {i}",
                     correct_answer="جواب",
                     correct_answer_normalized="جواب",
                     category="geography",

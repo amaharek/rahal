@@ -172,20 +172,20 @@ class TestShortestPathFinding:
             id=uuid4(),
             name_ar="جزيرة",
             name_en="Island",
-            iso_alpha_2="IS",
-            iso_alpha_3="ISL",
+            code="ISL",
+            name_ar_normalized="جزيره",
             flag_emoji="🏝️",
             continent="Pacific",
         )
         db_session.add(island)
         await db_session.commit()
-        
+
         # Clear cache to rebuild graph
         path_finder.clear_cache()
-        
+
         egypt = sample_countries[0]
         path = await path_finder.find_shortest_path(db_session, egypt.id, island.id)
-        
+
         assert path is None
     
     @pytest.mark.asyncio
@@ -289,14 +289,14 @@ class TestMultipleShortestPaths:
             id=uuid4(),
             name_ar="جزيرة",
             name_en="Island",
-            iso_alpha_2="IS",
-            iso_alpha_3="ISL",
+            code="ISL",
+            name_ar_normalized="جزيره",
             flag_emoji="🏝️",
             continent="Pacific",
         )
         db_session.add(island)
         await db_session.commit()
-        
+
         path_finder.clear_cache()
         
         egypt = sample_countries[0]
@@ -569,22 +569,25 @@ class TestPerformance:
                 id=uuid4(),
                 name_ar=f"دولة {i}",
                 name_en=f"Country {i}",
-                iso_alpha_2=f"C{i:02d}"[:2],
-                iso_alpha_3=f"C{i:03d}",
+                code=f"X{i:02d}",
+                name_ar_normalized=f"دوله {i}",
                 flag_emoji="🏳️",
                 continent="Test",
             )
             countries.append(country)
             db_session.add(country)
-        
+
         await db_session.commit()
-        
+
         # Add borders creating a chain
-        from app.models.country import CountryBorder
+        from app.models.country import Border
         for i in range(19):
-            border = CountryBorder(
-                country_a_id=countries[i].id,
-                country_b_id=countries[i + 1].id
+            a_id, b_id = countries[i].id, countries[i + 1].id
+            if str(a_id) > str(b_id):
+                a_id, b_id = b_id, a_id
+            border = Border(
+                country_a_id=a_id,
+                country_b_id=b_id
             )
             db_session.add(border)
         
