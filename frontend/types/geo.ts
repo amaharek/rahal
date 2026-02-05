@@ -129,7 +129,7 @@ export const NUMERIC_TO_ALPHA3: Record<string, string> = {
   '364': 'IRN',
   '368': 'IRQ',
   '372': 'IRL',
-  '376': 'ISR',
+  '376': 'PSE',
   '380': 'ITA',
   '388': 'JAM',
   '392': 'JPN',

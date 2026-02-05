@@ -1445,7 +1445,7 @@ async def seed_sample_challenges(session: AsyncSession, country_map: dict[str, U
 
     # Sample challenges (start_code, end_code, shortest_path)
     challenges = [
-        ("SAU", "EGY", 2),  # Saudi Arabia → Jordan → Egypt (or via Israel/Palestine)
+        ("SAU", "EGY", 2),  # Saudi Arabia → Jordan → Egypt (or via Palestine)
         ("FRA", "ITA", 1),  # France → Italy (direct border)
         ("DEU", "ESP", 2),  # Germany → France → Spain
         ("JPN", "KOR", 2),  # Japan → China → South Korea (sea route conceptual)
