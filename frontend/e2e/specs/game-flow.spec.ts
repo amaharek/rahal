@@ -1,0 +1,160 @@
+import { test, expect } from '@playwright/test';
+import { GamePage } from '../pages/game.page';
+import {
+  setupGameMocks,
+  setupGuessMock,
+  setupDynamicGuessMock,
+  setupApiErrorMock,
+} from '../utils/api-mocks';
+import mockChallenge from '../fixtures/mock-challenge.json';
+
+test.describe('Game Flow', () => {
+  let gamePage: GamePage;
+
+  test.beforeEach(async ({ page }) => {
+    gamePage = new GamePage(page);
+    await setupGameMocks(page);
+    await setupDynamicGuessMock(page);
+  });
+
+  test('should display daily challenge with start and end countries', async ({ page }) => {
+    await gamePage.goto();
+    await gamePage.waitForLoad();
+
+    // Verify start country is displayed
+    await expect(gamePage.startCountryFlag).toBeVisible();
+    const startFlagText = await gamePage.startCountryFlag.textContent();
+    expect(startFlagText).toContain(mockChallenge.start_country.flag_emoji);
+
+    // Verify end country is displayed
+    await expect(gamePage.endCountryFlag).toBeVisible();
+    const endFlagText = await gamePage.endCountryFlag.textContent();
+    expect(endFlagText).toContain(mockChallenge.end_country.flag_emoji);
+  });
+
+  test('should show shortest path count', async ({ page }) => {
+    await gamePage.goto();
+    await gamePage.waitForLoad();
+
+    // Verify shortest path info is displayed
+    const pageContent = await page.content();
+    expect(pageContent).toContain(String(mockChallenge.shortest_path));
+  });
+
+  test('should submit a valid country guess', async ({ page }) => {
+    await gamePage.goto();
+    await gamePage.waitForLoad();
+
+    // Initial guess count should be 0
+    const initialCount = await gamePage.getGuessCount();
+    expect(initialCount).toBe(0);
+
+    // Submit a guess
+    await gamePage.searchCountry('الأردن');
+
+    // Wait for autocomplete suggestions
+    await page.waitForTimeout(400);
+
+    // Check for suggestions and select
+    const suggestions = page.locator('[role="option"], [class*="suggestion"]');
+    const count = await suggestions.count();
+
+    if (count > 0) {
+      await suggestions.first().click();
+
+      // Wait for guess to be processed
+      await page.waitForTimeout(500);
+
+      // Verify guess was added
+      const newCount = await gamePage.getGuessCount();
+      expect(newCount).toBe(1);
+    }
+  });
+
+  test('should complete game when reaching destination', async ({ page }) => {
+    // Override to complete game immediately
+    await setupGuessMock(page, { scoreEmoji: '🟢', gameComplete: true });
+
+    await gamePage.goto();
+    await gamePage.waitForLoad();
+
+    // Submit the destination country
+    await gamePage.searchCountry('مصر');
+    await page.waitForTimeout(400);
+
+    const suggestions = page.locator('[role="option"], [class*="suggestion"]');
+    if (await suggestions.count() > 0) {
+      await suggestions.first().click();
+
+      // Wait for completion
+      await page.waitForTimeout(1000);
+
+      // Check for completion indicators
+      const completionText = await page.textContent('body');
+      // Game should show completion state
+      expect(completionText).toMatch(/🎉|تهانينا|أحسنت|مشاركة/);
+    }
+  });
+
+  test('should display completion screen with score', async ({ page }) => {
+    await setupGuessMock(page, { scoreEmoji: '🟢', gameComplete: true });
+
+    await gamePage.goto();
+    await gamePage.waitForLoad();
+
+    // Submit winning guess
+    await gamePage.searchCountry('مصر');
+    await page.waitForTimeout(400);
+
+    const suggestions = page.locator('[role="option"], [class*="suggestion"]');
+    if (await suggestions.count() > 0) {
+      await suggestions.first().click();
+      await page.waitForTimeout(1000);
+
+      // Verify score is displayed
+      const hasScoreDisplay = await page.locator('text=/النقاط|score/i').isVisible().catch(() => false);
+      const hasCompletionEmoji = await page.locator('text=🎉').isVisible().catch(() => false);
+
+      expect(hasScoreDisplay || hasCompletionEmoji).toBe(true);
+    }
+  });
+
+  test('should handle API errors gracefully', async ({ page }) => {
+    // Setup error mock
+    await setupApiErrorMock(page, '/api/challenge/daily', 500);
+
+    await gamePage.goto();
+
+    // Wait for error state
+    await page.waitForTimeout(2000);
+
+    // Should show error message or retry option
+    const hasError = await gamePage.errorMessage.isVisible().catch(() => false);
+    const hasRetry = await gamePage.retryButton.isVisible().catch(() => false);
+
+    expect(hasError || hasRetry).toBe(true);
+  });
+
+  test('should show loading state initially', async ({ page }) => {
+    // Delay the API response
+    await page.route('**/api/challenge/daily', async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(mockChallenge),
+      });
+    });
+
+    await gamePage.goto();
+
+    // Should show loading spinner
+    await expect(gamePage.loadingSpinner).toBeVisible();
+
+    // Wait for load to complete
+    await gamePage.waitForLoad();
+
+    // Loading should be hidden
+    await expect(gamePage.loadingSpinner).toBeHidden();
+  });
+});

@@ -129,8 +129,14 @@ Rahal-workspace/
 ├── frontend/               # Next.js frontend
 │   ├── app/               # App router pages
 │   ├── components/        # React components
+│   ├── e2e/               # E2E tests (Playwright)
+│   │   ├── fixtures/      # Mock data for tests
+│   │   ├── pages/         # Page Object Models
+│   │   ├── specs/         # Test specifications
+│   │   └── utils/         # Test helpers & API mocks
 │   ├── lib/               # Utilities, stores, API clients
-│   └── messages/          # i18n translations
+│   ├── messages/          # i18n translations
+│   └── playwright.config.ts # Playwright configuration
 ├── data/                   # Seed data (countries, borders, questions)
 ├── scripts/                # Utility scripts
 ├── supabase/              # Supabase configuration
@@ -158,6 +164,12 @@ make test             # Run all tests
 make test-backend     # Run backend tests
 make test-frontend    # Run frontend tests
 
+# Frontend E2E Tests (Playwright)
+cd frontend
+npm run test:e2e      # Run all E2E tests
+npm run test:e2e:ui   # Run with interactive UI
+npm run test:e2e:debug # Run in debug mode
+
 # Code Quality
 make lint             # Run linters
 make format           # Format code
@@ -180,6 +192,84 @@ Once the backend is running, visit:
 | `POST /api/quiz/answer` | Submit quiz answer |
 | `GET /api/autocomplete/countries` | Search countries |
 | `GET /api/users/leaderboard` | Get leaderboard |
+
+## Testing
+
+### Overview
+
+The project uses a comprehensive testing strategy:
+- **Backend**: pytest with async support for API and integration tests
+- **Frontend**: Playwright for end-to-end browser testing
+
+### Frontend E2E Tests (Playwright)
+
+#### Setup
+
+```bash
+cd frontend
+
+# Install Playwright browsers (first time only)
+npx playwright install
+```
+
+#### Running Tests
+
+```bash
+# Run all E2E tests
+npm run test:e2e
+
+# Run with interactive UI mode
+npm run test:e2e:ui
+
+# Run in debug mode (step through tests)
+npm run test:e2e:debug
+
+# Run a specific test file
+npx playwright test e2e/specs/game-flow.spec.ts
+```
+
+#### View Test Reports
+
+After running tests, view the HTML report:
+```bash
+npx playwright show-report
+```
+
+#### Test Suites
+
+| Test File | Description |
+|-----------|-------------|
+| `game-flow.spec.ts` | Game flow, challenge navigation, and win/lose scenarios |
+| `map-interaction.spec.ts` | Map rendering, zoom, pan, and country selection |
+| `autocomplete.spec.ts` | Country search autocomplete functionality |
+| `scoring.spec.ts` | Emoji scoring system and guess tracking |
+| `accessibility.spec.ts` | WCAG compliance and accessibility standards |
+
+### Backend Tests (pytest)
+
+```bash
+cd backend
+
+# Run all backend tests
+pytest
+
+# Run with coverage
+pytest --cov=app
+
+# Run specific test file
+pytest tests/test_api.py
+```
+
+### Running All Tests
+
+```bash
+# Using make (from project root)
+make test
+
+# Or run individually
+make test-backend
+make test-frontend
+```
 
 ## Environment Variables
 

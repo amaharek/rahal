@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import {
   ComposableMap,
   Geographies,
@@ -21,6 +21,22 @@ const getGeoUrl = () => {
   }
   // Fallback for SSR (though this component is client-only)
   return '/geo/world-110m.json';
+};
+
+// Prefetch and validate TopoJSON data
+const validateGeoData = async (): Promise<boolean> => {
+  try {
+    const url = getGeoUrl();
+    const response = await fetch(url, { method: 'HEAD' });
+    if (!response.ok) {
+      console.error(`[GameMap] TopoJSON file not accessible: ${response.status} ${response.statusText}`);
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.error('[GameMap] Failed to validate TopoJSON file:', error);
+    return false;
+  }
 };
 
 const MIN_ZOOM = 1;
@@ -48,6 +64,12 @@ export function GameMap({
   const [internalZoom, setInternalZoom] = useState(1.5);
   const [internalCenter, setInternalCenter] =
     useState<[number, number]>(defaultCenter);
+  const [geoDataValid, setGeoDataValid] = useState(true);
+
+  // Validate TopoJSON on mount
+  useEffect(() => {
+    validateGeoData().then(setGeoDataValid);
+  }, []);
 
   const zoom = externalZoom ?? internalZoom;
   const center = externalCenter ?? internalCenter;
@@ -81,6 +103,31 @@ export function GameMap({
     [onCenterChange, onZoomChange]
   );
 
+  if (!geoDataValid) {
+    return (
+      <div
+        className={cn(
+          'relative w-full aspect-[16/10] bg-gray-100 rounded-lg overflow-hidden border border-border flex flex-col items-center justify-center p-6 text-center',
+          className
+        )}
+      >
+        <span className="text-4xl mb-4">🗺️</span>
+        <p className="text-text-secondary text-sm">
+          تعذر تحميل بيانات الخريطة
+        </p>
+        <button
+          onClick={() => {
+            setGeoDataValid(true);
+            validateGeoData().then(setGeoDataValid);
+          }}
+          className="mt-4 text-primary text-sm underline"
+        >
+          إعادة المحاولة
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div
       className={cn(
@@ -97,6 +144,7 @@ export function GameMap({
       >
         <ZoomableGroup
           zoom={zoom}
+          // @ts-expect-error - Library types require branded Longitude/Latitude but [number, number] works
           center={center}
           onMoveEnd={handleMoveEnd}
           minZoom={MIN_ZOOM}
@@ -120,6 +168,7 @@ export function GameMap({
 
                 return (
                   <Geography
+                    // @ts-expect-error - rsmKey exists at runtime but types are incomplete
                     key={geo.rsmKey}
                     geography={geo}
                     fill={fillColor}

@@ -1,0 +1,22 @@
+{
+  "id": "test-challenge-001",
+  "date": "2024-01-15",
+  "start_country": {
+    "id": "sau",
+    "code": "SAU",
+    "name_ar": "السعودية",
+    "name_en": "Saudi Arabia",
+    "flag_emoji": "\ud83c\uddf8\ud83c\udde6",
+    "continent": "asia"
+  },
+  "end_country": {
+    "id": "egy",
+    "code": "EGY",
+    "name_ar": "مصر",
+    "name_en": "Egypt",
+    "flag_emoji": "\ud83c\uddea\ud83c\uddec",
+    "continent": "africa"
+  },
+  "shortest_path": 2,
+  "optimal_path": ["SAU", "JOR", "EGY"]
+}

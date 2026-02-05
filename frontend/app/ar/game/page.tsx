@@ -10,13 +10,24 @@ import { getDailyChallenge, submitGuess } from '@/lib/api/game';
 import { useGameStore } from '@/lib/stores/gameStore';
 import { CountryInput } from '@/components/game/CountryInput';
 import { EmojiScore } from '@/components/game/EmojiScore';
-import { MapSkeleton } from '@/components/game/GameMap';
+import { MapSkeleton, MapErrorBoundary } from '@/components/game/GameMap';
 import { Card, CardHeader, CardTitle, CardContent, Button } from '@/components/ui';
 import type { Country, GuessEntry } from '@/types/game';
 
 // Lazy load GameMap (SSR disabled due to react-simple-maps)
 const GameMap = dynamic(
-  () => import('@/components/game/GameMap').then((mod) => mod.GameMap),
+  () =>
+    import('@/components/game/GameMap')
+      .then((mod) => {
+        if (!mod.GameMap) {
+          throw new Error('GameMap component not found in module');
+        }
+        return mod.GameMap;
+      })
+      .catch((error) => {
+        console.error('[GamePage] Failed to load GameMap:', error);
+        throw error;
+      }),
   {
     ssr: false,
     loading: () => <MapSkeleton />,
@@ -205,15 +216,17 @@ export default function GamePage() {
 
             {/* Map Component */}
             <div className={`${showMap ? 'block' : 'hidden'} lg:block`}>
-              <GameMap
-                startCountryCode={challenge.start_country.code}
-                endCountryCode={challenge.end_country.code}
-                guessedCountryCodes={guessedCountryCodes}
-                zoom={mapZoom}
-                center={mapCenter}
-                onZoomChange={setMapZoom}
-                onCenterChange={setMapCenter}
-              />
+              <MapErrorBoundary>
+                <GameMap
+                  startCountryCode={challenge.start_country.code}
+                  endCountryCode={challenge.end_country.code}
+                  guessedCountryCodes={guessedCountryCodes}
+                  zoom={mapZoom}
+                  center={mapCenter}
+                  onZoomChange={setMapZoom}
+                  onCenterChange={setMapCenter}
+                />
+              </MapErrorBoundary>
             </div>
           </div>
 

@@ -1,0 +1,98 @@
+[
+  {
+    "id": "sau",
+    "code": "SAU",
+    "name_ar": "السعودية",
+    "name_en": "Saudi Arabia",
+    "flag_emoji": "\ud83c\uddf8\ud83c\udde6",
+    "continent": "asia"
+  },
+  {
+    "id": "egy",
+    "code": "EGY",
+    "name_ar": "مصر",
+    "name_en": "Egypt",
+    "flag_emoji": "\ud83c\uddea\ud83c\uddec",
+    "continent": "africa"
+  },
+  {
+    "id": "jor",
+    "code": "JOR",
+    "name_ar": "الأردن",
+    "name_en": "Jordan",
+    "flag_emoji": "\ud83c\uddef\ud83c\uddf4",
+    "continent": "asia"
+  },
+  {
+    "id": "irq",
+    "code": "IRQ",
+    "name_ar": "العراق",
+    "name_en": "Iraq",
+    "flag_emoji": "\ud83c\uddee\ud83c\uddf6",
+    "continent": "asia"
+  },
+  {
+    "id": "kwt",
+    "code": "KWT",
+    "name_ar": "الكويت",
+    "name_en": "Kuwait",
+    "flag_emoji": "\ud83c\uddf0\ud83c\uddfc",
+    "continent": "asia"
+  },
+  {
+    "id": "are",
+    "code": "ARE",
+    "name_ar": "الإمارات",
+    "name_en": "United Arab Emirates",
+    "flag_emoji": "\ud83c\udde6\ud83c\uddea",
+    "continent": "asia"
+  },
+  {
+    "id": "qat",
+    "code": "QAT",
+    "name_ar": "قطر",
+    "name_en": "Qatar",
+    "flag_emoji": "\ud83c\uddf6\ud83c\udde6",
+    "continent": "asia"
+  },
+  {
+    "id": "bhr",
+    "code": "BHR",
+    "name_ar": "البحرين",
+    "name_en": "Bahrain",
+    "flag_emoji": "\ud83c\udde7\ud83c\udded",
+    "continent": "asia"
+  },
+  {
+    "id": "omn",
+    "code": "OMN",
+    "name_ar": "عمان",
+    "name_en": "Oman",
+    "flag_emoji": "\ud83c\uddf4\ud83c\uddf2",
+    "continent": "asia"
+  },
+  {
+    "id": "yem",
+    "code": "YEM",
+    "name_ar": "اليمن",
+    "name_en": "Yemen",
+    "flag_emoji": "\ud83c\uddfe\ud83c\uddea",
+    "continent": "asia"
+  },
+  {
+    "id": "usa",
+    "code": "USA",
+    "name_ar": "الولايات المتحدة",
+    "name_en": "United States",
+    "flag_emoji": "\ud83c\uddfa\ud83c\uddf8",
+    "continent": "north_america"
+  },
+  {
+    "id": "fra",
+    "code": "FRA",
+    "name_ar": "فرنسا",
+    "name_en": "France",
+    "flag_emoji": "\ud83c\uddeb\ud83c\uddf7",
+    "continent": "europe"
+  }
+]
