@@ -14,6 +14,8 @@ export type CountryState =
 export interface GameMapProps {
   startCountryCode: string;
   endCountryCode: string;
+  startCountryName?: string;
+  endCountryName?: string;
   guessedCountryCodes: {
     code: string;
     isOnPath: boolean;

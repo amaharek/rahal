@@ -38,6 +38,7 @@ export interface DailyChallenge {
 
 export interface GuessEntry {
   country_id: string;
+  country_code: string;
   name_ar: string;
   flag_emoji: string | null;
   emoji: ScoreEmoji;

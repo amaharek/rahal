@@ -39,6 +39,8 @@ const ZOOM_STEP = 0.5;
 export function GameMap({
   startCountryCode,
   endCountryCode,
+  startCountryName,
+  endCountryName,
   guessedCountryCodes,
   hintCountryCodes = [],
   pathCountryCodes = [],
@@ -217,6 +219,14 @@ export function GameMap({
                 const fillColor = MAP_COLORS[countryState];
                 const isHighlighted = countryState !== 'default';
 
+                // Get tooltip text for start/end countries
+                let tooltipText = '';
+                if (alpha3Code === startCountryCode && startCountryName) {
+                  tooltipText = startCountryName;
+                } else if (alpha3Code === endCountryCode && endCountryName) {
+                  tooltipText = endCountryName;
+                }
+
                 // Use geo.id or fallback to index for unique key
                 const geoKey = geo.rsmKey || geo.id || `geo-${index}`;
 
@@ -235,13 +245,15 @@ export function GameMap({
                       hover: {
                         fill: isHighlighted ? fillColor : '#D1D5DB',
                         outline: 'none',
-                        cursor: 'pointer',
+                        cursor: tooltipText ? 'pointer' : 'default',
                       },
                       pressed: {
                         outline: 'none',
                       },
                     }}
-                  />
+                  >
+                    {tooltipText && <title>{tooltipText}</title>}
+                  </Geography>
                 );
               });
             }}

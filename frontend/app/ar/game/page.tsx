@@ -74,7 +74,7 @@ export default function GamePage() {
   // Convert guesses to map format
   const guessedCountryCodes = useMemo(() => {
     return guesses.map((guess) => ({
-      code: guess.country_id.toUpperCase(),
+      code: guess.country_code,
       isOnPath: guess.emoji === '🟢' || guess.emoji === '🟡',
     }));
   }, [guesses]);
@@ -89,6 +89,7 @@ export default function GamePage() {
     onSuccess: (response) => {
       const newGuess: GuessEntry = {
         country_id: response.country.id,
+        country_code: response.country.code,
         name_ar: response.country.name_ar,
         flag_emoji: response.country.flag_emoji,
         emoji: response.score_emoji,
@@ -243,7 +244,7 @@ export default function GamePage() {
         {/* Two-column layout for desktop */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Map Section - First on mobile (order-1), First on desktop (lg:order-1) */}
-          <div className="order-2 lg:order-1">
+          <div className="order-1 lg:order-1">
             {/* Mobile: Collapsible Map */}
             <div className="lg:hidden mb-4">
               <Button
@@ -267,6 +268,8 @@ export default function GamePage() {
                 <GameMap
                   startCountryCode={challenge.start_country.code}
                   endCountryCode={challenge.end_country.code}
+                  startCountryName={challenge.start_country.name_ar}
+                  endCountryName={challenge.end_country.name_ar}
                   guessedCountryCodes={guessedCountryCodes}
                   pathCountryCodes={challenge.path_country_codes || []}
                   zoom={mapZoom}
@@ -279,7 +282,7 @@ export default function GamePage() {
           </div>
 
           {/* Game Controls Section - Second on mobile (order-2), Second on desktop (lg:order-2) */}
-          <div className="order-1 lg:order-2 space-y-6">
+          <div className="order-2 lg:order-2 space-y-6">
             {/* Game Completed */}
             {isCompleted ? (
               <Card className="bg-success/10 border-success">

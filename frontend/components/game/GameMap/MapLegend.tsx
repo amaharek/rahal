@@ -19,18 +19,18 @@ export function MapLegend({ className }: MapLegendProps) {
   return (
     <div
       className={cn(
-        'absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg p-3 shadow-md z-10',
+        'absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg p-2 shadow-md z-10',
         className
       )}
     >
-      <div className="space-y-2">
+      <div className="flex items-center gap-4 flex-wrap">
         {LEGEND_ITEMS.map(({ state, labelKey }) => (
-          <div key={state} className="flex items-center gap-2 text-sm">
+          <div key={state} className="flex items-center gap-1.5 text-xs">
             <div
-              className="w-4 h-4 rounded-sm border border-gray-300"
+              className="w-3 h-3 rounded-sm border border-gray-300"
               style={{ backgroundColor: MAP_COLORS[state] }}
             />
-            <span className="text-text-secondary">{t(labelKey)}</span>
+            <span className="text-text-secondary whitespace-nowrap">{t(labelKey)}</span>
           </div>
         ))}
       </div>
