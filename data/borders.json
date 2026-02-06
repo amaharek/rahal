@@ -1,45 +1,854 @@
 {
   "borders": [
-    { "country_a": "SAU", "country_b": "JOR", "border_type": "land" },
-    { "country_a": "SAU", "country_b": "IRQ", "border_type": "land" },
-    { "country_a": "SAU", "country_b": "KWT", "border_type": "land" },
-    { "country_a": "SAU", "country_b": "ARE", "border_type": "land" },
-    { "country_a": "SAU", "country_b": "QAT", "border_type": "land" },
-    { "country_a": "SAU", "country_b": "OMN", "border_type": "land" },
-    { "country_a": "SAU", "country_b": "YEM", "border_type": "land" },
-    { "country_a": "EGY", "country_b": "LBY", "border_type": "land" },
-    { "country_a": "EGY", "country_b": "SDN", "border_type": "land" },
-    { "country_a": "EGY", "country_b": "PSE", "border_type": "land" },
-    { "country_a": "JOR", "country_b": "IRQ", "border_type": "land" },
-    { "country_a": "JOR", "country_b": "SYR", "border_type": "land" },
-    { "country_a": "JOR", "country_b": "PSE", "border_type": "land" },
-    { "country_a": "IRQ", "country_b": "KWT", "border_type": "land" },
-    { "country_a": "IRQ", "country_b": "SYR", "border_type": "land" },
-    { "country_a": "IRQ", "country_b": "TUR", "border_type": "land" },
-    { "country_a": "IRQ", "country_b": "IRN", "border_type": "land" },
-    { "country_a": "ARE", "country_b": "OMN", "border_type": "land" },
-    { "country_a": "OMN", "country_b": "YEM", "border_type": "land" },
-    { "country_a": "SYR", "country_b": "TUR", "border_type": "land" },
-    { "country_a": "SYR", "country_b": "LBN", "border_type": "land" },
-    { "country_a": "TUR", "country_b": "IRN", "border_type": "land" },
-    { "country_a": "IRN", "country_b": "PAK", "border_type": "land" },
-    { "country_a": "MAR", "country_b": "DZA", "border_type": "land" },
-    { "country_a": "MAR", "country_b": "MRT", "border_type": "land" },
-    { "country_a": "DZA", "country_b": "TUN", "border_type": "land" },
-    { "country_a": "DZA", "country_b": "LBY", "border_type": "land" },
-    { "country_a": "DZA", "country_b": "MRT", "border_type": "land" },
-    { "country_a": "TUN", "country_b": "LBY", "border_type": "land" },
-    { "country_a": "LBY", "country_b": "SDN", "border_type": "land" },
-    { "country_a": "FRA", "country_b": "DEU", "border_type": "land" },
-    { "country_a": "FRA", "country_b": "ITA", "border_type": "land" },
-    { "country_a": "FRA", "country_b": "ESP", "border_type": "land" },
-    { "country_a": "ESP", "country_b": "MAR", "border_type": "land" },
-    { "country_a": "USA", "country_b": "CAN", "border_type": "land" },
-    { "country_a": "USA", "country_b": "MEX", "border_type": "land" },
-    { "country_a": "BRA", "country_b": "ARG", "border_type": "land" },
-    { "country_a": "CHN", "country_b": "IND", "border_type": "land" },
-    { "country_a": "CHN", "country_b": "PAK", "border_type": "land" },
-    { "country_a": "CHN", "country_b": "RUS", "border_type": "land" },
-    { "country_a": "IND", "country_b": "PAK", "border_type": "land" }
+    {
+      "country_a": "SAU",
+      "country_b": "JOR",
+      "border_type": "land"
+    },
+    {
+      "country_a": "SAU",
+      "country_b": "IRQ",
+      "border_type": "land"
+    },
+    {
+      "country_a": "SAU",
+      "country_b": "KWT",
+      "border_type": "land"
+    },
+    {
+      "country_a": "SAU",
+      "country_b": "QAT",
+      "border_type": "land"
+    },
+    {
+      "country_a": "SAU",
+      "country_b": "ARE",
+      "border_type": "land"
+    },
+    {
+      "country_a": "SAU",
+      "country_b": "OMN",
+      "border_type": "land"
+    },
+    {
+      "country_a": "SAU",
+      "country_b": "YEM",
+      "border_type": "land"
+    },
+    {
+      "country_a": "JOR",
+      "country_b": "SYR",
+      "border_type": "land"
+    },
+    {
+      "country_a": "JOR",
+      "country_b": "IRQ",
+      "border_type": "land"
+    },
+    {
+      "country_a": "JOR",
+      "country_b": "ISR",
+      "border_type": "land"
+    },
+    {
+      "country_a": "JOR",
+      "country_b": "PSE",
+      "border_type": "land"
+    },
+    {
+      "country_a": "LBN",
+      "country_b": "SYR",
+      "border_type": "land"
+    },
+    {
+      "country_a": "LBN",
+      "country_b": "ISR",
+      "border_type": "land"
+    },
+    {
+      "country_a": "SYR",
+      "country_b": "TUR",
+      "border_type": "land"
+    },
+    {
+      "country_a": "SYR",
+      "country_b": "IRQ",
+      "border_type": "land"
+    },
+    {
+      "country_a": "SYR",
+      "country_b": "ISR",
+      "border_type": "land"
+    },
+    {
+      "country_a": "IRQ",
+      "country_b": "TUR",
+      "border_type": "land"
+    },
+    {
+      "country_a": "IRQ",
+      "country_b": "IRN",
+      "border_type": "land"
+    },
+    {
+      "country_a": "IRQ",
+      "country_b": "KWT",
+      "border_type": "land"
+    },
+    {
+      "country_a": "IRN",
+      "country_b": "TUR",
+      "border_type": "land"
+    },
+    {
+      "country_a": "IRN",
+      "country_b": "AFG",
+      "border_type": "land"
+    },
+    {
+      "country_a": "IRN",
+      "country_b": "PAK",
+      "border_type": "land"
+    },
+    {
+      "country_a": "IRN",
+      "country_b": "TKM",
+      "border_type": "land"
+    },
+    {
+      "country_a": "OMN",
+      "country_b": "ARE",
+      "border_type": "land"
+    },
+    {
+      "country_a": "OMN",
+      "country_b": "YEM",
+      "border_type": "land"
+    },
+    {
+      "country_a": "ISR",
+      "country_b": "EGY",
+      "border_type": "land"
+    },
+    {
+      "country_a": "ISR",
+      "country_b": "PSE",
+      "border_type": "land"
+    },
+    {
+      "country_a": "TUR",
+      "country_b": "GRC",
+      "border_type": "land"
+    },
+    {
+      "country_a": "TUR",
+      "country_b": "BGR",
+      "border_type": "land"
+    },
+    {
+      "country_a": "EGY",
+      "country_b": "LBY",
+      "border_type": "land"
+    },
+    {
+      "country_a": "EGY",
+      "country_b": "SDN",
+      "border_type": "land"
+    },
+    {
+      "country_a": "LBY",
+      "country_b": "TUN",
+      "border_type": "land"
+    },
+    {
+      "country_a": "LBY",
+      "country_b": "DZA",
+      "border_type": "land"
+    },
+    {
+      "country_a": "LBY",
+      "country_b": "NER",
+      "border_type": "land"
+    },
+    {
+      "country_a": "LBY",
+      "country_b": "TCD",
+      "border_type": "land"
+    },
+    {
+      "country_a": "LBY",
+      "country_b": "SDN",
+      "border_type": "land"
+    },
+    {
+      "country_a": "TUN",
+      "country_b": "DZA",
+      "border_type": "land"
+    },
+    {
+      "country_a": "DZA",
+      "country_b": "MAR",
+      "border_type": "land"
+    },
+    {
+      "country_a": "DZA",
+      "country_b": "MRT",
+      "border_type": "land"
+    },
+    {
+      "country_a": "DZA",
+      "country_b": "MLI",
+      "border_type": "land"
+    },
+    {
+      "country_a": "DZA",
+      "country_b": "NER",
+      "border_type": "land"
+    },
+    {
+      "country_a": "MAR",
+      "country_b": "MRT",
+      "border_type": "land"
+    },
+    {
+      "country_a": "SDN",
+      "country_b": "TCD",
+      "border_type": "land"
+    },
+    {
+      "country_a": "SDN",
+      "country_b": "ETH",
+      "border_type": "land"
+    },
+    {
+      "country_a": "SDN",
+      "country_b": "ERI",
+      "border_type": "land"
+    },
+    {
+      "country_a": "MRT",
+      "country_b": "MLI",
+      "border_type": "land"
+    },
+    {
+      "country_a": "MRT",
+      "country_b": "SEN",
+      "border_type": "land"
+    },
+    {
+      "country_a": "MLI",
+      "country_b": "SEN",
+      "border_type": "land"
+    },
+    {
+      "country_a": "MLI",
+      "country_b": "NER",
+      "border_type": "land"
+    },
+    {
+      "country_a": "SEN",
+      "country_b": "GHA",
+      "border_type": "land"
+    },
+    {
+      "country_a": "NER",
+      "country_b": "NGA",
+      "border_type": "land"
+    },
+    {
+      "country_a": "NER",
+      "country_b": "TCD",
+      "border_type": "land"
+    },
+    {
+      "country_a": "NGA",
+      "country_b": "CMR",
+      "border_type": "land"
+    },
+    {
+      "country_a": "NGA",
+      "country_b": "TCD",
+      "border_type": "land"
+    },
+    {
+      "country_a": "TCD",
+      "country_b": "CMR",
+      "border_type": "land"
+    },
+    {
+      "country_a": "TCD",
+      "country_b": "SDN",
+      "border_type": "land"
+    },
+    {
+      "country_a": "CMR",
+      "country_b": "NGA",
+      "border_type": "land"
+    },
+    {
+      "country_a": "ETH",
+      "country_b": "ERI",
+      "border_type": "land"
+    },
+    {
+      "country_a": "ETH",
+      "country_b": "DJI",
+      "border_type": "land"
+    },
+    {
+      "country_a": "ETH",
+      "country_b": "SOM",
+      "border_type": "land"
+    },
+    {
+      "country_a": "ETH",
+      "country_b": "KEN",
+      "border_type": "land"
+    },
+    {
+      "country_a": "ETH",
+      "country_b": "SDN",
+      "border_type": "land"
+    },
+    {
+      "country_a": "SOM",
+      "country_b": "KEN",
+      "border_type": "land"
+    },
+    {
+      "country_a": "SOM",
+      "country_b": "DJI",
+      "border_type": "land"
+    },
+    {
+      "country_a": "KEN",
+      "country_b": "TZA",
+      "border_type": "land"
+    },
+    {
+      "country_a": "KEN",
+      "country_b": "UGA",
+      "border_type": "land"
+    },
+    {
+      "country_a": "TZA",
+      "country_b": "UGA",
+      "border_type": "land"
+    },
+    {
+      "country_a": "FRA",
+      "country_b": "ESP",
+      "border_type": "land"
+    },
+    {
+      "country_a": "FRA",
+      "country_b": "BEL",
+      "border_type": "land"
+    },
+    {
+      "country_a": "FRA",
+      "country_b": "DEU",
+      "border_type": "land"
+    },
+    {
+      "country_a": "FRA",
+      "country_b": "CHE",
+      "border_type": "land"
+    },
+    {
+      "country_a": "FRA",
+      "country_b": "ITA",
+      "border_type": "land"
+    },
+    {
+      "country_a": "ESP",
+      "country_b": "PRT",
+      "border_type": "land"
+    },
+    {
+      "country_a": "DEU",
+      "country_b": "NLD",
+      "border_type": "land"
+    },
+    {
+      "country_a": "DEU",
+      "country_b": "BEL",
+      "border_type": "land"
+    },
+    {
+      "country_a": "DEU",
+      "country_b": "CHE",
+      "border_type": "land"
+    },
+    {
+      "country_a": "DEU",
+      "country_b": "AUT",
+      "border_type": "land"
+    },
+    {
+      "country_a": "DEU",
+      "country_b": "POL",
+      "border_type": "land"
+    },
+    {
+      "country_a": "DEU",
+      "country_b": "CZE",
+      "border_type": "land"
+    },
+    {
+      "country_a": "DEU",
+      "country_b": "DNK",
+      "border_type": "land"
+    },
+    {
+      "country_a": "ITA",
+      "country_b": "CHE",
+      "border_type": "land"
+    },
+    {
+      "country_a": "ITA",
+      "country_b": "AUT",
+      "border_type": "land"
+    },
+    {
+      "country_a": "ITA",
+      "country_b": "FRA",
+      "border_type": "land"
+    },
+    {
+      "country_a": "CHE",
+      "country_b": "AUT",
+      "border_type": "land"
+    },
+    {
+      "country_a": "AUT",
+      "country_b": "CZE",
+      "border_type": "land"
+    },
+    {
+      "country_a": "AUT",
+      "country_b": "HUN",
+      "border_type": "land"
+    },
+    {
+      "country_a": "AUT",
+      "country_b": "SVK",
+      "border_type": "land"
+    },
+    {
+      "country_a": "POL",
+      "country_b": "CZE",
+      "border_type": "land"
+    },
+    {
+      "country_a": "POL",
+      "country_b": "SVK",
+      "border_type": "land"
+    },
+    {
+      "country_a": "POL",
+      "country_b": "UKR",
+      "border_type": "land"
+    },
+    {
+      "country_a": "POL",
+      "country_b": "RUS",
+      "border_type": "land"
+    },
+    {
+      "country_a": "HUN",
+      "country_b": "SVK",
+      "border_type": "land"
+    },
+    {
+      "country_a": "HUN",
+      "country_b": "UKR",
+      "border_type": "land"
+    },
+    {
+      "country_a": "HUN",
+      "country_b": "ROU",
+      "border_type": "land"
+    },
+    {
+      "country_a": "HUN",
+      "country_b": "SRB",
+      "border_type": "land"
+    },
+    {
+      "country_a": "HUN",
+      "country_b": "HRV",
+      "border_type": "land"
+    },
+    {
+      "country_a": "ROU",
+      "country_b": "UKR",
+      "border_type": "land"
+    },
+    {
+      "country_a": "ROU",
+      "country_b": "BGR",
+      "border_type": "land"
+    },
+    {
+      "country_a": "ROU",
+      "country_b": "SRB",
+      "border_type": "land"
+    },
+    {
+      "country_a": "ROU",
+      "country_b": "HUN",
+      "border_type": "land"
+    },
+    {
+      "country_a": "BGR",
+      "country_b": "GRC",
+      "border_type": "land"
+    },
+    {
+      "country_a": "BGR",
+      "country_b": "SRB",
+      "border_type": "land"
+    },
+    {
+      "country_a": "BGR",
+      "country_b": "TUR",
+      "border_type": "land"
+    },
+    {
+      "country_a": "SRB",
+      "country_b": "HRV",
+      "border_type": "land"
+    },
+    {
+      "country_a": "SRB",
+      "country_b": "BGR",
+      "border_type": "land"
+    },
+    {
+      "country_a": "GRC",
+      "country_b": "TUR",
+      "border_type": "land"
+    },
+    {
+      "country_a": "GRC",
+      "country_b": "BGR",
+      "border_type": "land"
+    },
+    {
+      "country_a": "NOR",
+      "country_b": "SWE",
+      "border_type": "land"
+    },
+    {
+      "country_a": "NOR",
+      "country_b": "FIN",
+      "border_type": "land"
+    },
+    {
+      "country_a": "NOR",
+      "country_b": "RUS",
+      "border_type": "land"
+    },
+    {
+      "country_a": "SWE",
+      "country_b": "FIN",
+      "border_type": "land"
+    },
+    {
+      "country_a": "SWE",
+      "country_b": "NOR",
+      "border_type": "land"
+    },
+    {
+      "country_a": "FIN",
+      "country_b": "RUS",
+      "border_type": "land"
+    },
+    {
+      "country_a": "RUS",
+      "country_b": "UKR",
+      "border_type": "land"
+    },
+    {
+      "country_a": "RUS",
+      "country_b": "KAZ",
+      "border_type": "land"
+    },
+    {
+      "country_a": "CHN",
+      "country_b": "RUS",
+      "border_type": "land"
+    },
+    {
+      "country_a": "CHN",
+      "country_b": "KAZ",
+      "border_type": "land"
+    },
+    {
+      "country_a": "CHN",
+      "country_b": "IND",
+      "border_type": "land"
+    },
+    {
+      "country_a": "CHN",
+      "country_b": "PAK",
+      "border_type": "land"
+    },
+    {
+      "country_a": "CHN",
+      "country_b": "AFG",
+      "border_type": "land"
+    },
+    {
+      "country_a": "CHN",
+      "country_b": "NPL",
+      "border_type": "land"
+    },
+    {
+      "country_a": "CHN",
+      "country_b": "MMR",
+      "border_type": "land"
+    },
+    {
+      "country_a": "CHN",
+      "country_b": "LAO",
+      "border_type": "land"
+    },
+    {
+      "country_a": "CHN",
+      "country_b": "VNM",
+      "border_type": "land"
+    },
+    {
+      "country_a": "IND",
+      "country_b": "PAK",
+      "border_type": "land"
+    },
+    {
+      "country_a": "IND",
+      "country_b": "NPL",
+      "border_type": "land"
+    },
+    {
+      "country_a": "IND",
+      "country_b": "BGD",
+      "border_type": "land"
+    },
+    {
+      "country_a": "IND",
+      "country_b": "MMR",
+      "border_type": "land"
+    },
+    {
+      "country_a": "PAK",
+      "country_b": "AFG",
+      "border_type": "land"
+    },
+    {
+      "country_a": "PAK",
+      "country_b": "IRN",
+      "border_type": "land"
+    },
+    {
+      "country_a": "PAK",
+      "country_b": "CHN",
+      "border_type": "land"
+    },
+    {
+      "country_a": "AFG",
+      "country_b": "TKM",
+      "border_type": "land"
+    },
+    {
+      "country_a": "AFG",
+      "country_b": "UZB",
+      "border_type": "land"
+    },
+    {
+      "country_a": "AFG",
+      "country_b": "PAK",
+      "border_type": "land"
+    },
+    {
+      "country_a": "KAZ",
+      "country_b": "UZB",
+      "border_type": "land"
+    },
+    {
+      "country_a": "KAZ",
+      "country_b": "TKM",
+      "border_type": "land"
+    },
+    {
+      "country_a": "KAZ",
+      "country_b": "RUS",
+      "border_type": "land"
+    },
+    {
+      "country_a": "UZB",
+      "country_b": "TKM",
+      "border_type": "land"
+    },
+    {
+      "country_a": "UZB",
+      "country_b": "AFG",
+      "border_type": "land"
+    },
+    {
+      "country_a": "THA",
+      "country_b": "MMR",
+      "border_type": "land"
+    },
+    {
+      "country_a": "THA",
+      "country_b": "LAO",
+      "border_type": "land"
+    },
+    {
+      "country_a": "THA",
+      "country_b": "KHM",
+      "border_type": "land"
+    },
+    {
+      "country_a": "THA",
+      "country_b": "MYS",
+      "border_type": "land"
+    },
+    {
+      "country_a": "VNM",
+      "country_b": "LAO",
+      "border_type": "land"
+    },
+    {
+      "country_a": "VNM",
+      "country_b": "KHM",
+      "border_type": "land"
+    },
+    {
+      "country_a": "LAO",
+      "country_b": "KHM",
+      "border_type": "land"
+    },
+    {
+      "country_a": "LAO",
+      "country_b": "MMR",
+      "border_type": "land"
+    },
+    {
+      "country_a": "USA",
+      "country_b": "CAN",
+      "border_type": "land"
+    },
+    {
+      "country_a": "USA",
+      "country_b": "MEX",
+      "border_type": "land"
+    },
+    {
+      "country_a": "MEX",
+      "country_b": "USA",
+      "border_type": "land"
+    },
+    {
+      "country_a": "BRA",
+      "country_b": "ARG",
+      "border_type": "land"
+    },
+    {
+      "country_a": "BRA",
+      "country_b": "URY",
+      "border_type": "land"
+    },
+    {
+      "country_a": "BRA",
+      "country_b": "PRY",
+      "border_type": "land"
+    },
+    {
+      "country_a": "BRA",
+      "country_b": "BOL",
+      "border_type": "land"
+    },
+    {
+      "country_a": "BRA",
+      "country_b": "PER",
+      "border_type": "land"
+    },
+    {
+      "country_a": "BRA",
+      "country_b": "COL",
+      "border_type": "land"
+    },
+    {
+      "country_a": "BRA",
+      "country_b": "VEN",
+      "border_type": "land"
+    },
+    {
+      "country_a": "BRA",
+      "country_b": "ECU",
+      "border_type": "land"
+    },
+    {
+      "country_a": "ARG",
+      "country_b": "CHL",
+      "border_type": "land"
+    },
+    {
+      "country_a": "ARG",
+      "country_b": "BOL",
+      "border_type": "land"
+    },
+    {
+      "country_a": "ARG",
+      "country_b": "PRY",
+      "border_type": "land"
+    },
+    {
+      "country_a": "ARG",
+      "country_b": "URY",
+      "border_type": "land"
+    },
+    {
+      "country_a": "CHL",
+      "country_b": "PER",
+      "border_type": "land"
+    },
+    {
+      "country_a": "CHL",
+      "country_b": "BOL",
+      "border_type": "land"
+    },
+    {
+      "country_a": "PER",
+      "country_b": "ECU",
+      "border_type": "land"
+    },
+    {
+      "country_a": "PER",
+      "country_b": "COL",
+      "border_type": "land"
+    },
+    {
+      "country_a": "PER",
+      "country_b": "BOL",
+      "border_type": "land"
+    },
+    {
+      "country_a": "COL",
+      "country_b": "VEN",
+      "border_type": "land"
+    },
+    {
+      "country_a": "COL",
+      "country_b": "ECU",
+      "border_type": "land"
+    },
+    {
+      "country_a": "BOL",
+      "country_b": "PRY",
+      "border_type": "land"
+    }
   ]
 }

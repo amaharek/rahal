@@ -1,14 +1,21 @@
 #!/usr/bin/env python3
 """
-MVP Database Seeding Script for Rahal
+⚠️  DEPRECATED - Use ../scripts/seed_unified.py instead
+
+MVP Database Seeding Script for Rahal (Legacy)
+
+This script uses hardcoded Python data structures.
+Data has been exported to JSON files and is now loaded by seed_unified.py
 
 Seeds the database with:
-- ~100 countries (all continents)
-- ~80 borders (connected graph for path-finding)
-- ~100 questions (across all 8 categories, 3 difficulties)
+- 98 countries (all continents)
+- 170 borders (connected graph for path-finding)
+- 85 questions (across 8 categories, 3 difficulties)
 - 2 daily challenges (today + historical)
 
-Run with: python -m scripts.seed_mvp
+Please use: ../scripts/seed_unified.py
+
+Old Usage: python -m scripts.seed_mvp
 """
 
 import asyncio

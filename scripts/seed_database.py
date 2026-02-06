@@ -1,9 +1,19 @@
 #!/usr/bin/env python3
 """
-Rahal Database Seeding Script
+⚠️  DEPRECATED - Use scripts/seed_unified.py instead
+
+Rahal Database Seeding Script (Legacy)
 Seeds countries, borders, questions, achievements, daily challenges, and daily quizzes.
 
-Usage:
+This script is deprecated and kept for reference only.
+It has known issues:
+- Uses incorrect options format (wrapped object)
+- Incomplete data (39 countries, 41 borders, 48 questions)
+- Does not meet MVP requirements
+
+Please use: scripts/seed_unified.py
+
+Old Usage:
     cd backend
     source .venv/bin/activate
     python ../scripts/seed_database.py

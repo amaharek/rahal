@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo, useEffect, startTransition } from 'react';
 import {
   ComposableMap,
   Geographies,
@@ -88,29 +88,37 @@ export function GameMap({
 
   const handleZoomIn = useCallback(() => {
     const newZoom = Math.min(zoom + ZOOM_STEP, MAX_ZOOM);
-    setInternalZoom(newZoom);
-    onZoomChange?.(newZoom);
+    startTransition(() => {
+      setInternalZoom(newZoom);
+      onZoomChange?.(newZoom);
+    });
   }, [zoom, onZoomChange]);
 
   const handleZoomOut = useCallback(() => {
     const newZoom = Math.max(zoom - ZOOM_STEP, MIN_ZOOM);
-    setInternalZoom(newZoom);
-    onZoomChange?.(newZoom);
+    startTransition(() => {
+      setInternalZoom(newZoom);
+      onZoomChange?.(newZoom);
+    });
   }, [zoom, onZoomChange]);
 
   const handleReset = useCallback(() => {
-    setInternalZoom(1.5);
-    setInternalCenter(defaultCenter);
-    onZoomChange?.(1.5);
-    onCenterChange?.(defaultCenter);
+    startTransition(() => {
+      setInternalZoom(1.5);
+      setInternalCenter(defaultCenter);
+      onZoomChange?.(1.5);
+      onCenterChange?.(defaultCenter);
+    });
   }, [defaultCenter, onZoomChange, onCenterChange]);
 
   const handleMoveEnd = useCallback(
     (position: { coordinates: [number, number]; zoom: number }) => {
-      setInternalCenter(position.coordinates);
-      setInternalZoom(position.zoom);
-      onCenterChange?.(position.coordinates);
-      onZoomChange?.(position.zoom);
+      startTransition(() => {
+        setInternalCenter(position.coordinates);
+        setInternalZoom(position.zoom);
+        onCenterChange?.(position.coordinates);
+        onZoomChange?.(position.zoom);
+      });
     },
     [onCenterChange, onZoomChange]
   );
@@ -193,7 +201,7 @@ export function GameMap({
           <Geographies geography={topoData}>
             {({ geographies }) => {
               console.log('[GameMap] Geographies loaded:', geographies.length);
-              return geographies.map((geo) => {
+              return geographies.map((geo, index) => {
                 const numericCode = geo.id;
                 const alpha3Code = numericToAlpha3(String(numericCode));
                 const countryState = getCountryState(
@@ -207,10 +215,12 @@ export function GameMap({
                 const fillColor = MAP_COLORS[countryState];
                 const isHighlighted = countryState !== 'default';
 
+                // Use geo.id or fallback to index for unique key
+                const geoKey = geo.rsmKey || geo.id || `geo-${index}`;
+
                 return (
                   <Geography
-                    // @ts-expect-error - rsmKey exists at runtime but types are incomplete
-                    key={geo.rsmKey}
+                    key={geoKey}
                     geography={geo}
                     fill={fillColor}
                     stroke="#FFFFFF"

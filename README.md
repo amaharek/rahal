@@ -61,6 +61,13 @@ docker exec -i rahal-db psql -U postgres -d postgres < supabase/migrations-manua
 make seed
 ```
 
+**Seeded Data:**
+- ✅ 98 countries (all continents)
+- ✅ 154 borders (connected graph for pathfinding)
+- ✅ 85 questions (8 categories × 3 difficulties)
+- ✅ 5 achievements
+- ✅ 61 daily challenges (30 past + today + 30 future)
+
 Access the application:
 - **Frontend**: http://localhost:3000 (Next.js 15.5)
 - **Backend API**: http://localhost:8000/docs

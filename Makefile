@@ -94,6 +94,9 @@ migrate-new:
 	cd backend && alembic revision --autogenerate -m "$$name"
 
 seed:
+	cd backend && uv run python ../scripts/seed_unified.py
+
+seed-legacy:
 	cd backend && uv run python ../scripts/seed_database.py
 
 db-reset:
