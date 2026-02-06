@@ -32,6 +32,7 @@ export interface DailyChallenge {
   start_country: Country;
   end_country: Country;
   shortest_path: number;
+  path_country_codes: string[];
   user_progress: UserProgress | null;
 }
 

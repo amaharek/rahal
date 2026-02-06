@@ -66,6 +66,23 @@ async def get_daily_challenge(
                 score=result.score,
             )
 
+    # Calculate shortest path for visualization
+    path = await path_finder_service.find_shortest_path(
+        db, challenge.start_country.id, challenge.end_country.id
+    )
+    
+    # Extract country codes from path (excluding start and end)
+    path_country_codes = []
+    if path and len(path) > 2:
+        # Get countries excluding first (start) and last (end)
+        middle_country_ids = path[1:-1]
+        # Query countries to get their codes
+        from app.crud.country import country_crud
+        for country_id in middle_country_ids:
+            country = await country_crud.get(db, country_id)
+            if country:
+                path_country_codes.append(country.code)
+
     return DailyChallengeResponse(
         id=challenge.id,
         challenge_date=challenge.challenge_date,
@@ -84,6 +101,7 @@ async def get_daily_challenge(
             flag_emoji=challenge.end_country.flag_emoji,
         ),
         shortest_path=challenge.shortest_path,
+        path_country_codes=path_country_codes,
         user_progress=user_progress,
     )
 

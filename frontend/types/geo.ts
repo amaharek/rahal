@@ -8,7 +8,8 @@ export type CountryState =
   | 'guessed-off-path'
   | 'start'
   | 'end'
-  | 'hint';
+  | 'hint'
+  | 'path-country';
 
 export interface GameMapProps {
   startCountryCode: string;
@@ -18,6 +19,7 @@ export interface GameMapProps {
     isOnPath: boolean;
   }[];
   hintCountryCodes?: string[];
+  pathCountryCodes?: string[];
   zoom?: number;
   center?: [number, number];
   onZoomChange?: (zoom: number) => void;
@@ -36,14 +38,15 @@ export interface MapLegendProps {
   className?: string;
 }
 
-// Color constants for map states
+// Color constants for map states - Modern palette
 export const MAP_COLORS: Record<CountryState, string> = {
-  default: '#E5E7EB',
-  'guessed-on-path': '#2ECC71',
-  'guessed-off-path': '#9CA3AF',
-  start: '#0D7377',
-  end: '#D4A574',
-  hint: '#8B5CF6',
+  default: '#F3F4F6',           // Light gray (modern neutral)
+  'guessed-on-path': '#10B981', // Emerald green (Tailwind)
+  'guessed-off-path': '#6B7280', // Cool gray (Tailwind)
+  start: '#06B6D4',              // Cyan (modern teal)
+  end: '#F59E0B',                // Amber (warm modern)
+  hint: '#8B5CF6',               // Purple (vibrant)
+  'path-country': '#34D399',     // Light emerald (revealed path)
 };
 
 // ISO 3166-1 numeric to alpha-3 mapping (used by world-atlas TopoJSON)

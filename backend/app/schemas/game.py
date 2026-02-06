@@ -28,6 +28,7 @@ class DailyChallengeResponse(BaseModel):
     start_country: CountryBrief
     end_country: CountryBrief
     shortest_path: int
+    path_country_codes: list[str] = Field(default_factory=list)
     user_progress: UserProgress | None = None
 
     class Config:

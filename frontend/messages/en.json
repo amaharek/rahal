@@ -71,8 +71,9 @@
     "map": {
       "start": "Start",
       "end": "End",
-      "onPath": "On Path",
-      "offPath": "Off Path",
+      "pathCountry": "On Correct Path",
+      "onPath": "Correct Guess",
+      "offPath": "Wrong Guess",
       "showMap": "Show Map",
       "hideMap": "Hide Map"
     }

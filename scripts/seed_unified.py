@@ -51,6 +51,7 @@ from app.models.country import Border, Country
 from app.models.game import DailyChallenge
 from app.models.question import Question
 from app.models.user import Achievement
+from app.services.path_finder import PathFinderService
 
 
 # ============================================================================
@@ -449,38 +450,67 @@ async def seed_daily_challenges(
         print(f"  ✅ {len(existing)} daily challenges already exist\n")
         return len(existing)
     
-    # Get all country codes
+    # Get all country codes and initialize PathFinder
     country_codes = list(country_map.keys())
     if len(country_codes) < 2:
         print("  ⚠️  Not enough countries to create challenges")
         return 0
     
+    path_finder = PathFinderService()
+    
     # Generate challenges for 61 days
     today = date.today()
     challenges_created = 0
+    attempts = 0
+    max_attempts = 1000  # Prevent infinite loops
     
     for days_offset in range(-30, 31):
         challenge_date = today + timedelta(days=days_offset)
         
-        # Select random start and end countries
-        start_code = random.choice(country_codes)
-        end_code = random.choice([c for c in country_codes if c != start_code])
+        # Try to find valid country pairs with existing paths
+        valid_pair_found = False
+        pair_attempts = 0
         
-        start_country = country_map[start_code]
-        end_country = country_map[end_code]
+        while not valid_pair_found and pair_attempts < 50:
+            pair_attempts += 1
+            attempts += 1
+            
+            if attempts > max_attempts:
+                print(f"  ⚠️  Reached max attempts ({max_attempts}), stopping")
+                break
+            
+            # Select random start and end countries
+            start_code = random.choice(country_codes)
+            end_code = random.choice([c for c in country_codes if c != start_code])
+            
+            start_country = country_map[start_code]
+            end_country = country_map[end_code]
+            
+            # Calculate actual shortest path
+            path = await path_finder.find_shortest_path(
+                session, start_country.id, end_country.id
+            )
+            
+            if path and len(path) >= 3:  # Ensure minimum challenge difficulty
+                # Path exists and is long enough
+                shortest_path = len(path) - 1  # Number of borders to cross
+                
+                challenge = DailyChallenge(
+                    id=uuid4(),
+                    challenge_date=challenge_date,
+                    start_country_id=start_country.id,
+                    end_country_id=end_country.id,
+                    shortest_path=shortest_path,
+                )
+                session.add(challenge)
+                challenges_created += 1
+                valid_pair_found = True
+                
+                if challenges_created % 10 == 0:
+                    print(f"  📍 Created {challenges_created} challenges...")
         
-        # Estimate shortest path (simplified - between 2 and 6)
-        shortest_path = random.randint(2, 6)
-        
-        challenge = DailyChallenge(
-            id=uuid4(),
-            challenge_date=challenge_date,
-            start_country_id=start_country.id,
-            end_country_id=end_country.id,
-            shortest_path=shortest_path,
-        )
-        session.add(challenge)
-        challenges_created += 1
+        if attempts > max_attempts:
+            break
     
     await session.flush()
     print(f"  ✅ Created {challenges_created} daily challenges\n")

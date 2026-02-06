@@ -41,6 +41,7 @@ export function GameMap({
   endCountryCode,
   guessedCountryCodes,
   hintCountryCodes = [],
+  pathCountryCodes = [],
   zoom: externalZoom,
   center: externalCenter,
   onZoomChange,
@@ -209,7 +210,8 @@ export function GameMap({
                   startCountryCode,
                   endCountryCode,
                   guessedCountryCodes,
-                  hintCountryCodes
+                  hintCountryCodes,
+                  pathCountryCodes
                 );
 
                 const fillColor = MAP_COLORS[countryState];

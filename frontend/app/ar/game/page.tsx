@@ -268,6 +268,7 @@ export default function GamePage() {
                   startCountryCode={challenge.start_country.code}
                   endCountryCode={challenge.end_country.code}
                   guessedCountryCodes={guessedCountryCodes}
+                  pathCountryCodes={challenge.path_country_codes || []}
                   zoom={mapZoom}
                   center={mapCenter}
                   onZoomChange={setMapZoom}

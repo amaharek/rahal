@@ -8,6 +8,7 @@ import type { MapLegendProps } from '@/types/geo';
 const LEGEND_ITEMS = [
   { state: 'start', labelKey: 'game.map.start' },
   { state: 'end', labelKey: 'game.map.end' },
+  { state: 'path-country', labelKey: 'game.map.pathCountry' },
   { state: 'guessed-on-path', labelKey: 'game.map.onPath' },
   { state: 'guessed-off-path', labelKey: 'game.map.offPath' },
 ] as const;
