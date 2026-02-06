@@ -14,28 +14,21 @@ import type { GameMapProps } from '@/types/geo';
 import { MapControls } from './MapControls';
 import { MapLegend } from './MapLegend';
 
-// Construct absolute URL for geography data (required by react-simple-maps' URL constructor)
-const getGeoUrl = () => {
-  if (typeof window !== 'undefined') {
-    return `${window.location.origin}/geo/world-110m.json`;
-  }
-  // Fallback for SSR (though this component is client-only)
-  return '/geo/world-110m.json';
-};
-
-// Prefetch and validate TopoJSON data
-const validateGeoData = async (): Promise<boolean> => {
+// Fetch TopoJSON data to avoid URL validation issues
+const fetchTopoJSON = async () => {
   try {
-    const url = getGeoUrl();
-    const response = await fetch(url, { method: 'HEAD' });
+    console.log('[GameMap] Fetching TopoJSON data...');
+    const response = await fetch('/geo/world-110m.json');
     if (!response.ok) {
-      console.error(`[GameMap] TopoJSON file not accessible: ${response.status} ${response.statusText}`);
-      return false;
+      console.error(`[GameMap] Failed to fetch TopoJSON: ${response.status}`);
+      return null;
     }
-    return true;
+    const data = await response.json();
+    console.log('[GameMap] TopoJSON loaded successfully');
+    return data;
   } catch (error) {
-    console.error('[GameMap] Failed to validate TopoJSON file:', error);
-    return false;
+    console.error('[GameMap] Error fetching TopoJSON:', error);
+    return null;
   }
 };
 
@@ -64,15 +57,34 @@ export function GameMap({
   const [internalZoom, setInternalZoom] = useState(1.5);
   const [internalCenter, setInternalCenter] =
     useState<[number, number]>(defaultCenter);
-  const [geoDataValid, setGeoDataValid] = useState(true);
+  const [topoData, setTopoData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
 
-  // Validate TopoJSON on mount
+  // Fetch TopoJSON on mount
   useEffect(() => {
-    validateGeoData().then(setGeoDataValid);
+    console.log('[GameMap] Component mounted, fetching TopoJSON...');
+    setIsLoading(true);
+    fetchTopoJSON()
+      .then((data) => {
+        if (data) {
+          setTopoData(data);
+          setHasError(false);
+        } else {
+          setHasError(true);
+        }
+      })
+      .catch(() => setHasError(true))
+      .finally(() => setIsLoading(false));
   }, []);
 
   const zoom = externalZoom ?? internalZoom;
   const center = externalCenter ?? internalCenter;
+
+  // Debug logging
+  useEffect(() => {
+    console.log('[GameMap] Render - zoom:', zoom, 'center:', center);
+  }, [zoom, center]);
 
   const handleZoomIn = useCallback(() => {
     const newZoom = Math.min(zoom + ZOOM_STEP, MAX_ZOOM);
@@ -103,7 +115,21 @@ export function GameMap({
     [onCenterChange, onZoomChange]
   );
 
-  if (!geoDataValid) {
+  if (isLoading) {
+    return (
+      <div
+        className={cn(
+          'relative w-full aspect-[16/10] bg-gray-100 rounded-lg overflow-hidden border border-border flex flex-col items-center justify-center p-6 text-center',
+          className
+        )}
+      >
+        <span className="text-4xl mb-4 animate-pulse">🗺️</span>
+        <p className="text-text-secondary text-sm">جاري تحميل الخريطة...</p>
+      </div>
+    );
+  }
+
+  if (hasError || !topoData) {
     return (
       <div
         className={cn(
@@ -117,8 +143,19 @@ export function GameMap({
         </p>
         <button
           onClick={() => {
-            setGeoDataValid(true);
-            validateGeoData().then(setGeoDataValid);
+            setIsLoading(true);
+            setHasError(false);
+            fetchTopoJSON()
+              .then((data) => {
+                if (data) {
+                  setTopoData(data);
+                  setHasError(false);
+                } else {
+                  setHasError(true);
+                }
+              })
+              .catch(() => setHasError(true))
+              .finally(() => setIsLoading(false));
           }}
           className="mt-4 text-primary text-sm underline"
         >
@@ -134,12 +171,15 @@ export function GameMap({
         'relative w-full aspect-[16/10] bg-blue-50 rounded-lg overflow-hidden border border-border',
         className
       )}
+      style={{ minHeight: '500px' }}
     >
       <ComposableMap
         projection="geoMercator"
         projectionConfig={{
           scale: 150,
         }}
+        width={800}
+        height={500}
         style={{ width: '100%', height: '100%' }}
       >
         <ZoomableGroup
@@ -150,9 +190,10 @@ export function GameMap({
           minZoom={MIN_ZOOM}
           maxZoom={MAX_ZOOM}
         >
-          <Geographies geography={getGeoUrl()}>
-            {({ geographies }) =>
-              geographies.map((geo) => {
+          <Geographies geography={topoData}>
+            {({ geographies }) => {
+              console.log('[GameMap] Geographies loaded:', geographies.length);
+              return geographies.map((geo) => {
                 const numericCode = geo.id;
                 const alpha3Code = numericToAlpha3(String(numericCode));
                 const countryState = getCountryState(
@@ -190,8 +231,8 @@ export function GameMap({
                     }}
                   />
                 );
-              })
-            }
+              });
+            }}
           </Geographies>
         </ZoomableGroup>
       </ComposableMap>
