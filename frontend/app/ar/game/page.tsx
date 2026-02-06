@@ -1,18 +1,18 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { ChevronDown, ChevronUp, Map } from 'lucide-react';
-import { getDailyChallenge, submitGuess } from '@/lib/api/game';
+import { getDailyChallenge, submitGuess, useHint } from '@/lib/api/game';
 import { useGameStore } from '@/lib/stores/gameStore';
 import { CountryInput } from '@/components/game/CountryInput';
 import { EmojiScore } from '@/components/game/EmojiScore';
 import { MapSkeleton, MapErrorBoundary } from '@/components/game/GameMap';
 import { Card, CardHeader, CardTitle, CardContent, Button } from '@/components/ui';
-import type { Country, GuessEntry } from '@/types/game';
+import type { Country, GuessEntry, HintType, HintResponse } from '@/types/game';
 
 // Lazy load GameMap (SSR disabled due to react-simple-maps)
 const GameMap = dynamic(
@@ -47,12 +47,16 @@ export default function GamePage() {
     mapCenter,
     setChallenge,
     addGuess,
+    useHint: storeUseHint,
     completeGame,
     setError,
     toggleMap,
     setMapZoom,
     setMapCenter,
   } = useGameStore();
+
+  // State for hint display
+  const [currentHint, setCurrentHint] = useState<HintResponse | null>(null);
 
   // Fetch daily challenge
   const { data, isLoading, error } = useQuery({
@@ -101,6 +105,49 @@ export default function GamePage() {
       setError(error.message);
     },
   });
+
+  // Hint mutation
+  const hintMutation = useMutation({
+    mutationFn: (hintType: HintType) =>
+      useHint({
+        challenge_id: challenge!.id,
+        hint_type: hintType,
+      }),
+    onSuccess: (response) => {
+      setCurrentHint(response);
+      storeUseHint();
+    },
+    onError: (error: Error) => {
+      setError(error.message);
+    },
+  });
+
+  // Handle hint request
+  const handleHintRequest = (hintType: HintType) => {
+    if (!challenge || hintsUsed >= 3 || hintMutation.isPending) return;
+    hintMutation.mutate(hintType);
+  };
+
+  // Format hint data for display
+  const formatHintDisplay = (hint: HintResponse): string => {
+    const { hint_type, hint_data } = hint;
+
+    if (hint_type === 'border_hint' && hint_data.country) {
+      const country = hint_data.country as { name_ar: string; flag_emoji?: string };
+      return `${country.flag_emoji || ''} ${country.name_ar}`;
+    }
+
+    if (hint_type === 'all_borders_hint' && hint_data.countries) {
+      const countries = hint_data.countries as Array<{ name_ar: string; flag_emoji?: string }>;
+      return countries.map((c) => `${c.flag_emoji || ''} ${c.name_ar}`).join('، ');
+    }
+
+    if (hint_type === 'first_letter_hint' && hint_data.letter) {
+      return hint_data.letter as string;
+    }
+
+    return JSON.stringify(hint_data);
+  };
 
   const handleCountrySelect = (country: Country) => {
     if (!challenge || isCompleted) return;
@@ -289,28 +336,45 @@ export default function GamePage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      disabled={hintsUsed >= 3}
+                      disabled={hintsUsed >= 3 || hintMutation.isPending}
                       className="flex-1"
+                      onClick={() => handleHintRequest('border_hint')}
                     >
                       {t('game.hintTypes.border')}
                     </Button>
                     <Button
                       variant="outline"
                       size="sm"
-                      disabled={hintsUsed >= 3}
+                      disabled={hintsUsed >= 3 || hintMutation.isPending}
                       className="flex-1"
+                      onClick={() => handleHintRequest('all_borders_hint')}
                     >
                       {t('game.hintTypes.allBorders')}
                     </Button>
                     <Button
                       variant="outline"
                       size="sm"
-                      disabled={hintsUsed >= 3}
+                      disabled={hintsUsed >= 3 || hintMutation.isPending}
                       className="flex-1"
+                      onClick={() => handleHintRequest('first_letter_hint')}
                     >
                       {t('game.hintTypes.firstLetter')}
                     </Button>
                   </div>
+
+                  {/* Hint Display */}
+                  {currentHint && (
+                    <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                      <div className="text-sm text-yellow-800 font-medium mb-1">
+                        {currentHint.hint_type === 'border_hint' && t('game.hintTypes.border')}
+                        {currentHint.hint_type === 'all_borders_hint' && t('game.hintTypes.allBorders')}
+                        {currentHint.hint_type === 'first_letter_hint' && t('game.hintTypes.firstLetter')}
+                      </div>
+                      <div className="text-yellow-900">
+                        {formatHintDisplay(currentHint)}
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             )}
