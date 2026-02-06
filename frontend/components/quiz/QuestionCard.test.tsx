@@ -107,7 +107,10 @@ describe('QuestionCard', () => {
         currentQuestion={1}
         totalQuestions={10}
         locale="ar"
-      />stId('question-difficulty')
+      />
+    )
+
+    let badge = screen.getByTestId('question-difficulty')
     expect(badge).toHaveAttribute('data-difficulty', 'easy')
     expect(badge).toHaveClass(/green|success|easy/)
 

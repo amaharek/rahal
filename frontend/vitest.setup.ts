@@ -1,6 +1,11 @@
 import '@testing-library/jest-dom'
-import { cleanup } from '@testing-library/react'
+import { cleanup, configure } from '@testing-library/react'
 import { afterEach, vi } from 'vitest'
+
+// Configure testing-library to work with fake timers
+configure({
+  asyncUtilTimeout: 5000,
+})
 
 // Cleanup after each test
 afterEach(() => {

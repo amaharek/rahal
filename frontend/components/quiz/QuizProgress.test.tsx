@@ -89,8 +89,8 @@ describe('QuizProgress', () => {
       />
     )
 
-    const hintsDisplay = screen.getByText(/0/i)
-    expect(hintsDisplay.closest('div')).toHaveClass(/empty|disabled|muted/)
+    const hintsDisplay = screen.getByTestId('hints-display')
+    expect(hintsDisplay).toHaveClass(/empty|disabled|muted/)
   })
 
   it('should show accuracy percentage if provided', () => {
@@ -283,7 +283,9 @@ describe('QuizProgress', () => {
       />
     )
 
-    expect(screen.getByText(/0/)).toBeInTheDocument()
+    // Score should be 0 and displayed
+    const scoreValue = screen.getByTestId('score-value')
+    expect(scoreValue).toHaveTextContent('0')
   })
 
   it('should support compact mode for mobile', () => {

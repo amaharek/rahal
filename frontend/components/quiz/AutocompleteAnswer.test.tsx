@@ -9,7 +9,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom'
 import AutocompleteAnswer from '@/components/quiz/AutocompleteAnswer'
@@ -114,8 +114,9 @@ describe('AutocompleteAnswer', () => {
     const firstSuggestion = screen.getByTestId('suggestion-item-0')
     await user.click(firstSuggestion)
 
-    // Input should be filled with selected suggestion
-    expect(input).toHaveValue(expect.any(String))
+    // Input should be filled with selected suggestion (not empty)
+    expect(input).not.toHaveValue('')
+    expect((input as HTMLInputElement).value.length).toBeGreaterThan(0)
   })
 
   it('should navigate suggestions with arrow keys', async () => {
@@ -167,8 +168,9 @@ describe('AutocompleteAnswer', () => {
     await user.keyboard('{ArrowDown}')
     await user.keyboard('{Enter}')
 
-    // Input should be filled with selected suggestion
-    expect(input).toHaveValue(expect.any(String))
+    // Input should be filled with selected suggestion (not empty)
+    expect(input).not.toHaveValue('')
+    expect((input as HTMLInputElement).value.length).toBeGreaterThan(0)
   })
 
   it('should close suggestions with Escape', async () => {
