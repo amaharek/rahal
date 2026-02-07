@@ -196,20 +196,20 @@ export default function GamePage() {
   return (
     <main className="min-h-screen pb-20">
       {/* Header */}
-      <header className="bg-primary text-white py-4 px-4">
+      <header className="bg-primary text-white py-3 px-4">
         <div className="max-w-7xl mx-auto">
-          <Link href="/ar" className="text-white/80 text-sm mb-2 inline-block">
+          <Link href="/ar" className="text-white/80 text-sm mb-1 inline-block">
             ← {t('common.back')}
           </Link>
-          <h1 className="text-2xl font-bold">{t('game.title')}</h1>
-          <p className="text-white/80 text-sm">{t('game.subtitle')}</p>
+          <h1 className="text-xl font-bold">{t('game.title')}</h1>
+          <p className="text-white/80 text-xs">{t('game.subtitle')}</p>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 py-4">
+      <div className="max-w-7xl mx-auto px-4 py-3">
         {/* Challenge Display */}
-        <Card className="mb-4">
-          <CardContent className="py-3">
+        <Card className="mb-3">
+          <CardContent className="py-2">
             <div className="flex items-center justify-between gap-3">
               {/* Start Country */}
               <div className="text-center flex-1">
@@ -244,7 +244,7 @@ export default function GamePage() {
         </Card>
 
         {/* Two-column layout for desktop */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Map Section - First on mobile (order-1), First on desktop (lg:order-1) */}
           <div className="order-1 lg:order-1">
             {/* Mobile: Collapsible Map */}
@@ -284,7 +284,7 @@ export default function GamePage() {
           </div>
 
           {/* Game Controls Section - Second on mobile (order-2), Second on desktop (lg:order-2) */}
-          <div className="order-2 lg:order-2 space-y-6">
+          <div className="order-2 lg:order-2 space-y-4">
             {/* Game Completed */}
             {isCompleted ? (
               <Card className="bg-success/10 border-success">
@@ -399,11 +399,11 @@ export default function GamePage() {
                     <p className="text-sm mt-2">{t('game.startTyping')}</p>
                   </div>
                 ) : (
-                  <div className="space-y-3 max-h-[300px] overflow-y-auto">
+                  <div className="space-y-2 max-h-[200px] overflow-y-auto">
                     {guesses.map((guess, index) => (
                       <div
                         key={guess.country_id}
-                        className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg"
+                        className="flex items-center gap-3 p-2 bg-gray-50 rounded-lg"
                       >
                         <span className="text-lg font-bold text-text-secondary w-8">
                           {index + 1}.

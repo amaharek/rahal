@@ -68,8 +68,8 @@ export default function AnswerOptions({
     const isWrongSelection = isSubmitted && isSelected && correctIndex !== index;
 
     return cn(
-      'w-full p-4 rounded-lg border-2 transition-all',
-      'flex items-center gap-4',
+      'w-full p-3 rounded-lg border-2 transition-all',
+      'flex items-center gap-3',
       'focus:outline-none focus:ring-2 focus:ring-primary',
       isRTL && 'flex-row-reverse',
       // Default state
