@@ -12,6 +12,7 @@ import { CountryInput } from '@/components/game/CountryInput';
 import { EmojiScore } from '@/components/game/EmojiScore';
 import { MapSkeleton, MapErrorBoundary } from '@/components/game/GameMap';
 import { Card, CardHeader, CardTitle, CardContent, Button } from '@/components/ui';
+import { useDirection } from '@/lib/hooks/useDirection';
 import type { Country, GuessEntry, HintType, HintResponse } from '@/types/game';
 
 // Lazy load GameMap (SSR disabled due to react-simple-maps)
@@ -36,6 +37,7 @@ const GameMap = dynamic(
 
 export default function GamePage() {
   const t = useTranslations();
+  const direction = useDirection();
   const {
     challenge,
     guesses,
@@ -219,7 +221,7 @@ export default function GamePage() {
               </div>
 
               {/* Arrow */}
-              <div className="text-xl text-primary">→</div>
+              <div className="text-xl text-primary">{direction === 'rtl' ? '←' : '→'}</div>
 
               {/* End Country */}
               <div className="text-center flex-1">
