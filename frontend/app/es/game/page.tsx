@@ -135,18 +135,19 @@ export default function GamePage() {
   const formatHintDisplay = (hint: HintResponse): string => {
     const { hint_type, hint_data } = hint;
 
-    if (hint_type === 'border_hint' && hint_data.country) {
-      const country = hint_data.country as { name_ar: string; flag_emoji?: string };
-      return `${country.flag_emoji || ''} ${country.name_ar}`;
+    if (hint_type === 'border_hint' && hint_data.country_name_es) {
+      const borderCountries = hint_data.border_countries as string[];
+      return `${hint_data.country_name_es} limita con: ${borderCountries.join(', ')}`;
     }
 
-    if (hint_type === 'all_borders_hint' && hint_data.countries) {
-      const countries = hint_data.countries as Array<{ name_ar: string; flag_emoji?: string }>;
-      return countries.map((c) => `${c.flag_emoji || ''} ${c.name_ar}`).join('، ');
+    if (hint_type === 'all_borders_hint' && hint_data.path_countries) {
+      const pathCountries = hint_data.path_countries as string[];
+      return `Ruta: ${pathCountries.join(' → ')}`;
     }
 
-    if (hint_type === 'first_letter_hint' && hint_data.letter) {
-      return hint_data.letter as string;
+    if (hint_type === 'first_letter_hint' && hint_data.first_letters) {
+      const letters = hint_data.first_letters as string[];
+      return `Primeras letras: ${letters.join(', ')}`;
     }
 
     return JSON.stringify(hint_data);
