@@ -2,6 +2,7 @@
 
 import { cn } from '@/lib/utils';
 import { QuestionCategory, QuestionDifficulty, QuestionType, DIFFICULTY_COLORS } from '@/types/quiz';
+import { useIsRTL } from '@/lib/hooks/useDirection';
 
 interface QuestionCardProps {
   question: {
@@ -14,7 +15,6 @@ interface QuestionCardProps {
   };
   currentQuestion: number;
   totalQuestions: number;
-  locale: 'ar' | 'en';
 }
 
 const DIFFICULTY_CLASS_MAP: Record<QuestionDifficulty, string> = {
@@ -27,9 +27,8 @@ export default function QuestionCard({
   question,
   currentQuestion,
   totalQuestions,
-  locale,
 }: QuestionCardProps) {
-  const isRTL = locale === 'ar';
+  const isRTL = useIsRTL();
 
   return (
     <article

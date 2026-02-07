@@ -2,6 +2,7 @@
 
 import { useRef, useCallback } from 'react';
 import { cn } from '@/lib/utils';
+import { useIsRTL } from '@/lib/hooks/useDirection';
 
 interface AnswerOption {
   id: string;
@@ -14,7 +15,6 @@ interface AnswerOptionsProps {
   selectedIndex?: number;
   correctIndex?: number;
   isSubmitted?: boolean;
-  locale: 'ar' | 'en';
 }
 
 const OPTION_LETTERS = ['A', 'B', 'C', 'D'];
@@ -25,10 +25,9 @@ export default function AnswerOptions({
   selectedIndex,
   correctIndex,
   isSubmitted = false,
-  locale,
 }: AnswerOptionsProps) {
   const optionRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const isRTL = locale === 'ar';
+  const isRTL = useIsRTL();
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLButtonElement>, index: number) => {

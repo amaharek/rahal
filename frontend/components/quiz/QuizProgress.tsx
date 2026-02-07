@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { useIsRTL } from '@/lib/hooks/useDirection';
 
 interface CategoryStat {
   correct: number;
@@ -20,7 +21,6 @@ interface QuizProgressProps {
   correctAnswers?: number;
   milestones?: string[];
   compact?: boolean;
-  locale: 'ar' | 'en';
 }
 
 function formatTimeElapsed(seconds: number): string {
@@ -52,9 +52,8 @@ export default function QuizProgress({
   correctAnswers,
   milestones,
   compact = false,
-  locale,
 }: QuizProgressProps) {
-  const isRTL = locale === 'ar';
+  const isRTL = useIsRTL();
   const progressPercentage = (currentQuestion / totalQuestions) * 100;
   const isComplete = currentQuestion === totalQuestions;
   const prevScoreRef = useRef(score);

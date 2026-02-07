@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { cn, debounce } from '@/lib/utils';
+import { useIsRTL } from '@/lib/hooks/useDirection';
 
 interface Suggestion {
   id: string;
@@ -17,7 +18,6 @@ interface AutocompleteAnswerProps {
   isSubmitted?: boolean;
   isCorrect?: boolean;
   correctAnswerKey?: string;
-  locale: 'ar' | 'en';
 }
 
 export default function AutocompleteAnswer({
@@ -29,13 +29,12 @@ export default function AutocompleteAnswer({
   isSubmitted = false,
   isCorrect,
   correctAnswerKey,
-  locale,
 }: AutocompleteAnswerProps) {
   const [inputValue, setInputValue] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
-  const isRTL = locale === 'ar';
+  const isRTL = useIsRTL();
 
   // Normalize suggestions to Suggestion format
   const normalizedSuggestions: Suggestion[] = useMemo(() => {

@@ -1,0 +1,187 @@
+{
+  "common": {
+    "appName": "Rahal",
+    "tagline": "Descubre el Mundo a Través del Juego",
+    "loading": "Cargando...",
+    "error": "Ocurrió un error",
+    "retry": "Reintentar",
+    "close": "Cerrar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "submit": "Enviar",
+    "share": "Compartir",
+    "copy": "Copiar",
+    "copied": "¡Copiado!"
+  },
+  "nav": {
+    "home": "Inicio",
+    "game": "Juego de Ruta",
+    "quiz": "Cuestionario",
+    "stats": "Estadísticas",
+    "profile": "Perfil",
+    "settings": "Configuración",
+    "leaderboard": "Tabla de Clasificación"
+  },
+  "home": {
+    "welcomeTitle": "¡Bienvenido a Rahal!",
+    "welcomeDescription": "Pon a prueba tus conocimientos de geografía y descubre el mundo",
+    "dailyChallenge": "Desafío Diario",
+    "startGame": "Comenzar a Jugar",
+    "quickQuiz": "Cuestionario Rápido",
+    "yourStats": "Tus Estadísticas",
+    "currentStreak": "Racha Actual",
+    "gamesPlayed": "Juegos",
+    "accuracy": "Precisión"
+  },
+  "game": {
+    "title": "Juego de Ruta",
+    "subtitle": "Navega de un país a otro",
+    "from": "Desde",
+    "to": "Hasta",
+    "enterCountry": "Ingresa el nombre del país...",
+    "guesses": "Intentos",
+    "noGuessesYet": "Sin intentos aún",
+    "startTyping": "Comienza a escribir el nombre de un país",
+    "hints": "Pistas",
+    "hintsRemaining": "pistas restantes",
+    "hintTypes": {
+      "border": "Pista de Frontera",
+      "allBorders": "Todas las Fronteras",
+      "firstLetter": "Primeras Letras"
+    },
+    "completed": "¡Felicitaciones! 🎉",
+    "completedMessage": "Completaste el desafío de hoy",
+    "score": "Puntuación",
+    "totalGuesses": "Intentos Totales",
+    "shortestPath": "Ruta Más Corta",
+    "optimal": "¡Óptimo!",
+    "shareResult": "Compartir Resultado",
+    "playAgainTomorrow": "Juega de nuevo mañana",
+    "emojiDescriptions": {
+      "excellent": "Excelente",
+      "good": "Bueno",
+      "okay": "Aceptable",
+      "far": "Lejos",
+      "wrongContinent": "Continente Incorrecto"
+    },
+    "map": {
+      "start": "Inicio",
+      "end": "Fin",
+      "pathCountry": "En la Ruta Correcta",
+      "onPath": "Intento Correcto",
+      "offPath": "Intento Incorrecto",
+      "showMap": "Mostrar Mapa",
+      "hideMap": "Ocultar Mapa"
+    }
+  },
+  "quiz": {
+    "title": "Cuestionario",
+    "subtitle": "Pon a prueba tus conocimientos de geografía",
+    "categories": {
+      "capitals": "Capitales",
+      "flags": "Banderas",
+      "landmarks": "Monumentos",
+      "attractions": "Atracciones",
+      "geography": "Geografía",
+      "borders": "Fronteras",
+      "population": "Población",
+      "arab_world": "Mundo Árabe"
+    },
+    "difficulty": {
+      "easy": "Fácil",
+      "medium": "Medio",
+      "hard": "Difícil"
+    },
+    "questionOf": "Pregunta {current} de {total}",
+    "correct": "¡Correcto! ✓",
+    "incorrect": "Incorrecto ✗",
+    "correctAnswer": "Respuesta Correcta",
+    "points": "puntos",
+    "useHint": "Usar Pista",
+    "nextQuestion": "Siguiente Pregunta",
+    "quizComplete": "¡Cuestionario Completo!",
+    "finalScore": "Puntuación Final",
+    "questionsCorrect": "respuestas correctas",
+    "tryAgain": "Intentar de Nuevo",
+    "selectCategory": "Seleccionar Categoría",
+    "selectDifficulty": "Seleccionar Dificultad",
+    "startQuiz": "Comenzar Cuestionario",
+    "dailyQuiz": "Cuestionario Diario"
+  },
+  "stats": {
+    "title": "Estadísticas",
+    "gameStats": "Estadísticas del Juego",
+    "quizStats": "Estadísticas del Cuestionario",
+    "gamesPlayed": "Juegos",
+    "gamesWon": "Ganados",
+    "winRate": "Tasa de Victorias",
+    "currentStreak": "Racha Actual",
+    "maxStreak": "Racha Máxima",
+    "averageGuesses": "Promedio de Intentos",
+    "totalQuestions": "Preguntas Totales",
+    "correctAnswers": "Respuestas Correctas",
+    "accuracy": "Precisión",
+    "byCategory": "Por Categoría",
+    "byDifficulty": "Por Dificultad"
+  },
+  "profile": {
+    "title": "Perfil",
+    "username": "Nombre de Usuario",
+    "displayName": "Nombre para Mostrar",
+    "memberSince": "Miembro desde",
+    "achievements": "Logros",
+    "noAchievements": "Sin logros aún",
+    "editProfile": "Editar Perfil",
+    "signOut": "Cerrar Sesión"
+  },
+  "settings": {
+    "title": "Configuración",
+    "language": "Idioma",
+    "theme": "Tema",
+    "themes": {
+      "light": "Claro",
+      "dark": "Oscuro",
+      "system": "Sistema"
+    },
+    "notifications": "Notificaciones",
+    "dailyReminder": "Recordatorio Diario",
+    "soundEffects": "Efectos de Sonido"
+  },
+  "leaderboard": {
+    "title": "Tabla de Clasificación",
+    "rank": "Rango",
+    "player": "Jugador",
+    "score": "Puntuación",
+    "games": "Juegos",
+    "yourRank": "Tu Rango",
+    "types": {
+      "streak": "Racha Más Larga",
+      "wins": "Victorias",
+      "accuracy": "Precisión"
+    }
+  },
+  "auth": {
+    "signIn": "Iniciar Sesión",
+    "signUp": "Registrarse",
+    "signOut": "Cerrar Sesión",
+    "email": "Correo Electrónico",
+    "password": "Contraseña",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "noAccount": "¿No tienes una cuenta?",
+    "hasAccount": "¿Ya tienes una cuenta?",
+    "continueAsGuest": "Continuar como Invitado"
+  },
+  "errors": {
+    "general": "Ocurrió un error, por favor intenta de nuevo",
+    "network": "Error de conexión de red",
+    "notFound": "Página no encontrada",
+    "unauthorized": "Por favor inicia sesión",
+    "alreadyGuessed": "Ya adivinaste este país",
+    "noHintsLeft": "Todas las pistas usadas",
+    "gameCompleted": "Ya completaste este desafío"
+  }
+}
