@@ -1,7 +1,7 @@
 {
   "common": {
     "appName": "رحال",
-    "tagline": "اكتشف العالم من خلال اللعب",
+    "tagline": "رحلتك الممتعة لاكتشاف العالم",
     "loading": "جاري التحميل...",
     "error": "حدث خطأ",
     "retry": "إعادة المحاولة",
@@ -20,8 +20,8 @@
   },
   "nav": {
     "home": "الرئيسية",
-    "game": "لعبة المسار",
-    "quiz": "الأسئلة",
+    "game": "مسار الرحالة",
+    "quiz": "تحدي المعرفة",
     "stats": "الإحصائيات",
     "profile": "الملف الشخصي",
     "settings": "الإعدادات",
@@ -29,9 +29,9 @@
   },
   "home": {
     "welcomeTitle": "مرحباً بك في رحال!",
-    "welcomeDescription": "اختبر معلوماتك الجغرافية واكتشف العالم",
-    "dailyChallenge": "تحدي اليوم",
-    "startGame": "ابدأ اللعب",
+    "welcomeDescription": "ابدأ مغامرتك الجغرافية واكتشف خبايا العالم",
+    "dailyChallenge": "رحلة اليوم",
+    "startGame": "ابدأ الرحلة",
     "quickQuiz": "اختبار سريع",
     "yourStats": "إحصائياتك",
     "currentStreak": "السلسلة الحالية",
@@ -39,13 +39,13 @@
     "accuracy": "الدقة"
   },
   "game": {
-    "title": "لعبة المسار",
-    "subtitle": "انتقل من دولة إلى أخرى",
+    "title": "مسار الرحالة",
+    "subtitle": "هل تستطيع الترحال من بلد لأخرى وإيجاد كل الدول بينهما؟",
     "from": "من",
     "to": "إلى",
     "enterCountry": "اكتب اسم الدولة...",
     "guesses": "التخمينات",
-    "noGuessesYet": "لم تقم بأي تخمين بعد",
+    "noGuessesYet": "انطلق في رحلتك!",
     "startTyping": "ابدأ بكتابة اسم دولة",
     "hints": "التلميحات",
     "hintsRemaining": "تلميحات متبقية",
@@ -55,13 +55,13 @@
       "firstLetter": "الحروف الأولى"
     },
     "completed": "تهانينا! 🎉",
-    "completedMessage": "لقد أكملت تحدي اليوم",
+    "completedMessage": "أحسنت! لقد أتممت رحلة اليوم بنجاح",
     "score": "النتيجة",
     "totalGuesses": "عدد التخمينات",
     "shortestPath": "أقصر مسار",
     "optimal": "مثالي!",
-    "shareResult": "مشاركة النتيجة",
-    "playAgainTomorrow": "العب مرة أخرى غداً",
+    "shareResult": "شارك إنجازك",
+    "playAgainTomorrow": "عد إلينا غداً لرحلة جديدة",
     "emojiDescriptions": {
       "excellent": "ممتاز",
       "good": "جيد",
@@ -80,8 +80,8 @@
     }
   },
   "quiz": {
-    "title": "الأسئلة",
-    "subtitle": "اختبر معلوماتك الجغرافية",
+    "title": "تحدي المعرفة",
+    "subtitle": "هل أنت خبير في الجغرافيا؟ دعنا نختبر ذلك",
     "categories": {
       "capitals": "العواصم",
       "flags": "الأعلام",
@@ -106,11 +106,11 @@
     "useHint": "استخدم تلميح",
     "nextQuestion": "السؤال التالي",
     "submitAnswer": "إرسال الإجابة",
-    "ready": "جاهز للبدء؟",
-    "description": "أجب على 10 أسئلة لاختبار معلوماتك الجغرافية",
+    "ready": "هل أنت مستعد للمغامرة؟",
+    "description": "أجب على 10 أسئلة لتثبت خبرتك الجغرافية",
     "questions": "الأسئلة",
     "secondsPerQuestion": "ثانية لكل سؤال",
-    "start": "ابدأ الاختبار",
+    "start": "ابدأ التحدي",
     "perfect": "نتيجة مثالية!",
     "completed": "تم إنهاء الاختبار!",
     "completedMessage": "أحسنت! لقد أكملت الاختبار.",
@@ -126,7 +126,7 @@
     "selectCategory": "اختر فئة",
     "selectDifficulty": "اختر المستوى",
     "startQuiz": "ابدأ الاختبار",
-    "dailyQuiz": "اختبار اليوم"
+    "dailyQuiz": "تحدي اليوم"
   },
   "stats": {
     "title": "الإحصائيات",
