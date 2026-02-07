@@ -204,36 +204,36 @@ export default function GamePage() {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="max-w-7xl mx-auto px-4 py-4">
         {/* Challenge Display */}
-        <Card className="mb-6">
-          <CardContent>
-            <div className="flex items-center justify-between gap-4">
+        <Card className="mb-4">
+          <CardContent className="py-3">
+            <div className="flex items-center justify-between gap-3">
               {/* Start Country */}
               <div className="text-center flex-1">
-                <div className="text-3xl mb-1">
+                <div className="text-2xl mb-0.5">
                   {challenge.start_country.flag_emoji}
                 </div>
-                <div className="font-bold">{challenge.start_country.name_ar}</div>
+                <div className="font-bold text-sm">{challenge.start_country.name_ar}</div>
                 <div className="text-xs text-text-secondary">{t('game.from')}</div>
               </div>
 
               {/* Arrow */}
-              <div className="text-2xl text-primary">→</div>
+              <div className="text-xl text-primary">→</div>
 
               {/* End Country */}
               <div className="text-center flex-1">
-                <div className="text-3xl mb-1">
+                <div className="text-2xl mb-0.5">
                   {challenge.end_country.flag_emoji}
                 </div>
-                <div className="font-bold">{challenge.end_country.name_ar}</div>
+                <div className="font-bold text-sm">{challenge.end_country.name_ar}</div>
                 <div className="text-xs text-text-secondary">{t('game.to')}</div>
               </div>
             </div>
 
             {/* Shortest Path Info */}
-            <div className="text-center mt-4 pt-4 border-t border-border">
-              <span className="text-sm text-text-secondary">
+            <div className="text-center mt-2 pt-2 border-t border-border">
+              <span className="text-xs text-text-secondary">
                 {t('game.shortestPath')}: {challenge.shortest_path}{' '}
                 {challenge.shortest_path === 1 ? 'دولة' : 'دول'}
               </span>

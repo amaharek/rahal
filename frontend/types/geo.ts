@@ -40,15 +40,43 @@ export interface MapLegendProps {
   className?: string;
 }
 
-// Color constants for map states - Modern palette
+// DEPRECATED: Legacy static colors - use useMapColors() hook instead
 export const MAP_COLORS: Record<CountryState, string> = {
-  default: '#F3F4F6',           // Light gray (modern neutral)
-  'guessed-on-path': '#10B981', // Emerald green (Tailwind)
-  'guessed-off-path': '#6B7280', // Cool gray (Tailwind)
-  start: '#06B6D4',              // Cyan (modern teal)
-  end: '#F59E0B',                // Amber (warm modern)
-  hint: '#8B5CF6',               // Purple (vibrant)
-  'path-country': '#34D399',     // Light emerald (revealed path)
+  default: '#F3F4F6',
+  'guessed-on-path': '#10B981',
+  'guessed-off-path': '#6B7280',
+  start: '#06B6D4',
+  end: '#F59E0B',
+  hint: '#8B5CF6',
+  'path-country': '#34D399',
+};
+
+// Light mode: Muted, softer colors for comfortable viewing
+export const LIGHT_MAP_COLORS: Record<CountryState, string> = {
+  default: '#E8EEF0',           // Soft blue-gray
+  'guessed-on-path': '#34D399', // Emerald (medium saturation)
+  'guessed-off-path': '#94A3B8', // Slate gray
+  start: '#0D7377',             // Brand teal
+  end: '#D4A574',               // Brand sand-gold
+  hint: '#A78BFA',              // Purple (soft)
+  'path-country': '#6EE7B7',    // Light emerald
+};
+
+// Dark mode: Vibrant, saturated colors that "glow" against dark backgrounds
+export const DARK_MAP_COLORS: Record<CountryState, string> = {
+  default: '#2D3748',           // Dark slate
+  'guessed-on-path': '#10B981', // Bright emerald
+  'guessed-off-path': '#64748B', // Medium slate
+  start: '#14919B',             // Light teal (brand brightened)
+  end: '#F59E0B',               // Bright amber
+  hint: '#8B5CF6',              // Vivid purple
+  'path-country': '#34D399',    // Emerald green
+};
+
+// Ocean/background colors for map
+export const MAP_OCEAN_COLORS = {
+  light: '#E8F0F2',  // Soft blue-gray
+  dark: '#0A1929',   // Deep navy
 };
 
 // ISO 3166-1 numeric to alpha-3 mapping (used by world-atlas TopoJSON)

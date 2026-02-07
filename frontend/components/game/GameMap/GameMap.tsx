@@ -9,7 +9,7 @@ import {
 } from '@vnedyalk0v/react19-simple-maps';
 import { cn } from '@/lib/utils';
 import { numericToAlpha3, getCountryState, calculateMapCenter } from '@/lib/geo';
-import { MAP_COLORS } from '@/types/geo';
+import { useMapColors } from '@/lib/hooks/useMapColors';
 import type { GameMapProps } from '@/types/geo';
 import { MapControls } from './MapControls';
 import { MapLegend } from './MapLegend';
@@ -50,6 +50,9 @@ export function GameMap({
   onCenterChange,
   className,
 }: GameMapProps) {
+  // Get theme-aware map colors
+  const mapColors = useMapColors();
+
   // Calculate default center based on start/end countries
   const defaultCenter = useMemo(
     () => calculateMapCenter(startCountryCode, endCountryCode),
@@ -179,10 +182,10 @@ export function GameMap({
   return (
     <div
       className={cn(
-        'relative w-full aspect-[16/10] bg-blue-50 rounded-lg overflow-hidden border border-border',
+        'relative w-full aspect-[16/10] rounded-lg overflow-hidden border border-border',
         className
       )}
-      style={{ minHeight: '500px' }}
+      style={{ minHeight: '500px', backgroundColor: mapColors.oceanBg }}
     >
       <ComposableMap
         projection="geoMercator"
@@ -216,7 +219,7 @@ export function GameMap({
                   pathCountryCodes
                 );
 
-                const fillColor = MAP_COLORS[countryState];
+                const fillColor = mapColors.colors[countryState];
                 const isHighlighted = countryState !== 'default';
 
                 // Get tooltip text for start/end countries
@@ -235,7 +238,7 @@ export function GameMap({
                     key={geoKey}
                     geography={geo}
                     fill={fillColor}
-                    stroke="#FFFFFF"
+                    stroke={mapColors.borderColor}
                     strokeWidth={0.5}
                     style={{
                       default: {
@@ -243,7 +246,7 @@ export function GameMap({
                         transition: 'fill 0.3s ease',
                       },
                       hover: {
-                        fill: isHighlighted ? fillColor : '#D1D5DB',
+                        fill: isHighlighted ? fillColor : mapColors.hoverDefault,
                         outline: 'none',
                         cursor: tooltipText ? 'pointer' : 'default',
                       },
