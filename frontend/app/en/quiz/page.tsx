@@ -92,9 +92,15 @@ export default function QuizPage() {
         undefined // Let the store calculate time
       );
       setCurrentAnswer(result);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to submit answer:', err);
-      setIsAnswerSubmitted(false);
+      // Handle 404 error (stale question)
+      if (err?.status === 404) {
+        alert(t('errors.general') + ' - ' + t('quiz.tryAgain'));
+        resetQuiz();
+      } else {
+        setIsAnswerSubmitted(false);
+      }
     }
   };
 
@@ -112,9 +118,15 @@ export default function QuizPage() {
         undefined
       );
       setCurrentAnswer(result);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to submit answer:', err);
-      setIsAnswerSubmitted(false);
+      // Handle 404 error (stale question)
+      if (err?.status === 404) {
+        alert(t('errors.general') + ' - ' + t('quiz.tryAgain'));
+        resetQuiz();
+      } else {
+        setIsAnswerSubmitted(false);
+      }
     }
   };
 
@@ -124,13 +136,21 @@ export default function QuizPage() {
   };
 
   // Handle timer expiry
-  const handleTimerExpire = useCallback(() => {
+  const handleTimerExpire = useCallback(async () => {
     if (!isAnswerSubmitted && currentQuestion) {
       // Auto-submit empty answer when time runs out
       setIsAnswerSubmitted(true);
-      submitAnswer(currentQuestion.id, '', hintsUsed, undefined);
+      try {
+        await submitAnswer(currentQuestion.id, '', hintsUsed, undefined);
+      } catch (err: any) {
+        // Handle 404 error (stale question)
+        if (err?.status === 404) {
+          alert(t('errors.general') + ' - ' + t('quiz.tryAgain'));
+          resetQuiz();
+        }
+      }
     }
-  }, [isAnswerSubmitted, currentQuestion, hintsUsed, submitAnswer]);
+  }, [isAnswerSubmitted, currentQuestion, hintsUsed, submitAnswer, resetQuiz, t]);
 
   // Handle hint usage
   const handleUseHint = () => {
@@ -326,6 +346,7 @@ export default function QuizPage() {
             onExpire={handleTimerExpire}
             isPaused={isAnswerSubmitted}
             showProgress
+            locale="en"
           />
         </div>
       </header>

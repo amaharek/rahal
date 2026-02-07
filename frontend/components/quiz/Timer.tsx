@@ -86,7 +86,7 @@ export default function Timer({
         if (newVal <= 0) {
           if (!hasExpiredRef.current) {
             hasExpiredRef.current = true;
-            onExpireRef.current?.();
+            setTimeout(() => onExpireRef.current?.(), 0);
           }
           return 0;
         }

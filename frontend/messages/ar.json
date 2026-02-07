@@ -97,6 +97,7 @@
       "medium": "متوسط",
       "hard": "صعب"
     },
+    "hints": "التلميحات",
     "questionOf": "السؤال {current} من {total}",
     "correct": "صحيح! ✓",
     "incorrect": "خطأ ✗",
@@ -158,6 +159,7 @@
     "language": "اللغة",
     "theme": "المظهر",
     "themes": {
+      "theme": "السمة",
       "light": "فاتح",
       "dark": "داكن",
       "system": "حسب النظام"

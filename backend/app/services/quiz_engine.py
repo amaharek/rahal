@@ -132,7 +132,8 @@ class QuizEngine:
         for q in questions:
             options = None
             if q.question_type == QuestionType.MULTIPLE_CHOICE.value and q.options:
-                options = q.options.get("options", [])
+                # Options are stored as JSONB array directly
+                options = q.options if isinstance(q.options, list) else q.options.get("options", [])
 
             responses.append(
                 QuestionResponse(
@@ -205,7 +206,8 @@ class QuizEngine:
         for q in questions:
             options = None
             if q.question_type == QuestionType.MULTIPLE_CHOICE.value and q.options:
-                options = q.options.get("options", [])
+                # Options are stored as JSONB array directly
+                options = q.options if isinstance(q.options, list) else q.options.get("options", [])
 
             responses.append(
                 QuestionResponse(
