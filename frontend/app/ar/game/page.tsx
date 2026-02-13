@@ -142,7 +142,7 @@ export default function GamePage() {
 
     if (hint_type === 'all_borders_hint' && hint_data.path_countries) {
       const pathCountries = hint_data.path_countries as string[];
-      return `المسار: ${pathCountries.join(' → ')}`;
+      return `المسار: ${pathCountries.join(' ← ')}`;
     }
 
     if (hint_type === 'first_letter_hint' && hint_data.first_letters) {

@@ -157,18 +157,6 @@
       "flag_emoji": "🇵🇸"
     },
     {
-      "code": "ISR",
-      "name_ar": "إسرائيل",
-      "name_en": "Israel",
-      "continent": "Asia",
-      "region": "Middle East",
-      "population": 8655535,
-      "area_km2": null,
-      "capital_ar": "القدس",
-      "capital_en": "Jerusalem",
-      "flag_emoji": "🇮🇱"
-    },
-    {
       "code": "TUR",
       "name_ar": "تركيا",
       "name_en": "Turkey",
