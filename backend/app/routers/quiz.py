@@ -63,7 +63,8 @@ async def get_random_question(
     # Get options for multiple choice
     options = None
     if question.question_type == QuestionType.MULTIPLE_CHOICE.value and question.options:
-        options = question.options.get("options", [])
+        # Handle both list format ["opt1", "opt2"] and dict format {"options": [...]}
+        options = question.options if isinstance(question.options, list) else question.options.get("options", [])
 
     return QuestionResponse(
         id=question.id,
