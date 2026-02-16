@@ -326,6 +326,7 @@ export default function QuizPage() {
             onExpire={handleTimerExpire}
             isPaused={isAnswerSubmitted}
             showProgress
+            locale="es"
           />
         </div>
       </header>

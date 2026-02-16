@@ -1,5 +1,6 @@
 """Smoke tests for model creation and constraints."""
 import pytest
+from uuid import UUID
 from app.models.country import Country, Border
 from app.models.user import Profile
 from app.models.question import Question, QuestionCategory, QuestionDifficulty, QuestionType
@@ -12,6 +13,7 @@ async def test_create_country(db_session):
     country = Country(
         code="EGY",
         name_ar="مصر",
+        name_ar_normalized="مصر",
         name_en="Egypt",
         continent="Asia",
         region="Western Asia"
@@ -26,8 +28,8 @@ async def test_create_country(db_session):
 @pytest.mark.asyncio
 async def test_create_border_with_uuid_ordering(db_session):
     """Border enforces country_a_id < country_b_id."""
-    c1 = Country(code="EGY", name_ar="مصر", name_en="Egypt", continent="Asia", region="Western Asia")
-    c2 = Country(code="SDN", name_ar="السودان", name_en="Sudan", continent="Africa", region="Northern Africa")
+    c1 = Country(code="EGY", name_ar="مصر", name_ar_normalized="مصر", name_en="Egypt", continent="Asia", region="Western Asia")
+    c2 = Country(code="SDN", name_ar="السودان", name_ar_normalized="السودان", name_en="Sudan", continent="Africa", region="Northern Africa")
     db_session.add_all([c1, c2])
     await db_session.commit()
 
@@ -43,7 +45,7 @@ async def test_create_border_with_uuid_ordering(db_session):
 async def test_create_profile(db_session):
     """Can create a Profile."""
     profile = Profile(
-        id="user-123",
+        id=UUID("00000000-0000-0000-0000-000000000123"),
         username="test_user",
         display_name="Test User"
     )
@@ -78,8 +80,8 @@ async def test_create_daily_challenge(db_session):
     """Can create a DailyChallenge."""
     from datetime import date
 
-    c1 = Country(code="EGY", name_ar="مصر", name_en="Egypt", continent="Asia", region="Western Asia")
-    c2 = Country(code="SDN", name_ar="السودان", name_en="Sudan", continent="Africa", region="Northern Africa")
+    c1 = Country(code="EGY", name_ar="مصر", name_ar_normalized="مصر", name_en="Egypt", continent="Asia", region="Western Asia")
+    c2 = Country(code="SDN", name_ar="السودان", name_ar_normalized="السودان", name_en="Sudan", continent="Africa", region="Northern Africa")
     db_session.add_all([c1, c2])
     await db_session.commit()
 
@@ -100,9 +102,9 @@ async def test_create_game_result(db_session):
     """Can create a GameResult."""
     from datetime import date
 
-    profile = Profile(id="user-456", username="player1", display_name="Player One")
-    c1 = Country(code="EGY", name_ar="مصر", name_en="Egypt", continent="Asia", region="Western Asia")
-    c2 = Country(code="SDN", name_ar="السودان", name_en="Sudan", continent="Africa", region="Northern Africa")
+    profile = Profile(id=UUID("00000000-0000-0000-0000-000000000456"), username="player1", display_name="Player One")
+    c1 = Country(code="EGY", name_ar="مصر", name_ar_normalized="مصر", name_en="Egypt", continent="Asia", region="Western Asia")
+    c2 = Country(code="SDN", name_ar="السودان", name_ar_normalized="السودان", name_en="Sudan", continent="Africa", region="Northern Africa")
     db_session.add_all([profile, c1, c2])
     await db_session.commit()
 

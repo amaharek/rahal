@@ -10,7 +10,7 @@ interface TimerProps {
   isPaused?: boolean;
   resetTrigger?: number;
   showProgress?: boolean;
-  locale: 'ar' | 'en';
+  locale: 'ar' | 'en' | 'es';
   useArabicNumerals?: boolean;
   format?: 'default' | 'compact';
 }

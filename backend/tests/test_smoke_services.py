@@ -10,8 +10,8 @@ from app.models.question import Question, QuestionType
 @pytest.mark.asyncio
 async def test_path_finder_finds_path(db_session):
     """PathFinder finds path between connected countries."""
-    c1 = Country(code="EGY", name_ar="مصر", name_en="Egypt", continent="Asia", region="Western Asia")
-    c2 = Country(code="SDN", name_ar="السودان", name_en="Sudan", continent="Africa", region="Northern Africa")
+    c1 = Country(code="EGY", name_ar="مصر", name_ar_normalized="مصر", name_en="Egypt", continent="Asia", region="Western Asia")
+    c2 = Country(code="SDN", name_ar="السودان", name_ar_normalized="السودان", name_en="Sudan", continent="Africa", region="Northern Africa")
     db_session.add_all([c1, c2])
     await db_session.commit()
 
@@ -30,8 +30,8 @@ async def test_path_finder_finds_path(db_session):
 @pytest.mark.asyncio
 async def test_path_finder_returns_none_for_disconnected(db_session):
     """PathFinder returns None for disconnected countries."""
-    c1 = Country(code="EGY", name_ar="مصر", name_en="Egypt", continent="Asia", region="Western Asia")
-    c2 = Country(code="JPN", name_ar="اليابان", name_en="Japan", continent="Asia", region="Eastern Asia")
+    c1 = Country(code="EGY", name_ar="مصر", name_ar_normalized="مصر", name_en="Egypt", continent="Asia", region="Western Asia")
+    c2 = Country(code="JPN", name_ar="اليابان", name_ar_normalized="اليابان", name_en="Japan", continent="Asia", region="Eastern Asia")
     db_session.add_all([c1, c2])
     await db_session.commit()
 

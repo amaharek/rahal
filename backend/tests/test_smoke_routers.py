@@ -10,8 +10,8 @@ from app.models.game import DailyChallenge
 async def test_get_daily_challenge(client, db_session):
     """GET /api/game/daily returns daily challenge."""
     # Setup: Create countries and daily challenge
-    c1 = Country(code="DEU", name_ar="ألمانيا", name_en="Germany", continent="Europe", region="Western Europe")
-    c2 = Country(code="FRA", name_ar="فرنسا", name_en="France", continent="Europe", region="Western Europe")
+    c1 = Country(code="DEU", name_ar="ألمانيا", name_ar_normalized="المانيا", name_en="Germany", continent="Europe", region="Western Europe")
+    c2 = Country(code="FRA", name_ar="فرنسا", name_ar_normalized="فرنسا", name_en="France", continent="Europe", region="Western Europe")
     db_session.add_all([c1, c2])
     await db_session.commit()
 
@@ -38,7 +38,7 @@ async def test_get_daily_challenge(client, db_session):
 async def test_autocomplete_country(client, db_session):
     """GET /api/autocomplete/countries returns matching countries."""
     # Setup: Create a country
-    egypt = Country(code="EGY", name_ar="مصر", name_en="Egypt", continent="Asia", region="Western Asia")
+    egypt = Country(code="EGY", name_ar="مصر", name_ar_normalized="مصر", name_en="Egypt", continent="Asia", region="Western Asia")
     db_session.add(egypt)
     await db_session.commit()
 
@@ -124,8 +124,8 @@ async def test_submit_quiz_answer(client, db_session):
 async def test_submit_game_guess(client, db_session):
     """POST /api/game/guess processes guess correctly."""
     # Setup: Create countries, border, and challenge
-    c1 = Country(code="DEU", name_ar="ألمانيا", name_en="Germany", continent="Europe", region="Western Europe")
-    c2 = Country(code="FRA", name_ar="فرنسا", name_en="France", continent="Europe", region="Western Europe")
+    c1 = Country(code="DEU", name_ar="ألمانيا", name_ar_normalized="المانيا", name_en="Germany", continent="Europe", region="Western Europe")
+    c2 = Country(code="FRA", name_ar="فرنسا", name_ar_normalized="فرنسا", name_en="France", continent="Europe", region="Western Europe")
     db_session.add_all([c1, c2])
     await db_session.commit()
 
@@ -161,8 +161,8 @@ async def test_submit_game_guess(client, db_session):
 @pytest.mark.asyncio
 async def test_create_practice_session(client, db_session):
     """POST /api/game/practice/session creates ephemeral practice session."""
-    c1 = Country(code="ESP", name_ar="إسبانيا", name_en="Spain", continent="Europe", region="Southern Europe")
-    c2 = Country(code="FRA", name_ar="فرنسا", name_en="France", continent="Europe", region="Western Europe")
+    c1 = Country(code="ESP", name_ar="إسبانيا", name_ar_normalized="اسبانيا", name_en="Spain", continent="Europe", region="Southern Europe")
+    c2 = Country(code="FRA", name_ar="فرنسا", name_ar_normalized="فرنسا", name_en="France", continent="Europe", region="Western Europe")
     db_session.add_all([c1, c2])
     await db_session.commit()
 
@@ -189,8 +189,8 @@ async def test_create_practice_session(client, db_session):
 @pytest.mark.asyncio
 async def test_submit_practice_guess(client, db_session):
     """POST /api/game/practice/guess processes guess in practice mode."""
-    c1 = Country(code="BEL", name_ar="بلجيكا", name_en="Belgium", continent="Europe", region="Western Europe")
-    c2 = Country(code="NLD", name_ar="هولندا", name_en="Netherlands", continent="Europe", region="Western Europe")
+    c1 = Country(code="BEL", name_ar="بلجيكا", name_ar_normalized="بلجيكا", name_en="Belgium", continent="Europe", region="Western Europe")
+    c2 = Country(code="NLD", name_ar="هولندا", name_ar_normalized="هولندا", name_en="Netherlands", continent="Europe", region="Western Europe")
     db_session.add_all([c1, c2])
     await db_session.commit()
 
