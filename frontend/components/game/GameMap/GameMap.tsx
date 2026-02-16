@@ -8,7 +8,7 @@ import {
   ZoomableGroup,
 } from '@vnedyalk0v/react19-simple-maps';
 import { cn } from '@/lib/utils';
-import { numericToAlpha3, getCountryState, calculateMapCenter } from '@/lib/geo';
+import { numericToAlpha3, getCountryState, calculateMapView } from '@/lib/geo';
 import { useMapColors } from '@/lib/hooks/useMapColors';
 import type { GameMapProps } from '@/types/geo';
 import { MapControls } from './MapControls';
@@ -17,14 +17,12 @@ import { MapLegend } from './MapLegend';
 // Fetch TopoJSON data to avoid URL validation issues
 const fetchTopoJSON = async () => {
   try {
-    console.log('[GameMap] Fetching TopoJSON data...');
     const response = await fetch('/geo/world-110m.json');
     if (!response.ok) {
       console.error(`[GameMap] Failed to fetch TopoJSON: ${response.status}`);
       return null;
     }
     const data = await response.json();
-    console.log('[GameMap] TopoJSON loaded successfully');
     return data;
   } catch (error) {
     console.error('[GameMap] Error fetching TopoJSON:', error);
@@ -53,23 +51,22 @@ export function GameMap({
   // Get theme-aware map colors
   const mapColors = useMapColors();
 
-  // Calculate default center based on start/end countries
-  const defaultCenter = useMemo(
-    () => calculateMapCenter(startCountryCode, endCountryCode),
-    [startCountryCode, endCountryCode]
+  // Calculate default view based on start/end plus known shortest-path countries.
+  const defaultView = useMemo(
+    () => calculateMapView(startCountryCode, endCountryCode, pathCountryCodes),
+    [startCountryCode, endCountryCode, pathCountryCodes]
   );
 
   // Internal state for zoom and center (if not controlled externally)
-  const [internalZoom, setInternalZoom] = useState(1.5);
+  const [internalZoom, setInternalZoom] = useState(defaultView.zoom);
   const [internalCenter, setInternalCenter] =
-    useState<[number, number]>(defaultCenter);
+    useState<[number, number]>(defaultView.center);
   const [topoData, setTopoData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
 
   // Fetch TopoJSON on mount
   useEffect(() => {
-    console.log('[GameMap] Component mounted, fetching TopoJSON...');
     setIsLoading(true);
     fetchTopoJSON()
       .then((data) => {
@@ -87,10 +84,14 @@ export function GameMap({
   const zoom = externalZoom ?? internalZoom;
   const center = externalCenter ?? internalCenter;
 
-  // Debug logging
   useEffect(() => {
-    console.log('[GameMap] Render - zoom:', zoom, 'center:', center);
-  }, [zoom, center]);
+    if (externalZoom === undefined) {
+      setInternalZoom(defaultView.zoom);
+    }
+    if (externalCenter === undefined) {
+      setInternalCenter(defaultView.center);
+    }
+  }, [defaultView, externalZoom, externalCenter]);
 
   const handleZoomIn = useCallback(() => {
     const newZoom = Math.min(zoom + ZOOM_STEP, MAX_ZOOM);
@@ -110,12 +111,12 @@ export function GameMap({
 
   const handleReset = useCallback(() => {
     startTransition(() => {
-      setInternalZoom(1.5);
-      setInternalCenter(defaultCenter);
-      onZoomChange?.(1.5);
-      onCenterChange?.(defaultCenter);
+      setInternalZoom(defaultView.zoom);
+      setInternalCenter(defaultView.center);
+      onZoomChange?.(defaultView.zoom);
+      onCenterChange?.(defaultView.center);
     });
-  }, [defaultCenter, onZoomChange, onCenterChange]);
+  }, [defaultView, onZoomChange, onCenterChange]);
 
   const handleMoveEnd = useCallback(
     (position: { coordinates: [number, number]; zoom: number }) => {
@@ -206,7 +207,6 @@ export function GameMap({
         >
           <Geographies geography={topoData}>
             {({ geographies }) => {
-              console.log('[GameMap] Geographies loaded:', geographies.length);
               return geographies.map((geo, index) => {
                 const numericCode = geo.id;
                 const alpha3Code = numericToAlpha3(String(numericCode));
@@ -231,7 +231,8 @@ export function GameMap({
                 }
 
                 // Use geo.id or fallback to index for unique key
-                const geoKey = geo.rsmKey || geo.id || `geo-${index}`;
+                const geoKey =
+                  (geo as { rsmKey?: string }).rsmKey || geo.id || `geo-${index}`;
 
                 return (
                   <Geography

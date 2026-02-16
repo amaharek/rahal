@@ -93,6 +93,7 @@ export default function GamePage() {
         country_id: response.country.id,
         country_code: response.country.code,
         name_ar: response.country.name_ar,
+        name_en: response.country.name_en,
         flag_emoji: response.country.flag_emoji,
         emoji: response.score_emoji,
         order: guesses.length + 1,
@@ -135,19 +136,30 @@ export default function GamePage() {
   const formatHintDisplay = (hint: HintResponse): string => {
     const { hint_type, hint_data } = hint;
 
-    if (hint_type === 'border_hint' && hint_data.country_name_en) {
+    if (hint_type === 'border_hint') {
+      const countryName = (hint_data.country_name_en ||
+        hint_data.country_name_ar) as string | undefined;
       const borderCountries = hint_data.border_countries as string[];
-      return `${hint_data.country_name_en} borders: ${borderCountries.join(', ')}`;
+      if (countryName && borderCountries?.length) {
+        return t('game.hintDisplay.borderHint', {
+          country: countryName,
+          countries: borderCountries.join(', '),
+        });
+      }
     }
 
     if (hint_type === 'all_borders_hint' && hint_data.path_countries) {
       const pathCountries = hint_data.path_countries as string[];
-      return `Path: ${pathCountries.join(' → ')}`;
+      return t('game.hintDisplay.pathHint', {
+        countries: pathCountries.join(' → '),
+      });
     }
 
     if (hint_type === 'first_letter_hint' && hint_data.first_letters) {
       const letters = hint_data.first_letters as string[];
-      return `First letters: ${letters.join(', ')}`;
+      return t('game.hintDisplay.firstLettersHint', {
+        letters: letters.join(', '),
+      });
     }
 
     return JSON.stringify(hint_data);
@@ -164,6 +176,10 @@ export default function GamePage() {
     }
 
     guessMutation.mutate(country);
+  };
+
+  const getCountryNameByLocale = (country: { name_ar: string; name_en: string }) => {
+    return country.name_en || country.name_ar;
   };
 
   if (isLoading) {
@@ -199,7 +215,7 @@ export default function GamePage() {
       {/* Header */}
       <header className="bg-primary text-white py-3 px-4">
         <div className="max-w-7xl mx-auto">
-          <Link href="/ar" className="text-white/80 text-sm mb-1 inline-block">
+          <Link href="/en" className="text-white/80 text-sm mb-1 inline-block">
             ← {t('common.back')}
           </Link>
           <h1 className="text-xl font-bold">{t('game.title')}</h1>
@@ -217,7 +233,9 @@ export default function GamePage() {
                 <div className="text-2xl mb-0.5">
                   {challenge.start_country.flag_emoji}
                 </div>
-                <div className="font-bold text-sm">{challenge.start_country.name_ar}</div>
+                <div className="font-bold text-sm">
+                  {getCountryNameByLocale(challenge.start_country)}
+                </div>
                 <div className="text-xs text-text-secondary">{t('game.from')}</div>
               </div>
 
@@ -229,7 +247,9 @@ export default function GamePage() {
                 <div className="text-2xl mb-0.5">
                   {challenge.end_country.flag_emoji}
                 </div>
-                <div className="font-bold text-sm">{challenge.end_country.name_ar}</div>
+                <div className="font-bold text-sm">
+                  {getCountryNameByLocale(challenge.end_country)}
+                </div>
                 <div className="text-xs text-text-secondary">{t('game.to')}</div>
               </div>
             </div>
@@ -238,7 +258,7 @@ export default function GamePage() {
             <div className="text-center mt-2 pt-2 border-t border-border">
               <span className="text-xs text-text-secondary">
                 {t('game.shortestPath')}: {challenge.shortest_path}{' '}
-                {challenge.shortest_path === 1 ? 'دولة' : 'دول'}
+                {t('game.pathCountriesUnit')}
               </span>
             </div>
           </CardContent>
@@ -271,8 +291,8 @@ export default function GamePage() {
                 <GameMap
                   startCountryCode={challenge.start_country.code}
                   endCountryCode={challenge.end_country.code}
-                  startCountryName={challenge.start_country.name_ar}
-                  endCountryName={challenge.end_country.name_ar}
+                  startCountryName={getCountryNameByLocale(challenge.start_country)}
+                  endCountryName={getCountryNameByLocale(challenge.end_country)}
                   guessedCountryCodes={guessedCountryCodes}
                   pathCountryCodes={challenge.path_country_codes || []}
                   zoom={mapZoom}
@@ -410,7 +430,9 @@ export default function GamePage() {
                           {index + 1}.
                         </span>
                         <span className="text-2xl">{guess.flag_emoji}</span>
-                        <span className="flex-1 font-medium">{guess.name_ar}</span>
+                        <span className="flex-1 font-medium">
+                          {guess.name_en || guess.name_ar}
+                        </span>
                         <EmojiScore emoji={guess.emoji} size="sm" animate={false} />
                       </div>
                     ))}

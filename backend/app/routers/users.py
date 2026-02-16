@@ -2,9 +2,14 @@
 User-related API endpoints.
 """
 
-from fastapi import APIRouter, HTTPException, status
+from uuid import UUID
 
-from app.core.deps import DBSession, CurrentUser, OptionalUser
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials
+
+from app.core.deps import DBSession, CurrentUser, OptionalUser, security
+from app.core.security import verify_supabase_token
+from app.crud.country import country_crud
 from app.crud.user import profile_crud, user_achievement_crud
 from app.schemas.user import (
     AchievementResponse,
@@ -18,6 +23,87 @@ from app.schemas.user import (
 router = APIRouter()
 
 
+def _to_profile_response(user) -> ProfileResponse:
+    return ProfileResponse(
+        id=user.id,
+        username=user.username,
+        display_name=user.display_name,
+        avatar_url=user.avatar_url,
+        home_country_code=user.home_country_code,
+        current_streak=user.current_streak,
+        max_streak=user.max_streak,
+        games_played=user.games_played,
+        games_won=user.games_won,
+        total_questions_answered=user.total_questions_answered,
+        total_correct_answers=user.total_correct_answers,
+        win_rate=user.win_rate,
+        quiz_accuracy=user.quiz_accuracy,
+        created_at=user.created_at,
+    )
+
+
+@router.post("/bootstrap", response_model=ProfileResponse)
+async def bootstrap_current_user(
+    db: DBSession,
+    credentials: HTTPAuthorizationCredentials | None = Depends(security),
+):
+    """
+    Bootstrap the authenticated user's profile.
+
+    Creates a profile row if missing, otherwise returns existing profile.
+    """
+    if not credentials:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="غير مصرح - يرجى تسجيل الدخول",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    payload = verify_supabase_token(credentials.credentials)
+    if not payload:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="رمز المصادقة غير صالح",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    user_id = payload.get("sub")
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="رمز المصادقة غير صالح",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    try:
+        user_uuid = UUID(user_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="معرف المستخدم غير صالح",
+        )
+
+    existing = await profile_crud.get(db, user_uuid)
+    if existing:
+        return _to_profile_response(existing)
+
+    user_metadata = payload.get("user_metadata") or {}
+    display_name = user_metadata.get("full_name") or user_metadata.get("name")
+    avatar_url = user_metadata.get("avatar_url")
+
+    created = await profile_crud.create_from_dict(
+        db,
+        data={
+            "id": user_uuid,
+            "display_name": display_name,
+            "avatar_url": avatar_url,
+            "username": None,
+            "home_country_code": None,
+        },
+    )
+    return _to_profile_response(created)
+
+
 @router.get("/me", response_model=ProfileResponse)
 async def get_current_user_profile(
     db: DBSession,
@@ -28,21 +114,7 @@ async def get_current_user_profile(
 
     Requires authentication.
     """
-    return ProfileResponse(
-        id=current_user.id,
-        username=current_user.username,
-        display_name=current_user.display_name,
-        avatar_url=current_user.avatar_url,
-        current_streak=current_user.current_streak,
-        max_streak=current_user.max_streak,
-        games_played=current_user.games_played,
-        games_won=current_user.games_won,
-        total_questions_answered=current_user.total_questions_answered,
-        total_correct_answers=current_user.total_correct_answers,
-        win_rate=current_user.win_rate,
-        quiz_accuracy=current_user.quiz_accuracy,
-        created_at=current_user.created_at,
-    )
+    return _to_profile_response(current_user)
 
 
 @router.patch("/me", response_model=ProfileResponse)
@@ -65,6 +137,16 @@ async def update_current_user_profile(
                 detail="اسم المستخدم موجود بالفعل",  # Username already exists
             )
 
+    if update_data.home_country_code:
+        normalized_code = update_data.home_country_code.upper()
+        country = await country_crud.get_by_code(db, normalized_code)
+        if not country:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="رمز الدولة غير صالح",
+            )
+        update_data.home_country_code = normalized_code
+
     # Update profile
     updated_user = await profile_crud.update(
         db,
@@ -72,21 +154,7 @@ async def update_current_user_profile(
         obj_in=update_data,
     )
 
-    return ProfileResponse(
-        id=updated_user.id,
-        username=updated_user.username,
-        display_name=updated_user.display_name,
-        avatar_url=updated_user.avatar_url,
-        current_streak=updated_user.current_streak,
-        max_streak=updated_user.max_streak,
-        games_played=updated_user.games_played,
-        games_won=updated_user.games_won,
-        total_questions_answered=updated_user.total_questions_answered,
-        total_correct_answers=updated_user.total_correct_answers,
-        win_rate=updated_user.win_rate,
-        quiz_accuracy=updated_user.quiz_accuracy,
-        created_at=updated_user.created_at,
-    )
+    return _to_profile_response(updated_user)
 
 
 @router.get("/achievements", response_model=list[UserAchievementResponse])
@@ -169,6 +237,7 @@ async def get_leaderboard(
                 username=profile.username,
                 display_name=profile.display_name,
                 avatar_url=profile.avatar_url,
+                home_country_code=profile.home_country_code,
                 score=score,
                 games_played=profile.games_played,
             )

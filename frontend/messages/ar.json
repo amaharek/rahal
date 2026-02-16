@@ -59,6 +59,7 @@
     "score": "النتيجة",
     "totalGuesses": "عدد التخمينات",
     "shortestPath": "أقصر مسار",
+    "pathCountriesUnit": "دول",
     "optimal": "مثالي!",
     "shareResult": "شارك إنجازك",
     "playAgainTomorrow": "عد إلينا غداً لرحلة جديدة",
@@ -77,6 +78,11 @@
       "offPath": "تخمين خاطئ",
       "showMap": "إظهار الخريطة",
       "hideMap": "إخفاء الخريطة"
+    },
+    "hintDisplay": {
+      "borderHint": "حدود {country}: {countries}",
+      "pathHint": "المسار المقترح: {countries}",
+      "firstLettersHint": "الحروف الأولى: {letters}"
     }
   },
   "quiz": {
@@ -148,6 +154,9 @@
     "title": "الملف الشخصي",
     "username": "اسم المستخدم",
     "displayName": "الاسم المعروض",
+    "homeCountry": "دولة الملف",
+    "homeCountryPlaceholder": "ابحث عن دولتك...",
+    "onboardingTitle": "أكمل ملفك الشخصي",
     "memberSince": "عضو منذ",
     "achievements": "الإنجازات",
     "noAchievements": "لا إنجازات بعد",

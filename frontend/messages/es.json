@@ -59,6 +59,7 @@
     "score": "Puntuación",
     "totalGuesses": "Intentos Totales",
     "shortestPath": "Ruta Más Corta",
+    "pathCountriesUnit": "países",
     "optimal": "¡Óptimo!",
     "shareResult": "Compartir Resultado",
     "playAgainTomorrow": "Juega de nuevo mañana",
@@ -77,6 +78,11 @@
       "offPath": "Intento Incorrecto",
       "showMap": "Mostrar Mapa",
       "hideMap": "Ocultar Mapa"
+    },
+    "hintDisplay": {
+      "borderHint": "Fronteras de {country}: {countries}",
+      "pathHint": "Ruta sugerida: {countries}",
+      "firstLettersHint": "Primeras letras: {letters}"
     }
   },
   "quiz": {
@@ -147,6 +153,9 @@
     "title": "Perfil",
     "username": "Nombre de Usuario",
     "displayName": "Nombre para Mostrar",
+    "homeCountry": "País",
+    "homeCountryPlaceholder": "Busca tu país...",
+    "onboardingTitle": "Completa tu perfil",
     "memberSince": "Miembro desde",
     "achievements": "Logros",
     "noAchievements": "Sin logros aún",

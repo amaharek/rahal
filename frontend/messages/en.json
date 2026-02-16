@@ -59,6 +59,7 @@
     "score": "Score",
     "totalGuesses": "Total Guesses",
     "shortestPath": "Shortest Path",
+    "pathCountriesUnit": "countries",
     "optimal": "Optimal!",
     "shareResult": "Share Result",
     "playAgainTomorrow": "Play again tomorrow",
@@ -77,6 +78,11 @@
       "offPath": "Wrong Guess",
       "showMap": "Show Map",
       "hideMap": "Hide Map"
+    },
+    "hintDisplay": {
+      "borderHint": "Borders of {country}: {countries}",
+      "pathHint": "Suggested route: {countries}",
+      "firstLettersHint": "First letters: {letters}"
     }
   },
   "quiz": {
@@ -147,6 +153,9 @@
     "title": "Profile",
     "username": "Username",
     "displayName": "Display Name",
+    "homeCountry": "Home Country",
+    "homeCountryPlaceholder": "Search for your country...",
+    "onboardingTitle": "Complete your profile",
     "memberSince": "Member since",
     "achievements": "Achievements",
     "noAchievements": "No achievements yet",

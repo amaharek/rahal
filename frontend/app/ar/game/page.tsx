@@ -93,6 +93,7 @@ export default function GamePage() {
         country_id: response.country.id,
         country_code: response.country.code,
         name_ar: response.country.name_ar,
+        name_en: response.country.name_en,
         flag_emoji: response.country.flag_emoji,
         emoji: response.score_emoji,
         order: guesses.length + 1,
@@ -135,19 +136,30 @@ export default function GamePage() {
   const formatHintDisplay = (hint: HintResponse): string => {
     const { hint_type, hint_data } = hint;
 
-    if (hint_type === 'border_hint' && hint_data.country_name_ar) {
+    if (hint_type === 'border_hint') {
+      const countryName = (hint_data.country_name_ar ||
+        hint_data.country_name_en) as string | undefined;
       const borderCountries = hint_data.border_countries as string[];
-      return `${hint_data.country_name_ar} تحد: ${borderCountries.join('، ')}`;
+      if (countryName && borderCountries?.length) {
+        return t('game.hintDisplay.borderHint', {
+          country: countryName,
+          countries: borderCountries.join('، '),
+        });
+      }
     }
 
     if (hint_type === 'all_borders_hint' && hint_data.path_countries) {
       const pathCountries = hint_data.path_countries as string[];
-      return `المسار: ${pathCountries.join(' ← ')}`;
+      return t('game.hintDisplay.pathHint', {
+        countries: pathCountries.join(' ← '),
+      });
     }
 
     if (hint_type === 'first_letter_hint' && hint_data.first_letters) {
       const letters = hint_data.first_letters as string[];
-      return `الحروف الأولى: ${letters.join('، ')}`;
+      return t('game.hintDisplay.firstLettersHint', {
+        letters: letters.join('، '),
+      });
     }
 
     return JSON.stringify(hint_data);
@@ -238,7 +250,7 @@ export default function GamePage() {
             <div className="text-center mt-2 pt-2 border-t border-border">
               <span className="text-xs text-text-secondary">
                 {t('game.shortestPath')}: {challenge.shortest_path}{' '}
-                {challenge.shortest_path === 1 ? 'دولة' : 'دول'}
+                {t('game.pathCountriesUnit')}
               </span>
             </div>
           </CardContent>

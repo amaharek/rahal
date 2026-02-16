@@ -15,6 +15,7 @@ class ProfileBase(BaseModel):
     username: str | None = Field(None, min_length=3, max_length=50)
     display_name: str | None = Field(None, max_length=100)
     avatar_url: str | None = None
+    home_country_code: str | None = Field(None, min_length=3, max_length=3)
 
 
 class ProfileCreate(ProfileBase):
@@ -29,6 +30,7 @@ class ProfileUpdate(BaseModel):
     username: str | None = Field(None, min_length=3, max_length=50)
     display_name: str | None = Field(None, max_length=100)
     avatar_url: str | None = None
+    home_country_code: str | None = Field(None, min_length=3, max_length=3)
     preferences: dict[str, Any] | None = None
 
 
@@ -88,6 +90,7 @@ class LeaderboardEntry(BaseModel):
     username: str | None
     display_name: str | None
     avatar_url: str | None
+    home_country_code: str | None = None
     score: int  # Could be streak, games_won, etc.
     games_played: int
 

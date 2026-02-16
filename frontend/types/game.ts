@@ -40,6 +40,7 @@ export interface GuessEntry {
   country_id: string;
   country_code: string;
   name_ar: string;
+  name_en?: string;
   flag_emoji: string | null;
   emoji: ScoreEmoji;
   order: number;
