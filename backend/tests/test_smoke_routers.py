@@ -156,3 +156,67 @@ async def test_submit_game_guess(client, db_session):
     assert "score_emoji" in data
     assert "country" in data
     assert data["is_destination"] is True
+
+
+@pytest.mark.asyncio
+async def test_create_practice_session(client, db_session):
+    """POST /api/game/practice/session creates ephemeral practice session."""
+    c1 = Country(code="ESP", name_ar="إسبانيا", name_en="Spain", continent="Europe", region="Southern Europe")
+    c2 = Country(code="FRA", name_ar="فرنسا", name_en="France", continent="Europe", region="Western Europe")
+    db_session.add_all([c1, c2])
+    await db_session.commit()
+
+    a_id, b_id = sorted([c1.id, c2.id])
+    border = Border(country_a_id=a_id, country_b_id=b_id)
+    db_session.add(border)
+    await db_session.commit()
+
+    response = await client.post(
+        "/api/game/practice/session",
+        json={
+            "start_country_id": str(c1.id),
+            "end_country_id": str(c2.id),
+        },
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["mode"] == "practice"
+    assert data["start_country"]["code"] == "ESP"
+    assert data["end_country"]["code"] == "FRA"
+    assert "session_id" in data
+
+
+@pytest.mark.asyncio
+async def test_submit_practice_guess(client, db_session):
+    """POST /api/game/practice/guess processes guess in practice mode."""
+    c1 = Country(code="BEL", name_ar="بلجيكا", name_en="Belgium", continent="Europe", region="Western Europe")
+    c2 = Country(code="NLD", name_ar="هولندا", name_en="Netherlands", continent="Europe", region="Western Europe")
+    db_session.add_all([c1, c2])
+    await db_session.commit()
+
+    a_id, b_id = sorted([c1.id, c2.id])
+    border = Border(country_a_id=a_id, country_b_id=b_id)
+    db_session.add(border)
+    await db_session.commit()
+
+    session_response = await client.post(
+        "/api/game/practice/session",
+        json={
+            "start_country_id": str(c1.id),
+            "end_country_id": str(c2.id),
+        },
+    )
+    assert session_response.status_code == 200
+    session_id = session_response.json()["session_id"]
+
+    guess_response = await client.post(
+        "/api/game/practice/guess",
+        json={
+            "session_id": session_id,
+            "country_id": str(c2.id),
+        },
+    )
+    assert guess_response.status_code == 200
+    data = guess_response.json()
+    assert data["is_destination"] is True
+    assert data["game_complete"] is True

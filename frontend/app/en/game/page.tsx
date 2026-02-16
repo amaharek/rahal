@@ -264,6 +264,15 @@ export default function GamePage() {
           </CardContent>
         </Card>
 
+        <Card className="mb-3">
+          <CardContent className="py-3 flex items-center justify-between gap-3">
+            <div className="text-sm text-text-secondary">{t('practice.cta')}</div>
+            <Link href="/en/game/practice">
+              <Button size="sm" variant="outline">{t('practice.startButton')}</Button>
+            </Link>
+          </CardContent>
+        </Card>
+
         {/* Two-column layout for desktop */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Map Section - First on mobile (order-1), First on desktop (lg:order-1) */}

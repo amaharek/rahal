@@ -135,6 +135,7 @@
   },
   "stats": {
     "title": "Statistics",
+    "signInRequired": "Sign in to view your personal statistics.",
     "gameStats": "Game Statistics",
     "quizStats": "Quiz Statistics",
     "gamesPlayed": "Games",
@@ -182,10 +183,33 @@
     "score": "Score",
     "games": "Games",
     "yourRank": "Your Rank",
+    "empty": "No leaderboard entries yet.",
+    "anonymous": "Anonymous",
+    "country": "Country",
+    "currentFilter": "Current filter: {filter}",
     "types": {
       "streak": "Longest Streak",
       "wins": "Wins",
-      "accuracy": "Accuracy"
+      "accuracy": "Accuracy",
+      "maxStreak": "Longest Streak",
+      "gamesWon": "Games Won",
+      "currentStreak": "Current Streak"
+    }
+  },
+  "practice": {
+    "title": "Practice Mode",
+    "subtitle": "Play unlimited runs without affecting daily challenge progress.",
+    "cta": "Want to warm up first?",
+    "setupTitle": "Create a Practice Route",
+    "startCountry": "Start Country",
+    "endCountry": "End Country",
+    "startCountryPlaceholder": "Choose start country",
+    "endCountryPlaceholder": "Choose destination country",
+    "startButton": "Start Practice",
+    "completedMessage": "Practice run complete.",
+    "newRun": "New Practice Run",
+    "errors": {
+      "sameCountry": "Start and end countries must be different."
     }
   },
   "auth": {

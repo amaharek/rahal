@@ -136,6 +136,7 @@
   },
   "stats": {
     "title": "الإحصائيات",
+    "signInRequired": "سجّل الدخول لعرض إحصائياتك الشخصية.",
     "gameStats": "إحصائيات اللعبة",
     "quizStats": "إحصائيات الأسئلة",
     "gamesPlayed": "الألعاب",
@@ -184,10 +185,33 @@
     "score": "النتيجة",
     "games": "الألعاب",
     "yourRank": "ترتيبك",
+    "empty": "لا توجد نتائج بعد.",
+    "anonymous": "مجهول",
+    "country": "الدولة",
+    "currentFilter": "الفلتر الحالي: {filter}",
     "types": {
       "streak": "أطول سلسلة",
       "wins": "الانتصارات",
-      "accuracy": "الدقة"
+      "accuracy": "الدقة",
+      "maxStreak": "أطول سلسلة",
+      "gamesWon": "أكثر انتصارات",
+      "currentStreak": "السلسلة الحالية"
+    }
+  },
+  "practice": {
+    "title": "وضع التدريب",
+    "subtitle": "العب جولات غير محدودة بدون التأثير على تقدم تحدي اليوم.",
+    "cta": "تريد الإحماء أولاً؟",
+    "setupTitle": "إنشاء مسار تدريب",
+    "startCountry": "دولة البداية",
+    "endCountry": "دولة النهاية",
+    "startCountryPlaceholder": "اختر دولة البداية",
+    "endCountryPlaceholder": "اختر دولة النهاية",
+    "startButton": "ابدأ التدريب",
+    "completedMessage": "اكتملت جولة التدريب.",
+    "newRun": "جولة تدريب جديدة",
+    "errors": {
+      "sameCountry": "يجب أن تكون دولتا البداية والنهاية مختلفتين."
     }
   },
   "auth": {

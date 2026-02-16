@@ -10,6 +10,10 @@ import type {
   HintRequest,
   HintResponse,
   GameStats,
+  PracticeSession,
+  PracticeSessionRequest,
+  PracticeGuessRequest,
+  PracticeHintRequest,
 } from '@/types/game';
 
 /**
@@ -54,6 +58,36 @@ export async function useHint(
  */
 export async function getGameStats(token: string): Promise<GameStats> {
   return get<GameStats>('/api/game/stats', token);
+}
+
+/**
+ * Create a practice session
+ */
+export async function createPracticeSession(
+  data: PracticeSessionRequest,
+  token?: string
+): Promise<PracticeSession> {
+  return post<PracticeSession>('/api/game/practice/session', data, token);
+}
+
+/**
+ * Submit a guess in practice mode
+ */
+export async function submitPracticeGuess(
+  data: PracticeGuessRequest,
+  token?: string
+): Promise<GuessResponse> {
+  return post<GuessResponse>('/api/game/practice/guess', data, token);
+}
+
+/**
+ * Use a hint in practice mode
+ */
+export async function usePracticeHint(
+  data: PracticeHintRequest,
+  token?: string
+): Promise<HintResponse> {
+  return post<HintResponse>('/api/game/practice/hint', data, token);
 }
 
 /**

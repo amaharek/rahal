@@ -109,3 +109,36 @@ class GameStatsResponse(BaseModel):
     average_guesses: float
     hints_used_total: int
     last_played: date | None
+
+
+class PracticeSessionCreateRequest(BaseModel):
+    """Request to start a practice session."""
+
+    start_country_id: UUID
+    end_country_id: UUID
+
+
+class PracticeSessionResponse(BaseModel):
+    """Practice session response."""
+
+    session_id: UUID
+    mode: Literal["practice"] = "practice"
+    start_country: CountryBrief
+    end_country: CountryBrief
+    shortest_path: int
+    path_country_codes: list[str] = Field(default_factory=list)
+    user_progress: UserProgress | None = None
+
+
+class PracticeGuessRequest(BaseModel):
+    """Request for submitting a practice guess."""
+
+    session_id: UUID
+    country_id: UUID
+
+
+class PracticeHintRequest(BaseModel):
+    """Request for using a hint in practice mode."""
+
+    session_id: UUID
+    hint_type: Literal["border_hint", "all_borders_hint", "first_letter_hint"]

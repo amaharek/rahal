@@ -34,6 +34,10 @@ from app.schemas.game import (
     HintResponse,
     GameCompleteResponse,
     GameStatsResponse,
+    PracticeSessionCreateRequest,
+    PracticeSessionResponse,
+    PracticeGuessRequest,
+    PracticeHintRequest,
 )
 from app.schemas.user import (
     ProfileBase,
@@ -75,6 +79,10 @@ __all__ = [
     "HintResponse",
     "GameCompleteResponse",
     "GameStatsResponse",
+    "PracticeSessionCreateRequest",
+    "PracticeSessionResponse",
+    "PracticeGuessRequest",
+    "PracticeHintRequest",
     # User
     "ProfileBase",
     "ProfileCreate",

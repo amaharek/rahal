@@ -87,6 +87,31 @@ export interface GameStats {
   last_played: string | null;
 }
 
+export interface PracticeSessionRequest {
+  start_country_id: string;
+  end_country_id: string;
+}
+
+export interface PracticeSession {
+  session_id: string;
+  mode: 'practice';
+  start_country: Country;
+  end_country: Country;
+  shortest_path: number;
+  path_country_codes: string[];
+  user_progress: UserProgress | null;
+}
+
+export interface PracticeGuessRequest {
+  session_id: string;
+  country_id: string;
+}
+
+export interface PracticeHintRequest {
+  session_id: string;
+  hint_type: HintType;
+}
+
 export interface GameCompleteData {
   completed: boolean;
   score: number;

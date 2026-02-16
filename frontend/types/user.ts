@@ -42,3 +42,23 @@ export interface ProfileUpdatePayload {
   home_country_code?: string | null;
   preferences?: Record<string, unknown>;
 }
+
+export type LeaderboardType = 'max_streak' | 'games_won' | 'current_streak';
+
+export interface LeaderboardEntry {
+  rank: number;
+  user_id: string;
+  username: string | null;
+  display_name: string | null;
+  avatar_url: string | null;
+  home_country_code: string | null;
+  score: number;
+  games_played: number;
+}
+
+export interface LeaderboardResponse {
+  type: LeaderboardType;
+  entries: LeaderboardEntry[];
+  total_users: number;
+  user_rank: number | null;
+}

@@ -135,6 +135,7 @@
   },
   "stats": {
     "title": "Estadísticas",
+    "signInRequired": "Inicia sesión para ver tus estadísticas personales.",
     "gameStats": "Estadísticas del Juego",
     "quizStats": "Estadísticas del Cuestionario",
     "gamesPlayed": "Juegos",
@@ -182,10 +183,33 @@
     "score": "Puntuación",
     "games": "Juegos",
     "yourRank": "Tu Rango",
+    "empty": "Aún no hay entradas en la clasificación.",
+    "anonymous": "Anónimo",
+    "country": "País",
+    "currentFilter": "Filtro actual: {filter}",
     "types": {
       "streak": "Racha Más Larga",
       "wins": "Victorias",
-      "accuracy": "Precisión"
+      "accuracy": "Precisión",
+      "maxStreak": "Racha Máxima",
+      "gamesWon": "Juegos Ganados",
+      "currentStreak": "Racha Actual"
+    }
+  },
+  "practice": {
+    "title": "Modo Práctica",
+    "subtitle": "Juega partidas ilimitadas sin afectar el desafío diario.",
+    "cta": "¿Quieres calentar primero?",
+    "setupTitle": "Crear Ruta de Práctica",
+    "startCountry": "País de Inicio",
+    "endCountry": "País de Destino",
+    "startCountryPlaceholder": "Elige país de inicio",
+    "endCountryPlaceholder": "Elige país de destino",
+    "startButton": "Comenzar Práctica",
+    "completedMessage": "Práctica completada.",
+    "newRun": "Nueva Práctica",
+    "errors": {
+      "sameCountry": "El país de inicio y destino deben ser distintos."
     }
   },
   "auth": {
