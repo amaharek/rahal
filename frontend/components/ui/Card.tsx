@@ -14,12 +14,14 @@ export function Card({ children, className, hover, onClick }: CardProps) {
   return (
     <div
       className={cn(
-        'bg-surface rounded-xl border border-border p-6 shadow-sm',
-        hover &&
-          'hover:shadow-md hover:border-primary/30 transition-all cursor-pointer',
+        'bg-surface rounded-xl border border-border p-6',
+        'shadow-xs',
+        hover && 'card-hover',
         className
       )}
       onClick={onClick}
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
     >
       {children}
     </div>
@@ -42,7 +44,7 @@ interface CardTitleProps {
 
 export function CardTitle({ children, className }: CardTitleProps) {
   return (
-    <h3 className={cn('text-xl font-bold text-text-primary', className)}>
+    <h3 className={cn('text-lg font-bold text-text-primary', className)}>
       {children}
     </h3>
   );
@@ -55,7 +57,7 @@ interface CardDescriptionProps {
 
 export function CardDescription({ children, className }: CardDescriptionProps) {
   return (
-    <p className={cn('text-sm text-text-secondary mt-1', className)}>
+    <p className={cn('text-sm text-text-secondary mt-1 leading-relaxed', className)}>
       {children}
     </p>
   );
@@ -67,7 +69,7 @@ interface CardContentProps {
 }
 
 export function CardContent({ children, className }: CardContentProps) {
-  return <div className={cn('text-text-secondary', className)}>{children}</div>;
+  return <div className={cn('', className)}>{children}</div>;
 }
 
 interface CardFooterProps {
