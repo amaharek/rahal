@@ -1,4 +1,4 @@
-'use client';
+import { DailyGamePage } from '@/components/game/DailyGamePage';
 
 import { useEffect, useMemo, useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';

@@ -176,7 +176,7 @@ cd Rahal
 cd backend
 uv venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-uv pip install -e ".[test]"
+uv pip install -e ".[dev]"
 
 # 3. Setup frontend
 cd ../frontend
@@ -192,7 +192,7 @@ docker-compose up -d
 ```bash
 # Backend tests
 cd backend
-pytest
+uv run pytest
 
 # Frontend unit tests
 cd frontend
@@ -207,7 +207,7 @@ npm run test:e2e
 ```bash
 # Backend coverage
 cd backend
-pytest --cov=app --cov-report=html
+uv run pytest --cov=app --cov-report=html
 
 # Frontend coverage
 cd frontend
@@ -234,7 +234,7 @@ npm run test:coverage
 - Disconnected regions
 - Performance with large graphs
 
-**Run**: `pytest tests/test_services/test_path_finder.py`
+**Run**: `uv run pytest tests/test_services/test_path_finder.py`
 
 ---
 
@@ -254,7 +254,7 @@ npm run test:coverage
 - Emoji assignment
 - Multiple quiz rounds
 
-**Run**: `pytest tests/test_services/test_score_calculator.py`
+**Run**: `uv run pytest tests/test_services/test_score_calculator.py`
 
 ---
 
@@ -274,7 +274,7 @@ npm run test:coverage
 - Hint system
 - Multi-round quizzes
 
-**Run**: `pytest tests/test_services/test_quiz_engine.py`
+**Run**: `uv run pytest tests/test_services/test_quiz_engine.py`
 
 ---
 
@@ -477,7 +477,7 @@ npm run test:coverage
 
 3. **Run test**:
    ```bash
-   pytest tests/test_new_feature.py -v
+   uv run pytest tests/test_new_feature.py -v
    ```
 
 ---
@@ -605,19 +605,19 @@ npm run test:coverage
 
 #### Flaky Tests
 1. Identify flaky test
-2. Run test 10+ times: `pytest tests/test_flaky.py --count=10`
+2. Run test 10+ times: `uv run pytest tests/test_flaky.py --count=10`
 3. Add appropriate waits
 4. Fix race conditions
 5. Verify fix with repeated runs
 
 #### Slow Tests
-1. Profile test: `pytest tests/test_slow.py --durations=10`
+1. Profile test: `uv run pytest tests/test_slow.py --durations=10`
 2. Optimize database queries
 3. Use mocks for external calls
 4. Parallelize with pytest-xdist
 
 #### Coverage Gaps
-1. Generate coverage: `pytest --cov=app --cov-report=html`
+1. Generate coverage: `uv run pytest --cov=app --cov-report=html`
 2. Review uncovered lines in `htmlcov/index.html`
 3. Add targeted tests
 4. Verify improvement
@@ -657,7 +657,7 @@ npm run test:coverage
 ### Run All Tests
 ```bash
 # Backend
-cd backend && pytest
+cd backend && uv run pytest
 
 # Frontend Unit
 cd frontend && npm run test
@@ -669,7 +669,7 @@ cd frontend && npm run test:e2e
 ### Generate Coverage
 ```bash
 # Backend
-cd backend && pytest --cov=app --cov-report=html
+cd backend && uv run pytest --cov=app --cov-report=html
 
 # Frontend
 cd frontend && npm run test:coverage
@@ -678,7 +678,7 @@ cd frontend && npm run test:coverage
 ### Debug Tests
 ```bash
 # Backend
-cd backend && pytest -vv -s tests/test_name.py
+cd backend && uv run pytest -vv -s tests/test_name.py
 
 # Frontend Unit
 cd frontend && npm run test:ui
@@ -686,6 +686,19 @@ cd frontend && npm run test:ui
 # Frontend E2E
 cd frontend && npx playwright test --debug
 ```
+
+### Issue #4 Closure Checks
+```bash
+# Backend practice endpoint smoke
+cd backend && uv run pytest tests/test_smoke_routers.py -q
+
+# Frontend type check
+cd frontend && npm run type-check
+
+# Phase 3 critical path on CI gate browser
+cd frontend && npm run test:e2e -- --project=chromium e2e/specs/phase3-critical.spec.ts
+```
+Record the CI run URL and commit SHA in the issue comment before closing.
 
 ---
 

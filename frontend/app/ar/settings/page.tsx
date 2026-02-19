@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { ChevronRight, Palette, Languages, Home, MapPin, HelpCircle, BarChart3, User } from 'lucide-react';
 import { ThemeSelector } from '@/components/ui/ThemeToggle';
+import { LanguageSwitcher } from '@/components/shared/LanguageSwitcher';
 
 export default function SettingsPage() {
   const t = useTranslations('settings');

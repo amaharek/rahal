@@ -1,15 +1,8 @@
-import { IBM_Plex_Sans_Arabic } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { Providers } from '@/components/Providers';
+import { Header } from '@/components/layout/Header';
 import '@/app/globals.css';
-
-const ibmPlexArabic = IBM_Plex_Sans_Arabic({
-  subsets: ['arabic', 'latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-arabic',
-  display: 'swap',
-});
 
 export const metadata = {
   title: '\u0631\u062D\u0627\u0644 - \u0627\u0643\u062A\u0634\u0641 \u0627\u0644\u0639\u0627\u0644\u0645 \u0645\u0646 \u062E\u0644\u0627\u0644 \u0627\u0644\u0644\u0639\u0628',
@@ -42,7 +35,10 @@ export default async function ArabicLayout({
     <html lang="ar" dir="rtl" className={ibmPlexArabic.variable} suppressHydrationWarning>
       <body className="font-arabic bg-background text-text-primary min-h-screen antialiased">
         <NextIntlClientProvider messages={messages}>
-          <Providers>{children}</Providers>
+          <Providers>
+            <Header />
+            <main className="pt-16">{children}</main>
+          </Providers>
         </NextIntlClientProvider>
       </body>
     </html>

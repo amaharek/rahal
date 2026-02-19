@@ -88,6 +88,7 @@ class CRUDGameResult(CRUDBase[GameResult, GameResult, GameResult]):
         db: AsyncSession,
         user_id: UUID | None,
         challenge_id: UUID,
+        mode: str = "shortest",
     ) -> GameResult | None:
         """Get game result for a specific user and challenge."""
         if user_id is None:
@@ -96,6 +97,7 @@ class CRUDGameResult(CRUDBase[GameResult, GameResult, GameResult]):
             select(GameResult).where(
                 GameResult.user_id == user_id,
                 GameResult.challenge_id == challenge_id,
+                GameResult.mode == mode,
             )
         )
         return result.scalar_one_or_none()
@@ -105,10 +107,11 @@ class CRUDGameResult(CRUDBase[GameResult, GameResult, GameResult]):
         db: AsyncSession,
         user_id: UUID | None,
         challenge_id: UUID,
+        mode: str = "shortest",
     ) -> GameResult:
         """Get existing game result or create a new one."""
         if user_id:
-            existing = await self.get_by_user_and_challenge(db, user_id, challenge_id)
+            existing = await self.get_by_user_and_challenge(db, user_id, challenge_id, mode)
             if existing:
                 return existing
 
@@ -116,6 +119,7 @@ class CRUDGameResult(CRUDBase[GameResult, GameResult, GameResult]):
         game_result = GameResult(
             user_id=user_id,
             challenge_id=challenge_id,
+            mode=mode,
             guesses=[],
             total_guesses=0,
             hints_used=0,

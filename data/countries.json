@@ -157,18 +157,6 @@
       "flag_emoji": "🇵🇸"
     },
     {
-      "code": "ISR",
-      "name_ar": "إسرائيل",
-      "name_en": "Israel",
-      "continent": "Asia",
-      "region": "Middle East",
-      "population": 8655535,
-      "area_km2": null,
-      "capital_ar": "القدس",
-      "capital_en": "Jerusalem",
-      "flag_emoji": "🇮🇱"
-    },
-    {
       "code": "TUR",
       "name_ar": "تركيا",
       "name_en": "Turkey",
@@ -1031,6 +1019,90 @@
       "capital_ar": "مكسيكو سيتي",
       "capital_en": "Mexico City",
       "flag_emoji": "🇲🇽"
+    },
+    {
+      "code": "GTM",
+      "name_ar": "غواتيمالا",
+      "name_en": "Guatemala",
+      "continent": "North America",
+      "region": "Central America",
+      "population": 17915568,
+      "area_km2": 108889,
+      "capital_ar": "غواتيمالا سيتي",
+      "capital_en": "Guatemala City",
+      "flag_emoji": "🇬🇹"
+    },
+    {
+      "code": "BLZ",
+      "name_ar": "بليز",
+      "name_en": "Belize",
+      "continent": "North America",
+      "region": "Central America",
+      "population": 397628,
+      "area_km2": 22966,
+      "capital_ar": "بلموبان",
+      "capital_en": "Belmopan",
+      "flag_emoji": "🇧🇿"
+    },
+    {
+      "code": "HND",
+      "name_ar": "هندوراس",
+      "name_en": "Honduras",
+      "continent": "North America",
+      "region": "Central America",
+      "population": 9904607,
+      "area_km2": 112492,
+      "capital_ar": "تيغوسيغالبا",
+      "capital_en": "Tegucigalpa",
+      "flag_emoji": "🇭🇳"
+    },
+    {
+      "code": "SLV",
+      "name_ar": "السلفادور",
+      "name_en": "El Salvador",
+      "continent": "North America",
+      "region": "Central America",
+      "population": 6486205,
+      "area_km2": 21041,
+      "capital_ar": "سان سلفادور",
+      "capital_en": "San Salvador",
+      "flag_emoji": "🇸🇻"
+    },
+    {
+      "code": "NIC",
+      "name_ar": "نيكاراغوا",
+      "name_en": "Nicaragua",
+      "continent": "North America",
+      "region": "Central America",
+      "population": 6624554,
+      "area_km2": 130373,
+      "capital_ar": "ماناغوا",
+      "capital_en": "Managua",
+      "flag_emoji": "🇳🇮"
+    },
+    {
+      "code": "CRI",
+      "name_ar": "كوستاريكا",
+      "name_en": "Costa Rica",
+      "continent": "North America",
+      "region": "Central America",
+      "population": 5094118,
+      "area_km2": 51100,
+      "capital_ar": "سان خوسيه",
+      "capital_en": "San Jose",
+      "flag_emoji": "🇨🇷"
+    },
+    {
+      "code": "PAN",
+      "name_ar": "بنما",
+      "name_en": "Panama",
+      "continent": "North America",
+      "region": "Central America",
+      "population": 4314767,
+      "area_km2": 75417,
+      "capital_ar": "بنما سيتي",
+      "capital_en": "Panama City",
+      "flag_emoji": "🇵🇦"
     },
     {
       "code": "BRA",

@@ -105,9 +105,15 @@ export default function QuizPage() {
         undefined
       );
       setCurrentAnswer(result);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to submit answer:', err);
-      setIsAnswerSubmitted(false);
+      // Handle 404 error (stale question)
+      if (err?.status === 404) {
+        alert(t('errors.general') + ' - ' + t('quiz.tryAgain'));
+        resetQuiz();
+      } else {
+        setIsAnswerSubmitted(false);
+      }
     }
   };
 
@@ -124,9 +130,15 @@ export default function QuizPage() {
         undefined
       );
       setCurrentAnswer(result);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to submit answer:', err);
-      setIsAnswerSubmitted(false);
+      // Handle 404 error (stale question)
+      if (err?.status === 404) {
+        alert(t('errors.general') + ' - ' + t('quiz.tryAgain'));
+        resetQuiz();
+      } else {
+        setIsAnswerSubmitted(false);
+      }
     }
   };
 
@@ -137,9 +149,17 @@ export default function QuizPage() {
   const handleTimerExpire = useCallback(() => {
     if (!isAnswerSubmitted && currentQuestion) {
       setIsAnswerSubmitted(true);
-      submitAnswer(currentQuestion.id, '', hintsUsed, undefined);
+      try {
+        await submitAnswer(currentQuestion.id, '', hintsUsed, undefined);
+      } catch (err: any) {
+        // Handle 404 error (stale question)
+        if (err?.status === 404) {
+          alert(t('errors.general') + ' - ' + t('quiz.tryAgain'));
+          resetQuiz();
+        }
+      }
     }
-  }, [isAnswerSubmitted, currentQuestion, hintsUsed, submitAnswer]);
+  }, [isAnswerSubmitted, currentQuestion, hintsUsed, submitAnswer, resetQuiz, t]);
 
   const handleUseHint = () => {
     if (hintsUsed < 3 && !isAnswerSubmitted) {
@@ -431,8 +451,8 @@ export default function QuizPage() {
             initialSeconds={TIME_PER_QUESTION_SECONDS}
             onExpire={handleTimerExpire}
             isPaused={isAnswerSubmitted}
-            locale="ar"
             showProgress
+            locale="ar"
           />
         </div>
       </nav>
@@ -446,7 +466,6 @@ export default function QuizPage() {
           hintsRemaining={3 - hintsUsed}
           accuracy={answers.length > 0 ? accuracy : undefined}
           correctStreak={streak > 0 ? streak : undefined}
-          locale="ar"
         />
 
         {/* Question Card */}
@@ -461,7 +480,6 @@ export default function QuizPage() {
           }}
           currentQuestion={progress.current}
           totalQuestions={progress.total}
-          locale="ar"
         />
 
         {/* Answer Section */}

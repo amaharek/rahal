@@ -167,6 +167,54 @@ class CRUDQuestion(CRUDBase[Question, QuestionCreate, QuestionCreate]):
         result = await db.execute(query)
         return list(result.scalars().all())
 
+    async def list_for_admin(
+        self,
+        db: AsyncSession,
+        *,
+        category: QuestionCategory | None = None,
+        difficulty: QuestionDifficulty | None = None,
+        question_type: QuestionType | None = None,
+        is_active: bool | None = None,
+        search: str | None = None,
+        skip: int = 0,
+        limit: int = 50,
+    ) -> tuple[list[Question], int]:
+        """List questions for admin with filters and total count."""
+        filters = []
+
+        if category:
+            filters.append(Question.category == category.value)
+        if difficulty:
+            filters.append(Question.difficulty == difficulty.value)
+        if question_type:
+            filters.append(Question.question_type == question_type.value)
+        if is_active is not None:
+            filters.append(Question.is_active == is_active)
+        if search:
+            like_value = f"%{search.strip()}%"
+            filters.append(
+                or_(
+                    Question.question_ar.ilike(like_value),
+                    Question.correct_answer.ilike(like_value),
+                )
+            )
+
+        base_query = select(Question)
+        count_query = select(func.count(Question.id))
+
+        if filters:
+            base_query = base_query.where(and_(*filters))
+            count_query = count_query.where(and_(*filters))
+
+        base_query = base_query.order_by(Question.updated_at.desc()).offset(skip).limit(limit)
+
+        result = await db.execute(base_query)
+        items = list(result.scalars().all())
+        total_result = await db.execute(count_query)
+        total = total_result.scalar() or 0
+
+        return items, total
+
 
 # Singleton instance
 question_crud = CRUDQuestion(Question)

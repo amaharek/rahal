@@ -47,7 +47,7 @@
     },
     {
       "country_a": "JOR",
-      "country_b": "ISR",
+      "country_b": "PSE",
       "border_type": "land"
     },
     {
@@ -62,7 +62,7 @@
     },
     {
       "country_a": "LBN",
-      "country_b": "ISR",
+      "country_b": "PSE",
       "border_type": "land"
     },
     {
@@ -77,7 +77,7 @@
     },
     {
       "country_a": "SYR",
-      "country_b": "ISR",
+      "country_b": "PSE",
       "border_type": "land"
     },
     {
@@ -126,13 +126,8 @@
       "border_type": "land"
     },
     {
-      "country_a": "ISR",
+      "country_a": "PSE",
       "country_b": "EGY",
-      "border_type": "land"
-    },
-    {
-      "country_a": "ISR",
-      "country_b": "PSE",
       "border_type": "land"
     },
     {
@@ -843,6 +838,56 @@
     {
       "country_a": "COL",
       "country_b": "ECU",
+      "border_type": "land"
+    },
+    {
+      "country_a": "COL",
+      "country_b": "PAN",
+      "border_type": "land"
+    },
+    {
+      "country_a": "PAN",
+      "country_b": "CRI",
+      "border_type": "land"
+    },
+    {
+      "country_a": "CRI",
+      "country_b": "NIC",
+      "border_type": "land"
+    },
+    {
+      "country_a": "NIC",
+      "country_b": "HND",
+      "border_type": "land"
+    },
+    {
+      "country_a": "HND",
+      "country_b": "GTM",
+      "border_type": "land"
+    },
+    {
+      "country_a": "HND",
+      "country_b": "SLV",
+      "border_type": "land"
+    },
+    {
+      "country_a": "GTM",
+      "country_b": "MEX",
+      "border_type": "land"
+    },
+    {
+      "country_a": "GTM",
+      "country_b": "BLZ",
+      "border_type": "land"
+    },
+    {
+      "country_a": "BLZ",
+      "country_b": "MEX",
+      "border_type": "land"
+    },
+    {
+      "country_a": "SLV",
+      "country_b": "GTM",
       "border_type": "land"
     },
     {

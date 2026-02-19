@@ -80,6 +80,7 @@ class GameResult(Base, UUIDMixin, TimestampMixin):
     )
 
     # Game progress
+    mode: Mapped[str] = mapped_column(String(20), default="shortest", nullable=False)
     guesses: Mapped[list[dict[str, Any]]] = mapped_column(JSONB, default=list)
     total_guesses: Mapped[int] = mapped_column(Integer, default=0)
     hints_used: Mapped[int] = mapped_column(Integer, default=0)
@@ -99,7 +100,7 @@ class GameResult(Base, UUIDMixin, TimestampMixin):
 
     # Constraints
     __table_args__ = (
-        UniqueConstraint("user_id", "challenge_id", name="unique_user_challenge"),
+        UniqueConstraint("user_id", "challenge_id", "mode", name="unique_user_challenge_mode"),
     )
 
     def __repr__(self) -> str:

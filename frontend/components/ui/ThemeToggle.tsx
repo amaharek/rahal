@@ -1,6 +1,7 @@
 'use client';
 
 import { useTheme } from '@/components/ThemeProvider';
+import { useTranslations } from 'next-intl';
 import { Sun, Moon, Monitor } from 'lucide-react';
 import { Button } from './Button';
 
@@ -18,6 +19,8 @@ const themeLabels = {
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
+  const tThemes = useTranslations('settings.themes');
+  const tSettings = useTranslations('settings');
 
   const cycleTheme = () => {
     const themes: Array<'light' | 'dark' | 'system'> = ['light', 'dark', 'system'];
@@ -27,6 +30,7 @@ export function ThemeToggle() {
   };
 
   const Icon = themeIcons[theme];
+  const currentThemeLabel = tThemes(theme);
 
   return (
     <Button
@@ -47,6 +51,7 @@ interface ThemeSelectorProps {
 
 export function ThemeSelector({ className }: ThemeSelectorProps) {
   const { theme, setTheme } = useTheme();
+  const tThemes = useTranslations('settings.themes');
 
   const themes: Array<{ value: 'light' | 'dark' | 'system'; label: string; Icon: typeof Sun }> = [
     { value: 'light', label: '\u0641\u0627\u062A\u062D', Icon: Sun },

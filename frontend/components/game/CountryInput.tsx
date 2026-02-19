@@ -7,6 +7,7 @@ import { searchCountries } from '@/lib/api/game';
 import { Input } from '@/components/ui/Input';
 import { cn } from '@/lib/utils';
 import { debounce } from '@/lib/utils';
+import { useDirection } from '@/lib/hooks/useDirection';
 
 interface Country {
   id: string;
@@ -35,6 +36,7 @@ export function CountryInput({
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
+  const direction = useDirection();
 
   const debouncedSetQuery = useCallback(
     debounce((value: string) => {

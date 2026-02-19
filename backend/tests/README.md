@@ -64,37 +64,37 @@ export TEST_DATABASE_URL="postgresql+asyncpg://postgres:postgres@localhost:54322
 
 ```bash
 # Run all tests
-pytest
+uv run pytest
 
 # Run with coverage
-pytest --cov=app --cov-report=html --cov-report=term
+uv run pytest --cov=app --cov-report=html --cov-report=term
 
 # Run in parallel (faster)
-pytest -n auto
+uv run pytest -n auto
 
 # Run specific test file
-pytest tests/test_services/test_quiz_engine.py
+uv run pytest tests/test_services/test_quiz_engine.py
 
 # Run specific test class
-pytest tests/test_routers/test_game.py::TestGetDailyChallenge
+uv run pytest tests/test_routers/test_game.py::TestGetDailyChallenge
 
 # Run specific test
-pytest tests/test_routers/test_game.py::TestGetDailyChallenge::test_get_todays_challenge_success
+uv run pytest tests/test_routers/test_game.py::TestGetDailyChallenge::test_get_todays_challenge_success
 
 # Run with verbose output
-pytest -v
+uv run pytest -v
 
 # Run with extra verbose output (shows all print statements)
-pytest -vv -s
+uv run pytest -vv -s
 
 # Stop on first failure
-pytest -x
+uv run pytest -x
 
 # Run only failed tests from last run
-pytest --lf
+uv run pytest --lf
 
 # Show test durations (slowest 10)
-pytest --durations=10
+uv run pytest --durations=10
 ```
 
 ---
@@ -111,7 +111,7 @@ pytest --durations=10
 - `TestQuestionDataDistribution` - Question quality checks
 - `TestDatabaseSeedingIdempotency` - Seeding consistency
 
-**Run**: `pytest tests/test_data_validation.py -v`
+**Run**: `uv run pytest tests/test_data_validation.py -v`
 
 **Expected**: Some failures until database is properly seeded (300+ borders, 195 countries, 100+ questions)
 
@@ -129,8 +129,8 @@ pytest --durations=10
 
 **Run**: 
 ```bash
-pytest tests/test_security.py -v
-pytest tests/test_rate_limiting.py -v
+uv run pytest tests/test_security.py -v
+uv run pytest tests/test_rate_limiting.py -v
 ```
 
 **Expected**: Rate limiting tests will fail until middleware is implemented
@@ -152,7 +152,7 @@ pytest tests/test_rate_limiting.py -v
 - Hint generation (3 types)
 - Performance benchmarks
 
-**Run**: `pytest tests/test_services/test_path_finder.py -v`
+**Run**: `uv run pytest tests/test_services/test_path_finder.py -v`
 
 **Key Methods Tested**:
 - `build_graph()`
@@ -173,7 +173,7 @@ pytest tests/test_rate_limiting.py -v
 - Optimal path detection
 - Edge cases
 
-**Run**: `pytest tests/test_services/test_score_calculator.py -v`
+**Run**: `uv run pytest tests/test_services/test_score_calculator.py -v`
 
 **Key Methods Tested**:
 - `calculate_guess_score(challenge, guessed_country_id)`
@@ -202,7 +202,7 @@ final_score = max(0, base_score - penalties + bonuses)
 - Daily quiz balancing (33/33/33%)
 - Edge cases
 
-**Run**: `pytest tests/test_services/test_quiz_engine.py -v`
+**Run**: `uv run pytest tests/test_services/test_quiz_engine.py -v`
 
 **Key Methods Tested**:
 - `check_answer(question, user_answer, hints_used)`
@@ -231,7 +231,7 @@ final_score = max(0, base_score - penalties + bonuses)
 - `POST /api/game/hint` - Use hint (3 max)
 - `GET /api/game/stats` - User statistics (auth required)
 
-**Run**: `pytest tests/test_routers/test_game.py -v`
+**Run**: `uv run pytest tests/test_routers/test_game.py -v`
 
 **Test Classes**:
 - `TestGetDailyChallenge` - Challenge retrieval
@@ -254,7 +254,7 @@ final_score = max(0, base_score - penalties + bonuses)
 - `GET /api/quiz/stats` - User quiz stats (auth required)
 - `GET /api/quiz/categories` - Available categories
 
-**Run**: `pytest tests/test_routers/test_quiz.py -v`
+**Run**: `uv run pytest tests/test_routers/test_quiz.py -v`
 
 **Test Classes**:
 - `TestGetRandomQuestion` - Question retrieval with filters
@@ -477,7 +477,7 @@ fixture 'sample_questions' not found
 - Check fixture is defined in `conftest.py`
 - Verify pytest can discover the file:
   ```bash
-  pytest --fixtures | grep sample_questions
+  uv run pytest --fixtures | grep sample_questions
   ```
 
 ---
@@ -526,7 +526,7 @@ asyncio.TimeoutError
   timeout = 60
   ```
 - Check for infinite loops or deadlocks
-- Use `pytest -vv -s` to see where it hangs
+- Use `uv run pytest -vv -s` to see where it hangs
 
 ---
 
@@ -548,16 +548,16 @@ Run tests with maximum verbosity and debugging:
 
 ```bash
 # Show all output including print statements
-pytest -vv -s
+uv run pytest -vv -s
 
 # Show local variables on failure
-pytest -vv -l
+uv run pytest -vv -l
 
 # Enter debugger on failure
-pytest --pdb
+uv run pytest --pdb
 
 # Start debugger at beginning of test
-pytest --trace
+uv run pytest --trace
 ```
 
 ---
@@ -566,13 +566,13 @@ pytest --trace
 
 ```bash
 # Show 10 slowest tests
-pytest --durations=10
+uv run pytest --durations=10
 
 # Profile with py-spy (if installed)
 py-spy record -o profile.svg -- pytest
 
 # Memory profiling
-pytest --memray
+uv run pytest --memray
 ```
 
 ---
@@ -606,7 +606,7 @@ pytest --memray
 ### Generate HTML Coverage Report
 
 ```bash
-pytest --cov=app --cov-report=html
+uv run pytest --cov=app --cov-report=html
 open htmlcov/index.html  # macOS
 xdg-open htmlcov/index.html  # Linux
 ```
@@ -622,7 +622,7 @@ xdg-open htmlcov/index.html  # Linux
 ### View Coverage in Terminal
 
 ```bash
-pytest --cov=app --cov-report=term-missing
+uv run pytest --cov=app --cov-report=term-missing
 ```
 
 Shows which lines are not covered.
