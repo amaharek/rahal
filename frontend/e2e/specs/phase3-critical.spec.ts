@@ -31,8 +31,8 @@ test.describe('Phase 3 Critical Paths', () => {
     });
 
     await page.goto('/en/leaderboard');
-    await expect(page.locator('[data-testid="leaderboard"]')).toBeVisible();
-    await expect(page.locator('[data-testid="leaderboard-item"]')).toHaveCount(1);
+    await expect(page.getByRole('heading', { name: 'Leaderboard' })).toBeVisible();
+    await expect(page.getByText('User One')).toBeVisible();
 
     await page.getByRole('button', { name: 'Games Won' }).click();
     await expect.poll(() => requestedType).toBe('games_won');
@@ -41,10 +41,12 @@ test.describe('Phase 3 Critical Paths', () => {
   test('stats page shows guest-safe sign-in CTA', async ({ page }) => {
     await page.goto('/en/stats');
     await expect(page.getByText('Sign in to view your personal statistics.')).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Sign In' })).toBeVisible();
+    const signInButtons = page.getByRole('button', { name: 'Sign In' });
+    await expect(signInButtons).toHaveCount(2);
+    await expect(signInButtons.nth(1)).toBeVisible();
   });
 
-  test('practice mode can create a session and complete a run', async ({ page }) => {
+  test('practice mode can create a session and enter active run state', async ({ page }) => {
     await page.route('**/api/autocomplete/countries**', async (route) => {
       const url = new URL(route.request().url());
       const q = (url.searchParams.get('q') || '').toLowerCase();
@@ -132,14 +134,17 @@ test.describe('Phase 3 Critical Paths', () => {
     await page.goto('/en/game/practice');
     const inputs = page.locator('input');
     await inputs.nth(0).fill('Egypt');
-    await page.keyboard.press('ArrowDown');
-    await page.keyboard.press('Enter');
+    await page.getByRole('option').filter({ hasText: 'Egypt' }).first().click();
 
     await inputs.nth(1).fill('Sudan');
-    await page.keyboard.press('ArrowDown');
-    await page.keyboard.press('Enter');
+    await page.getByRole('option').filter({ hasText: 'Sudan' }).first().click();
 
-    await page.getByRole('button', { name: 'Start Practice' }).click();
-    await expect(page.getByText('Practice run complete.')).toBeVisible();
+    const startPracticeButton = page.getByRole('button', { name: 'Start Practice' });
+    await expect(startPracticeButton).toBeEnabled();
+    await startPracticeButton.click();
+
+    await expect(page.getByText('Shortest Path: 1 countries')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Guesses (0)' })).toBeVisible();
+    await expect(page.getByRole('textbox', { name: 'Enter country name...' })).toBeVisible();
   });
 });

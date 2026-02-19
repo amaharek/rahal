@@ -258,13 +258,13 @@ npx playwright show-report
 cd backend
 
 # Run all backend tests
-pytest
+uv run pytest
 
 # Run with coverage
-pytest --cov=app
+uv run pytest --cov=app
 
 # Run specific test file
-pytest tests/test_api.py
+uv run pytest tests/test_api.py
 ```
 
 ### Running All Tests
