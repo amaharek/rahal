@@ -18,6 +18,8 @@ interface Country {
 
 interface CountryInputProps {
   onSelect: (country: Country) => void;
+  onFocusStart?: () => void;
+  onCountryCommitted?: (countryCode: string) => void;
   placeholder?: string;
   disabled?: boolean;
   autoFocus?: boolean;
@@ -25,6 +27,8 @@ interface CountryInputProps {
 
 export function CountryInput({
   onSelect,
+  onFocusStart,
+  onCountryCommitted,
   placeholder = 'اكتب اسم الدولة...',
   disabled,
   autoFocus,
@@ -89,6 +93,7 @@ export function CountryInput({
   };
 
   const handleSelect = (country: Country) => {
+    onCountryCommitted?.(country.code);
     onSelect(country);
     setQuery('');
     setDebouncedQuery('');
@@ -109,7 +114,12 @@ export function CountryInput({
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         onKeyDown={handleKeyDown}
-        onFocus={() => debouncedQuery.length >= 1 && setIsOpen(true)}
+        onFocus={() => {
+          onFocusStart?.();
+          if (debouncedQuery.length >= 1) {
+            setIsOpen(true);
+          }
+        }}
         onBlur={() => setTimeout(() => setIsOpen(false), 200)}
         placeholder={placeholder}
         disabled={disabled}

@@ -88,6 +88,17 @@
       "borderHint": "Fronteras de {country}: {countries}",
       "pathHint": "Ruta sugerida: {countries}",
       "firstLettersHint": "Primeras letras: {letters}"
+    },
+    "hud": {
+      "streak": "Racha",
+      "hints": "Pistas",
+      "efficiency": "Eficiencia",
+      "efficiencyLevels": {
+        "pending": "Pendiente",
+        "high": "Alta",
+        "medium": "Media",
+        "low": "Baja"
+      }
     }
   },
   "admin": {

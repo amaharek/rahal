@@ -109,19 +109,14 @@ test.describe('Game Flow', () => {
     const suggestions = page.locator('[role="option"], [class*="suggestion"]');
     if (await suggestions.count() > 0) {
       await suggestions.first().click();
-      await page.waitForTimeout(1000);
-
-      // Verify score is displayed
-      const hasScoreDisplay = await page.locator('text=/النقاط|score/i').isVisible().catch(() => false);
-      const hasCompletionEmoji = await page.locator('text=🎉').isVisible().catch(() => false);
-
-      expect(hasScoreDisplay || hasCompletionEmoji).toBe(true);
+      await expect(gamePage.completionCard).toBeVisible();
+      await expect(gamePage.scoreDisplay).toBeVisible();
     }
   });
 
   test('should handle API errors gracefully', async ({ page }) => {
     // Setup error mock
-    await setupApiErrorMock(page, '/api/challenge/daily', 500);
+    await setupApiErrorMock(page, '/api/game/daily', 500);
 
     await gamePage.goto();
 
@@ -137,12 +132,18 @@ test.describe('Game Flow', () => {
 
   test('should show loading state initially', async ({ page }) => {
     // Delay the API response
-    await page.route('**/api/challenge/daily', async (route) => {
+    await page.route('**/api/game/daily**', async (route) => {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify(mockChallenge),
+        body: JSON.stringify({
+          ...mockChallenge,
+          challenge_date: mockChallenge.date,
+          mode: 'shortest',
+          path_country_codes: mockChallenge.optimal_path,
+          user_progress: null,
+        }),
       });
     });
 

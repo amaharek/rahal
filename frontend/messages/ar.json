@@ -88,6 +88,17 @@
       "borderHint": "حدود {country}: {countries}",
       "pathHint": "المسار المقترح: {countries}",
       "firstLettersHint": "الحروف الأولى: {letters}"
+    },
+    "hud": {
+      "streak": "السلسلة",
+      "hints": "التلميحات",
+      "efficiency": "الكفاءة",
+      "efficiencyLevels": {
+        "pending": "قيد التتبع",
+        "high": "مرتفعة",
+        "medium": "متوسطة",
+        "low": "منخفضة"
+      }
     }
   },
   "admin": {

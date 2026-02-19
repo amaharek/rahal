@@ -88,6 +88,17 @@
       "borderHint": "Borders of {country}: {countries}",
       "pathHint": "Suggested route: {countries}",
       "firstLettersHint": "First letters: {letters}"
+    },
+    "hud": {
+      "streak": "Streak",
+      "hints": "Hints",
+      "efficiency": "Efficiency",
+      "efficiencyLevels": {
+        "pending": "Pending",
+        "high": "High",
+        "medium": "Medium",
+        "low": "Low"
+      }
     }
   },
   "admin": {

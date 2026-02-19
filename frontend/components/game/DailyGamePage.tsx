@@ -5,14 +5,24 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { useTranslations, useLocale } from 'next-intl';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import { ChevronDown, ChevronUp, Map } from 'lucide-react';
-import { getDailyChallenge, submitGuess, useHint } from '@/lib/api/game';
-import { useGameStore } from '@/lib/stores/gameStore';
-import { CountryInput } from '@/components/game/CountryInput';
-import { EmojiScore } from '@/components/game/EmojiScore';
-import { MapSkeleton, MapErrorBoundary } from '@/components/game/GameMap';
-import { Card, CardHeader, CardTitle, CardContent, Button } from '@/components/ui';
 import { useDirection } from '@/lib/hooks/useDirection';
+import { getDailyChallenge, getGameStats, submitGuess, useHint } from '@/lib/api/game';
+import { useGameStore } from '@/lib/stores/gameStore';
+import { useAuthStore } from '@/lib/stores/authStore';
+import {
+  resetChallengeTelemetryState,
+  trackDockAction,
+  trackGuessSubmission,
+  trackHudRenderState,
+  trackInputFocusStart,
+} from '@/lib/telemetry/gameTelemetry';
+import { MapSkeleton, MapErrorBoundary } from '@/components/game/GameMap';
+import { GameHUD, deriveEfficiencyBucket } from '@/components/game/GameHUD';
+import { GameChallengeCard } from '@/components/game/GameChallengeCard';
+import { GameActionDock } from '@/components/game/GameActionDock';
+import { GameHintsPanel } from '@/components/game/GameHintsPanel';
+import { GameGuessList } from '@/components/game/GameGuessList';
+import { Card, CardContent, Button } from '@/components/ui';
 import type { Country, GuessEntry, HintResponse, RouteMode } from '@/types/game';
 
 const GameMap = dynamic(
@@ -39,13 +49,17 @@ export function DailyGamePage() {
   const locale = useLocale();
   const direction = useDirection();
   const [routeMode, setRouteMode] = useState<RouteMode>('shortest');
+  const [currentHint, setCurrentHint] = useState<HintResponse | null>(null);
+  const [qualityExplanation, setQualityExplanation] = useState<string | null>(null);
+
+  const accessToken = useAuthStore((state) => state.accessToken);
+
   const {
     challenge,
     guesses,
     hintsUsed,
     isCompleted,
     score,
-    showMap,
     mapZoom,
     mapCenter,
     setChallenge,
@@ -53,13 +67,16 @@ export function DailyGamePage() {
     useHint: storeUseHint,
     completeGame,
     setError,
-    toggleMap,
     setMapZoom,
     setMapCenter,
   } = useGameStore();
 
-  const [currentHint, setCurrentHint] = useState<HintResponse | null>(null);
-  const [qualityExplanation, setQualityExplanation] = useState<string | null>(null);
+  const { data: statsData } = useQuery({
+    queryKey: ['gameStatsHud', accessToken],
+    queryFn: () => getGameStats(accessToken as string),
+    enabled: Boolean(accessToken),
+    retry: false,
+  });
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['dailyChallenge', routeMode],
@@ -74,6 +91,18 @@ export function DailyGamePage() {
     }
   }, [data, setChallenge]);
 
+  useEffect(() => {
+    if (!challenge) {
+      return;
+    }
+
+    resetChallengeTelemetryState(challenge.id);
+
+    return () => {
+      resetChallengeTelemetryState(challenge.id);
+    };
+  }, [challenge?.id]);
+
   const guessedCountryCodes = useMemo(
     () =>
       guesses.map((guess) => ({
@@ -82,6 +111,38 @@ export function DailyGamePage() {
       })),
     [guesses]
   );
+
+  const efficiencyBucket = useMemo(
+    () => (challenge ? deriveEfficiencyBucket(guesses.length, challenge.shortest_path) : 'pending'),
+    [challenge, guesses.length]
+  );
+
+  const hintsRemaining = Math.max(0, 3 - hintsUsed);
+  const streakValue = statsData?.current_streak ?? null;
+
+  useEffect(() => {
+    if (!challenge) {
+      return;
+    }
+
+    trackHudRenderState({
+      challengeId: challenge.id,
+      mode: routeMode,
+      streak: streakValue,
+      hintsRemaining,
+      efficiency: efficiencyBucket,
+      guessesCount: guesses.length,
+      isCompleted,
+    });
+  }, [
+    challenge,
+    routeMode,
+    streakValue,
+    hintsRemaining,
+    efficiencyBucket,
+    guesses.length,
+    isCompleted,
+  ]);
 
   const guessMutation = useMutation({
     mutationFn: (country: Country) =>
@@ -107,8 +168,8 @@ export function DailyGamePage() {
         setQualityExplanation(response.quality_explanation_ar);
       }
     },
-    onError: (error: Error) => {
-      setError(error.message);
+    onError: (mutationError: Error) => {
+      setError(mutationError.message);
     },
   });
 
@@ -122,13 +183,17 @@ export function DailyGamePage() {
       setCurrentHint(response);
       storeUseHint();
     },
-    onError: (error: Error) => {
-      setError(error.message);
+    onError: (mutationError: Error) => {
+      setError(mutationError.message);
     },
   });
 
   const handleHintRequest = () => {
-    if (!challenge || hintsUsed >= 3 || hintMutation.isPending) return;
+    if (!challenge || hintsUsed >= 3 || hintMutation.isPending) {
+      return;
+    }
+
+    trackDockAction(challenge.id, routeMode, 'use_hint');
     hintMutation.mutate();
   };
 
@@ -166,7 +231,9 @@ export function DailyGamePage() {
   };
 
   const handleCountrySelect = (country: Country) => {
-    if (!challenge || isCompleted) return;
+    if (!challenge || isCompleted) {
+      return;
+    }
 
     const alreadyGuessed = guesses.some((g) => g.country_id === country.id);
     if (alreadyGuessed) {
@@ -174,7 +241,24 @@ export function DailyGamePage() {
       return;
     }
 
+    trackGuessSubmission(challenge.id, routeMode, country.code);
     guessMutation.mutate(country);
+  };
+
+  const handleCountryCommitted = (_countryCode: string) => {
+    if (!challenge || isCompleted) {
+      return;
+    }
+
+    trackDockAction(challenge.id, routeMode, 'submit_guess');
+  };
+
+  const handleInputFocusStart = () => {
+    if (!challenge || isCompleted) {
+      return;
+    }
+
+    trackInputFocusStart(challenge.id);
   };
 
   const getCountryNameByLocale = (country: { name_ar: string; name_en: string }) =>
@@ -204,10 +288,12 @@ export function DailyGamePage() {
     );
   }
 
-  if (!challenge) return null;
+  if (!challenge) {
+    return null;
+  }
 
   return (
-    <main className="min-h-screen pb-20">
+    <main className="min-h-screen pb-[12rem] lg:pb-20">
       <header className="bg-primary text-white py-3 px-4">
         <div className="max-w-7xl mx-auto">
           <Link href={`/${locale}`} className="text-white/80 text-sm mb-1 inline-block">
@@ -240,40 +326,25 @@ export function DailyGamePage() {
           </CardContent>
         </Card>
 
-        <Card className="mb-3">
-          <CardContent className="py-2">
-            <div className="flex items-center justify-between gap-3">
-              <div className="text-center flex-1">
-                <div className="text-2xl mb-0.5">{challenge.start_country.flag_emoji}</div>
-                <div className="font-bold text-sm">{getCountryNameByLocale(challenge.start_country)}</div>
-                <div className="text-xs text-text-secondary">{t('game.from')}</div>
-              </div>
-              <div className="text-xl text-primary">{direction === 'rtl' ? '←' : '→'}</div>
-              <div className="text-center flex-1">
-                <div className="text-2xl mb-0.5">{challenge.end_country.flag_emoji}</div>
-                <div className="font-bold text-sm">{getCountryNameByLocale(challenge.end_country)}</div>
-                <div className="text-xs text-text-secondary">{t('game.to')}</div>
-              </div>
-            </div>
-            <div className="text-center mt-2 pt-2 border-t border-border">
-              <span className="text-xs text-text-secondary">
-                {t('game.shortestPath')}: {challenge.shortest_path} {t('game.pathCountriesUnit')}
-              </span>
-            </div>
-          </CardContent>
-        </Card>
+        <GameHUD
+          streak={streakValue}
+          hintsRemaining={hintsRemaining}
+          efficiency={efficiencyBucket}
+          localeLabel={t}
+        />
+
+        <GameChallengeCard
+          startCountry={challenge.start_country}
+          endCountry={challenge.end_country}
+          shortestPath={challenge.shortest_path}
+          direction={direction}
+          getCountryNameByLocale={getCountryNameByLocale}
+          t={t}
+        />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="order-1 lg:order-1">
-            <div className="lg:hidden mb-4">
-              <Button variant="outline" onClick={toggleMap} className="w-full flex items-center justify-center gap-2">
-                <Map className="w-4 h-4" />
-                {showMap ? t('game.map.hideMap') : t('game.map.showMap')}
-                {showMap ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-              </Button>
-            </div>
-
-            <div className={`${showMap ? 'block' : 'hidden'} lg:block`}>
+            <div data-testid="game-map">
               <MapErrorBoundary>
                 <GameMap
                   startCountryCode={challenge.start_country.code}
@@ -292,9 +363,25 @@ export function DailyGamePage() {
           </div>
 
           <div className="order-2 lg:order-2 space-y-4">
+            {!isCompleted && (
+              <div className="hidden lg:block">
+                <GameActionDock
+                  onCountrySelect={handleCountrySelect}
+                  onInputFocusStart={handleInputFocusStart}
+                  onCountryCommitted={handleCountryCommitted}
+                  onHintRequest={handleHintRequest}
+                  hintDisabled={hintsUsed >= 3}
+                  hintPending={hintMutation.isPending}
+                  disabled={guessMutation.isPending}
+                  placeholder={t('game.enterCountry')}
+                  hintLabel={t('game.nextHint')}
+                />
+              </div>
+            )}
+
             {isCompleted ? (
               <Card className="bg-success/10 border-success">
-                <CardContent className="text-center">
+                <CardContent className="text-center" data-testid="game-completion-card">
                   <div className="text-4xl mb-2">🎉</div>
                   <h2 className="text-xl font-bold text-success mb-2">{t('game.completed')}</h2>
                   <div className="grid grid-cols-2 gap-4 mb-4">
@@ -311,63 +398,43 @@ export function DailyGamePage() {
                 </CardContent>
               </Card>
             ) : (
-              <CountryInput
-                onSelect={handleCountrySelect}
-                placeholder={t('game.enterCountry')}
-                disabled={guessMutation.isPending}
-                autoFocus
+              <GameHintsPanel
+                hintsUsed={hintsUsed}
+                hintsTitle={t('game.hints')}
+                hintsRemainingLabel={t('game.hintsRemaining')}
+                nextHintLabel={t('game.nextHint')}
+                hintPending={hintMutation.isPending}
+                currentHint={currentHint}
+                formatHintDisplay={formatHintDisplay}
+                onHintRequest={handleHintRequest}
               />
             )}
 
-            {!isCompleted && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">
-                    {t('game.hints')} ({3 - hintsUsed} {t('game.hintsRemaining')})
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Button variant="outline" size="sm" disabled={hintsUsed >= 3 || hintMutation.isPending} className="w-full" onClick={handleHintRequest}>
-                    {t('game.nextHint')}
-                  </Button>
-                  {currentHint && (
-                    <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                      <div className="text-yellow-900">{formatHintDisplay(currentHint)}</div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">
-                  {t('game.guesses')} ({guesses.length})
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {guesses.length === 0 ? (
-                  <div className="text-center py-8 text-text-secondary">
-                    <p>{t('game.noGuessesYet')}</p>
-                    <p className="text-sm mt-2">{t('game.startTyping')}</p>
-                  </div>
-                ) : (
-                  <div className="space-y-2 max-h-[200px] overflow-y-auto">
-                    {guesses.map((guess, index) => (
-                      <div key={guess.country_id} className="flex items-center gap-3 p-2 bg-gray-50 rounded-lg">
-                        <span className="text-lg font-bold text-text-secondary w-8">{index + 1}.</span>
-                        <span className="text-2xl">{guess.flag_emoji}</span>
-                        <span className="flex-1 font-medium">{getCountryNameByLocale({ name_ar: guess.name_ar, name_en: guess.name_en || guess.name_ar })}</span>
-                        <EmojiScore emoji={guess.emoji} size="sm" animate={false} />
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            <GameGuessList
+              guesses={guesses}
+              getCountryNameByLocale={getCountryNameByLocale}
+              title={t('game.guesses')}
+              noGuessesLabel={t('game.noGuessesYet')}
+              startTypingLabel={t('game.startTyping')}
+            />
           </div>
         </div>
       </div>
+
+      {!isCompleted && (
+        <GameActionDock
+          fixedMobile
+          onCountrySelect={handleCountrySelect}
+          onInputFocusStart={handleInputFocusStart}
+          onCountryCommitted={handleCountryCommitted}
+          onHintRequest={handleHintRequest}
+          hintDisabled={hintsUsed >= 3}
+          hintPending={hintMutation.isPending}
+          disabled={guessMutation.isPending}
+          placeholder={t('game.enterCountry')}
+          hintLabel={t('game.nextHint')}
+        />
+      )}
     </main>
   );
 }
