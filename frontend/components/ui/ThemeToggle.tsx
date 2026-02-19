@@ -13,7 +13,8 @@ const themeIcons = {
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
-  const t = useTranslations('settings.themes');
+  const tThemes = useTranslations('settings.themes');
+  const tSettings = useTranslations('settings');
 
   const cycleTheme = () => {
     const themes: Array<'light' | 'dark' | 'system'> = ['light', 'dark', 'system'];
@@ -23,14 +24,14 @@ export function ThemeToggle() {
   };
 
   const Icon = themeIcons[theme];
-  const currentThemeLabel = t(theme);
+  const currentThemeLabel = tThemes(theme);
 
   return (
     <Button
       variant="outline"
       size="icon"
       onClick={cycleTheme}
-      aria-label={`${t('theme')}: ${currentThemeLabel}`}
+      aria-label={`${tSettings('theme')}: ${currentThemeLabel}`}
       title={currentThemeLabel}
     >
       <Icon className="h-5 w-5" />
@@ -44,7 +45,7 @@ interface ThemeSelectorProps {
 
 export function ThemeSelector({ className }: ThemeSelectorProps) {
   const { theme, setTheme } = useTheme();
-  const t = useTranslations('settings.themes');
+  const tThemes = useTranslations('settings.themes');
 
   const themes: Array<{ value: 'light' | 'dark' | 'system'; Icon: typeof Sun }> = [
     { value: 'light', Icon: Sun },
@@ -63,7 +64,7 @@ export function ThemeSelector({ className }: ThemeSelectorProps) {
           className="flex items-center gap-2"
         >
           <Icon className="h-4 w-4" />
-          <span>{t(value)}</span>
+          <span>{tThemes(value)}</span>
         </Button>
       ))}
     </div>
