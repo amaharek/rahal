@@ -36,6 +36,7 @@ class Settings(BaseSettings):
     SUPABASE_ANON_KEY: str = ""  # For client-side API calls
     SUPABASE_SERVICE_ROLE_KEY: str = ""  # For server-side admin operations
     SUPABASE_JWT_SECRET: str = "super-secret-jwt-token-with-at-least-32-characters-long"  # For JWT verification
+    ADMIN_USER_IDS: str = ""
 
     # CORS
     ALLOWED_ORIGINS: str = "http://localhost:3000,http://127.0.0.1:3000"
@@ -51,6 +52,13 @@ class Settings(BaseSettings):
     def allowed_origins_list(self) -> list[str]:
         """Parse allowed origins from comma-separated string."""
         return [origin.strip() for origin in self.ALLOWED_ORIGINS.split(",")]
+
+    @property
+    def admin_user_ids_list(self) -> list[str]:
+        """Parse admin UUID allowlist from comma-separated string."""
+        if not self.ADMIN_USER_IDS.strip():
+            return []
+        return [user_id.strip() for user_id in self.ADMIN_USER_IDS.split(",") if user_id.strip()]
 
 
 @lru_cache

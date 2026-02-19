@@ -2,6 +2,7 @@
 Question and Quiz-related Pydantic schemas.
 """
 
+from datetime import datetime
 from typing import Any
 from uuid import UUID
 
@@ -98,3 +99,65 @@ class QuizStatsResponse(BaseModel):
     accuracy: float
     by_category: dict[str, CategoryStats]
     by_difficulty: dict[str, CategoryStats]
+
+
+class AdminQuestionListItem(BaseModel):
+    """Question record for admin list view."""
+
+    id: UUID
+    category: str
+    difficulty: str
+    question_type: str
+    question_ar: str
+    correct_answer: str
+    options: list[str] | None = None
+    hint: str | None = None
+    image_url: str | None = None
+    tags: list[str] | None = None
+    is_active: bool
+    created_at: datetime
+    updated_at: datetime
+
+
+class AdminQuestionListResponse(BaseModel):
+    """Paginated admin questions list."""
+
+    items: list[AdminQuestionListItem]
+    total: int
+    skip: int
+    limit: int
+
+
+class AdminQuestionCreateRequest(BaseModel):
+    """Create payload for admin question APIs."""
+
+    category: QuestionCategory
+    difficulty: QuestionDifficulty
+    question_type: QuestionType
+    question_ar: str = Field(..., min_length=5)
+    correct_answer: str = Field(..., min_length=1)
+    options: list[str] | None = None
+    hint: str | None = None
+    image_url: str | None = None
+    tags: list[str] | None = None
+    is_active: bool = True
+
+
+class AdminQuestionUpdateRequest(BaseModel):
+    """Partial update payload for admin question APIs."""
+
+    category: QuestionCategory | None = None
+    difficulty: QuestionDifficulty | None = None
+    question_type: QuestionType | None = None
+    question_ar: str | None = Field(None, min_length=5)
+    correct_answer: str | None = Field(None, min_length=1)
+    options: list[str] | None = None
+    hint: str | None = None
+    image_url: str | None = None
+    tags: list[str] | None = None
+
+
+class AdminQuestionActivationRequest(BaseModel):
+    """Activation payload for admin question APIs."""
+
+    is_active: bool

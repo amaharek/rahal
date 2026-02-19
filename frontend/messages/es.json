@@ -48,7 +48,12 @@
     "noGuessesYet": "Sin intentos aún",
     "startTyping": "Comienza a escribir el nombre de un país",
     "hints": "Pistas",
+    "nextHint": "Revelar siguiente pista",
     "hintsRemaining": "pistas restantes",
+    "routeModes": {
+      "shortest": "Ruta más corta",
+      "explorer": "Explorador"
+    },
     "hintTypes": {
       "border": "Pista de Frontera",
       "allBorders": "Todas las Fronteras",
@@ -84,6 +89,20 @@
       "pathHint": "Ruta sugerida: {countries}",
       "firstLettersHint": "Primeras letras: {letters}"
     }
+  },
+  "admin": {
+    "title": "Gestión de preguntas",
+    "signInRequired": "Inicia sesión con cuenta admin para gestionar preguntas.",
+    "forbidden": "No tienes acceso de administrador.",
+    "search": "Buscar por pregunta o respuesta...",
+    "questionAr": "Pregunta (árabe)",
+    "correctAnswer": "Respuesta correcta",
+    "optionsCsv": "Opciones CSV (selección múltiple)",
+    "hint": "Pista",
+    "create": "Crear pregunta",
+    "questions": "Preguntas",
+    "activate": "Activar",
+    "deactivate": "Desactivar"
   },
   "quiz": {
     "title": "Cuestionario",

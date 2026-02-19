@@ -63,7 +63,7 @@ async def client(db_session):
 @pytest.fixture
 def auth_headers():
     """Create valid JWT token for tests."""
-    user_id = "test-user-id"
+    user_id = "00000000-0000-0000-0000-000000000999"
     token = jwt.encode(
         {
             "sub": user_id,

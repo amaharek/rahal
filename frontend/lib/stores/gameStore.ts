@@ -59,7 +59,8 @@ export const useGameStore = create<GameState>()(
         if (
           currentChallenge &&
           currentChallenge.challenge_date === challenge.challenge_date &&
-          currentChallenge.id === challenge.id
+          currentChallenge.id === challenge.id &&
+          currentChallenge.mode === challenge.mode
         ) {
           // Same challenge - keep existing local progress
           set({ challenge }); // Update challenge object in case of any changes

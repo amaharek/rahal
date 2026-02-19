@@ -48,7 +48,12 @@
     "noGuessesYet": "انطلق في رحلتك!",
     "startTyping": "ابدأ بكتابة اسم دولة",
     "hints": "التلميحات",
+    "nextHint": "اكشف التلميح التالي",
     "hintsRemaining": "تلميحات متبقية",
+    "routeModes": {
+      "shortest": "أقصر مسار",
+      "explorer": "المستكشف"
+    },
     "hintTypes": {
       "border": "تلميح الحدود",
       "allBorders": "جميع الحدود",
@@ -84,6 +89,20 @@
       "pathHint": "المسار المقترح: {countries}",
       "firstLettersHint": "الحروف الأولى: {letters}"
     }
+  },
+  "admin": {
+    "title": "إدارة الأسئلة",
+    "signInRequired": "سجّل الدخول بحساب مسؤول لإدارة الأسئلة.",
+    "forbidden": "لا تملك صلاحية المسؤول.",
+    "search": "ابحث بالسؤال أو الإجابة...",
+    "questionAr": "نص السؤال بالعربية",
+    "correctAnswer": "الإجابة الصحيحة",
+    "optionsCsv": "خيارات مفصولة بفواصل (للاختيار المتعدد)",
+    "hint": "تلميح",
+    "create": "إضافة سؤال",
+    "questions": "الأسئلة",
+    "activate": "تفعيل",
+    "deactivate": "تعطيل"
   },
   "quiz": {
     "title": "تحدي المعرفة",

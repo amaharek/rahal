@@ -14,13 +14,14 @@ import type {
   PracticeSessionRequest,
   PracticeGuessRequest,
   PracticeHintRequest,
+  RouteMode,
 } from '@/types/game';
 
 /**
  * Get today's daily challenge
  */
-export async function getDailyChallenge(token?: string): Promise<DailyChallenge> {
-  return get<DailyChallenge>('/api/game/daily', token);
+export async function getDailyChallenge(mode: RouteMode, token?: string): Promise<DailyChallenge> {
+  return get<DailyChallenge>(`/api/game/daily?mode=${mode}`, token);
 }
 
 /**
@@ -28,9 +29,10 @@ export async function getDailyChallenge(token?: string): Promise<DailyChallenge>
  */
 export async function getChallengeByDate(
   date: string,
+  mode: RouteMode,
   token?: string
 ): Promise<DailyChallenge> {
-  return get<DailyChallenge>(`/api/game/daily?challenge_date=${date}`, token);
+  return get<DailyChallenge>(`/api/game/daily?challenge_date=${date}&mode=${mode}`, token);
 }
 
 /**

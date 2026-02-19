@@ -1,9 +1,14 @@
 """Smoke tests for API routers."""
 import pytest
 from datetime import date
+from datetime import datetime, timedelta, timezone
+from uuid import UUID
+from jose import jwt
+from app.core.config import settings
 from app.models.country import Country, Border
 from app.models.question import Question, QuestionType
 from app.models.game import DailyChallenge
+from app.models.user import Profile
 
 
 @pytest.mark.asyncio
@@ -220,3 +225,69 @@ async def test_submit_practice_guess(client, db_session):
     data = guess_response.json()
     assert data["is_destination"] is True
     assert data["game_complete"] is True
+
+
+@pytest.mark.asyncio
+async def test_guess_persists_mode_specific_progress(client, db_session):
+    c1 = Country(code="ITA", name_ar="إيطاليا", name_ar_normalized="ايطاليا", name_en="Italy", continent="Europe", region="Southern Europe")
+    c2 = Country(code="CHE", name_ar="سويسرا", name_ar_normalized="سويسرا", name_en="Switzerland", continent="Europe", region="Western Europe")
+    db_session.add_all([c1, c2])
+    await db_session.commit()
+
+    a_id, b_id = sorted([c1.id, c2.id])
+    db_session.add(Border(country_a_id=a_id, country_b_id=b_id))
+    await db_session.commit()
+
+    challenge = DailyChallenge(
+        challenge_date=date.today(),
+        start_country_id=c1.id,
+        end_country_id=c2.id,
+        shortest_path=1
+    )
+    db_session.add(challenge)
+    await db_session.commit()
+
+    response = await client.post(
+        "/api/game/guess",
+        json={
+            "challenge_id": str(challenge.id),
+            "country_id": str(c2.id),
+            "mode": "explorer",
+        }
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["route_mode"] == "explorer"
+    assert data["quality_tier"] in ["perfect", "near_optimal", "good_discovery", "scenic"]
+
+
+@pytest.mark.asyncio
+async def test_admin_session_requires_admin(client, db_session):
+    user_id = "00000000-0000-0000-0000-000000000123"
+    db_session.add(
+        Profile(
+            id=UUID(user_id),
+            username=None,
+            display_name="Admin Test",
+            avatar_url=None,
+            home_country_code=None,
+        )
+    )
+    await db_session.commit()
+
+    token = jwt.encode(
+        {
+            "sub": user_id,
+            "aud": "authenticated",
+            "exp": datetime.now(timezone.utc) + timedelta(hours=1),
+            "app_metadata": {"role": "admin"},
+        },
+        settings.SUPABASE_JWT_SECRET,
+        algorithm="HS256"
+    )
+    response = await client.get(
+        "/api/admin/session",
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 200
+    assert response.json()["is_admin"] is True

@@ -48,7 +48,12 @@
     "noGuessesYet": "No guesses yet",
     "startTyping": "Start typing a country name",
     "hints": "Hints",
+    "nextHint": "Reveal Next Hint",
     "hintsRemaining": "hints remaining",
+    "routeModes": {
+      "shortest": "Shortest Route",
+      "explorer": "Explorer"
+    },
     "hintTypes": {
       "border": "Border Hint",
       "allBorders": "All Borders",
@@ -84,6 +89,20 @@
       "pathHint": "Suggested route: {countries}",
       "firstLettersHint": "First letters: {letters}"
     }
+  },
+  "admin": {
+    "title": "Question Management",
+    "signInRequired": "Sign in with an admin account to manage questions.",
+    "forbidden": "You do not have admin access.",
+    "search": "Search by question or answer...",
+    "questionAr": "Question (Arabic)",
+    "correctAnswer": "Correct answer",
+    "optionsCsv": "Options CSV (for multiple choice)",
+    "hint": "Hint",
+    "create": "Create Question",
+    "questions": "Questions",
+    "activate": "Activate",
+    "deactivate": "Deactivate"
   },
   "quiz": {
     "title": "Quiz",

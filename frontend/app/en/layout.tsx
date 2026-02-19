@@ -1,16 +1,8 @@
-import { Inter } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { Providers } from '@/components/Providers';
 import { Header } from '@/components/layout/Header';
 import '@/app/globals.css';
-
-const inter = Inter({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-inter',
-  display: 'swap',
-});
 
 export const metadata = {
   title: 'Rahal - Discover the World Through Play',
@@ -33,7 +25,7 @@ export default async function EnglishLayout({
   const messages = await getMessages();
 
   return (
-    <html lang="en" dir="ltr" className={inter.variable} suppressHydrationWarning>
+    <html lang="en" dir="ltr" suppressHydrationWarning>
       <body className="font-sans bg-background text-text-primary min-h-screen">
         <NextIntlClientProvider messages={messages}>
           <Providers>

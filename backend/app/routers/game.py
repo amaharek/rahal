@@ -25,6 +25,7 @@ from app.schemas.game import (
     PracticeHintRequest,
     PracticeSessionCreateRequest,
     PracticeSessionResponse,
+    RouteMode,
     UserProgress,
 )
 from app.schemas.country import CountryBrief
@@ -49,6 +50,7 @@ class PracticeSessionState:
     end_country_id: UUID
     shortest_path: int
     path_country_codes: list[str]
+    route_mode: RouteMode = "shortest"
     guesses: list[dict] = field(default_factory=list)
     hints_used: int = 0
     completed: bool = False
@@ -101,6 +103,7 @@ async def get_daily_challenge(
     db: DBSession,
     current_user: OptionalUser,
     challenge_date: date | None = None,
+    mode: RouteMode = "shortest",
 ):
     """
     Get today's daily challenge.
@@ -121,7 +124,7 @@ async def get_daily_challenge(
     user_progress = None
     if current_user:
         result = await game_result_crud.get_by_user_and_challenge(
-            db, current_user.id, challenge.id
+            db, current_user.id, challenge.id, mode
         )
         if result:
             user_progress = UserProgress(
@@ -165,6 +168,7 @@ async def get_daily_challenge(
             flag_emoji=challenge.end_country.flag_emoji,
         ),
         shortest_path=challenge.shortest_path,
+        mode=mode,
         path_country_codes=path_country_codes,
         user_progress=user_progress,
     )
@@ -191,7 +195,7 @@ async def submit_guess(
 
     # Get or create game result
     game_result = await game_result_crud.get_or_create_for_user(
-        db, current_user.id if current_user else None, challenge.id
+        db, current_user.id if current_user else None, challenge.id, request.mode
     )
 
     # Check if already completed
@@ -229,6 +233,7 @@ async def submit_guess(
             game_result.total_guesses,
             game_result.hints_used,
             challenge.shortest_path,
+            request.mode,
         )
 
     await db.flush()
@@ -247,6 +252,27 @@ async def submit_guess(
         is_destination=score_result.is_destination,
         game_complete=game_result.completed,
         total_guesses=game_result.total_guesses,
+        score=game_result.score,
+        route_mode=request.mode,
+        gap_from_optimal=(
+            max(0, game_result.total_guesses - challenge.shortest_path)
+            if game_result.completed
+            else None
+        ),
+        quality_tier=(
+            score_calculator.get_quality_tier(game_result.total_guesses, challenge.shortest_path)
+            if game_result.completed
+            else None
+        ),
+        quality_explanation_ar=(
+            score_calculator.get_quality_explanation_ar(
+                mode=request.mode,
+                total_guesses=game_result.total_guesses,
+                shortest_path=challenge.shortest_path,
+            )
+            if game_result.completed
+            else None
+        ),
     )
 
 
@@ -272,7 +298,7 @@ async def use_hint(
         )
 
     game_result = await game_result_crud.get_or_create_for_user(
-        db, current_user.id if current_user else None, challenge.id
+        db, current_user.id if current_user else None, challenge.id, request.mode
     )
 
     if game_result.hints_used >= 3:
@@ -288,10 +314,11 @@ async def use_hint(
         )
 
     # Generate hint
+    hint_step = game_result.hints_used + 1
     hint_data = await path_finder_service.generate_hint(
         db=db,
         challenge=challenge,
-        hint_type=request.hint_type,
+        hint_step=hint_step,
         previous_guesses=game_result.guesses,
     )
 
@@ -299,7 +326,7 @@ async def use_hint(
     await db.flush()
 
     return HintResponse(
-        hint_type=request.hint_type,
+        hint_type=f"progressive_{hint_step}",
         hint_data=hint_data,
         hints_remaining=3 - game_result.hints_used,
     )
@@ -375,11 +402,13 @@ async def create_practice_session(
         start_country_id=request.start_country_id,
         end_country_id=request.end_country_id,
         shortest_path=max(len(path) - 1, 1),
+        route_mode=request.mode,
         path_country_codes=path_country_codes,
     )
 
     return PracticeSessionResponse(
         session_id=session_id,
+        route_mode=request.mode,
         start_country=CountryBrief(
             id=start_country.id,
             code=start_country.code,
@@ -441,6 +470,7 @@ async def submit_practice_guess(
             len(session.guesses),
             session.hints_used,
             session.shortest_path,
+            session.route_mode,
         )
 
     return GuessResponse(
@@ -457,6 +487,25 @@ async def submit_practice_guess(
         is_destination=score_result.is_destination,
         game_complete=session.completed,
         total_guesses=len(session.guesses),
+        score=session.score,
+        route_mode=session.route_mode,
+        gap_from_optimal=(
+            max(0, len(session.guesses) - session.shortest_path) if session.completed else None
+        ),
+        quality_tier=(
+            score_calculator.get_quality_tier(len(session.guesses), session.shortest_path)
+            if session.completed
+            else None
+        ),
+        quality_explanation_ar=(
+            score_calculator.get_quality_explanation_ar(
+                mode=session.route_mode,
+                total_guesses=len(session.guesses),
+                shortest_path=session.shortest_path,
+            )
+            if session.completed
+            else None
+        ),
     )
 
 
@@ -482,17 +531,29 @@ async def use_practice_hint(
             detail="لقد أنهيت جولة التدريب بالفعل",
         )
 
+    hint_step = session.hints_used + 1
     hint_data = await path_finder_service.generate_hint(
         db=db,
         challenge=_build_challenge_like(session),
-        hint_type=request.hint_type,
+        hint_step=hint_step,
         previous_guesses=session.guesses,
     )
 
     session.hints_used += 1
 
     return HintResponse(
-        hint_type=request.hint_type,
+        hint_type=f"progressive_{hint_step}",
         hint_data=hint_data,
         hints_remaining=3 - session.hints_used,
     )
+    if request.mode != session.route_mode:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="وضع اللعب لا يطابق إعداد الجلسة",
+        )
+
+    if request.mode != session.route_mode:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="وضع اللعب لا يطابق إعداد الجلسة",
+        )

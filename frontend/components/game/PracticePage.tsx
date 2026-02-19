@@ -16,8 +16,8 @@ import type {
   Country,
   GuessEntry,
   HintResponse,
-  HintType,
   PracticeSession,
+  RouteMode,
 } from '@/types/game';
 
 const GameMap = dynamic(
@@ -51,6 +51,7 @@ export function PracticePage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [mapZoom, setMapZoom] = useState(1.5);
   const [mapCenter, setMapCenter] = useState<[number, number]>([35, 25]);
+  const [routeMode, setRouteMode] = useState<RouteMode>('shortest');
 
   const guessedCountryCodes = useMemo(
     () =>
@@ -66,6 +67,7 @@ export function PracticePage() {
       createPracticeSession({
         start_country_id: startCountry!.id,
         end_country_id: endCountry!.id,
+        mode: routeMode,
       }),
     onSuccess: (practiceSession) => {
       setSession(practiceSession);
@@ -94,6 +96,7 @@ export function PracticePage() {
       submitPracticeGuess({
         session_id: session!.session_id,
         country_id: country.id,
+        mode: routeMode,
       }),
     onSuccess: (response) => {
       const newGuess: GuessEntry = {
@@ -108,11 +111,7 @@ export function PracticePage() {
       setGuesses((prev) => [...prev, newGuess]);
 
       if (response.game_complete && session) {
-        const calculatedScore = Math.max(
-          0,
-          1000 - (response.total_guesses - session.shortest_path) * 50 - hintsUsed * 100
-        );
-        setScore(calculatedScore);
+        setScore(response.score ?? 0);
         setIsCompleted(true);
       }
     },
@@ -122,10 +121,10 @@ export function PracticePage() {
   });
 
   const hintMutation = useMutation({
-    mutationFn: (hintType: HintType) =>
+    mutationFn: () =>
       usePracticeHint({
         session_id: session!.session_id,
-        hint_type: hintType,
+        mode: routeMode,
       }),
     onSuccess: (response) => {
       setCurrentHint(response);
@@ -144,7 +143,7 @@ export function PracticePage() {
     const separator = locale === 'ar' ? '، ' : ', ';
     const arrow = locale === 'ar' ? ' ← ' : ' -> ';
 
-    if (hint_type === 'border_hint') {
+    if (hint_type === 'progressive_1') {
       const countryName = (hint_data.country_name_en || hint_data.country_name_ar) as
         | string
         | undefined;
@@ -157,14 +156,14 @@ export function PracticePage() {
       }
     }
 
-    if (hint_type === 'all_borders_hint' && hint_data.path_countries) {
+    if (hint_type === 'progressive_3' && hint_data.path_countries) {
       const pathCountries = hint_data.path_countries as string[];
       return t('game.hintDisplay.pathHint', {
         countries: pathCountries.join(arrow),
       });
     }
 
-    if (hint_type === 'first_letter_hint' && hint_data.first_letters) {
+    if (hint_type === 'progressive_2' && hint_data.first_letters) {
       const letters = hint_data.first_letters as string[];
       return t('game.hintDisplay.firstLettersHint', {
         letters: letters.join(separator),
@@ -193,9 +192,9 @@ export function PracticePage() {
     guessMutation.mutate(country);
   };
 
-  const onUseHint = (hintType: HintType) => {
+  const onUseHint = () => {
     if (!session || isCompleted || hintsUsed >= 3 || hintMutation.isPending) return;
-    hintMutation.mutate(hintType);
+    hintMutation.mutate();
   };
 
   return (
@@ -217,6 +216,22 @@ export function PracticePage() {
               <CardTitle>{t('practice.setupTitle')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div className="flex gap-2">
+                <Button
+                  variant={routeMode === 'shortest' ? 'primary' : 'outline'}
+                  className="flex-1"
+                  onClick={() => setRouteMode('shortest')}
+                >
+                  {t('game.routeModes.shortest')}
+                </Button>
+                <Button
+                  variant={routeMode === 'explorer' ? 'primary' : 'outline'}
+                  className="flex-1"
+                  onClick={() => setRouteMode('explorer')}
+                >
+                  {t('game.routeModes.explorer')}
+                </Button>
+              </div>
               <div>
                 <div className="text-sm font-medium mb-2">{t('practice.startCountry')}</div>
                 <CountryInput
@@ -353,40 +368,20 @@ export function PracticePage() {
                 {!isCompleted && (
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-base">
-                        {t('game.hints')} ({3 - hintsUsed} {t('game.hintsRemaining')})
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          disabled={hintsUsed >= 3 || hintMutation.isPending}
-                          className="flex-1"
-                          onClick={() => onUseHint('border_hint')}
-                        >
-                          {t('game.hintTypes.border')}
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          disabled={hintsUsed >= 3 || hintMutation.isPending}
-                          className="flex-1"
-                          onClick={() => onUseHint('all_borders_hint')}
-                        >
-                          {t('game.hintTypes.allBorders')}
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          disabled={hintsUsed >= 3 || hintMutation.isPending}
-                          className="flex-1"
-                          onClick={() => onUseHint('first_letter_hint')}
-                        >
-                          {t('game.hintTypes.firstLetter')}
-                        </Button>
-                      </div>
+                    <CardTitle className="text-base">
+                      {t('game.hints')} ({3 - hintsUsed} {t('game.hintsRemaining')})
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={hintsUsed >= 3 || hintMutation.isPending}
+                        className="w-full"
+                        onClick={onUseHint}
+                      >
+                        {t('game.nextHint')}
+                      </Button>
                       {currentHint && (
                         <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                           <div className="text-yellow-900">{formatHintDisplay(currentHint)}</div>
