@@ -92,9 +92,15 @@ export default function QuizPage() {
         undefined // Let the store calculate time
       );
       setCurrentAnswer(result);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to submit answer:', err);
-      setIsAnswerSubmitted(false);
+      // Handle 404 error (stale question)
+      if (err?.status === 404) {
+        alert(t('errors.general') + ' - ' + t('quiz.tryAgain'));
+        resetQuiz();
+      } else {
+        setIsAnswerSubmitted(false);
+      }
     }
   };
 
@@ -112,9 +118,15 @@ export default function QuizPage() {
         undefined
       );
       setCurrentAnswer(result);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to submit answer:', err);
-      setIsAnswerSubmitted(false);
+      // Handle 404 error (stale question)
+      if (err?.status === 404) {
+        alert(t('errors.general') + ' - ' + t('quiz.tryAgain'));
+        resetQuiz();
+      } else {
+        setIsAnswerSubmitted(false);
+      }
     }
   };
 
@@ -124,13 +136,21 @@ export default function QuizPage() {
   };
 
   // Handle timer expiry
-  const handleTimerExpire = useCallback(() => {
+  const handleTimerExpire = useCallback(async () => {
     if (!isAnswerSubmitted && currentQuestion) {
       // Auto-submit empty answer when time runs out
       setIsAnswerSubmitted(true);
-      submitAnswer(currentQuestion.id, '', hintsUsed, undefined);
+      try {
+        await submitAnswer(currentQuestion.id, '', hintsUsed, undefined);
+      } catch (err: any) {
+        // Handle 404 error (stale question)
+        if (err?.status === 404) {
+          alert(t('errors.general') + ' - ' + t('quiz.tryAgain'));
+          resetQuiz();
+        }
+      }
     }
-  }, [isAnswerSubmitted, currentQuestion, hintsUsed, submitAnswer]);
+  }, [isAnswerSubmitted, currentQuestion, hintsUsed, submitAnswer, resetQuiz, t]);
 
   // Handle hint usage
   const handleUseHint = () => {
@@ -312,7 +332,7 @@ export default function QuizPage() {
   return (
     <main className="min-h-screen pb-20">
       {/* Header */}
-      <header className="bg-primary text-white py-4 px-4">
+      <header className="bg-primary text-white py-3 px-4">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <div>
             <Link href="/ar" className="text-white/80 text-sm mb-1 inline-block">
@@ -325,13 +345,13 @@ export default function QuizPage() {
             initialSeconds={TIME_PER_QUESTION_SECONDS}
             onExpire={handleTimerExpire}
             isPaused={isAnswerSubmitted}
-            locale="ar"
             showProgress
+            locale="ar"
           />
         </div>
       </header>
 
-      <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
+      <div className="max-w-3xl mx-auto px-4 py-4 space-y-4">
         {/* Progress */}
         <QuizProgress
           currentQuestion={progress.current}
@@ -340,7 +360,6 @@ export default function QuizPage() {
           hintsRemaining={3 - hintsUsed}
           accuracy={answers.length > 0 ? accuracy : undefined}
           correctStreak={streak > 0 ? streak : undefined}
-          locale="ar"
         />
 
         {/* Question Card */}
@@ -355,27 +374,25 @@ export default function QuizPage() {
           }}
           currentQuestion={progress.current}
           totalQuestions={progress.total}
-          locale="ar"
         />
 
         {/* Answer Section */}
         <Card>
           <CardContent>
             {currentQuestion.question_type === 'multiple_choice' ? (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <AnswerOptions
                   options={formattedOptions}
                   onSelect={handleOptionSelect}
                   selectedIndex={selectedOptionIndex}
                   correctIndex={isAnswerSubmitted ? getCorrectAnswerIndex() : undefined}
                   isSubmitted={isAnswerSubmitted}
-                  locale="ar"
                 />
 
                 {!isAnswerSubmitted && (
                   <Button
                     variant="primary"
-                    className="w-full mt-4"
+                    className="w-full mt-3"
                     onClick={handleSubmit}
                     disabled={selectedOptionIndex === undefined || isSubmitting}
                   >
@@ -389,14 +406,13 @@ export default function QuizPage() {
                 isSubmitted={isAnswerSubmitted}
                 isCorrect={currentAnswer?.is_correct}
                 correctAnswerKey={currentAnswer?.correct_answer}
-                locale="ar"
               />
             )}
 
             {/* Answer Feedback */}
             {isAnswerSubmitted && currentAnswer && (
               <div
-                className={`mt-4 p-4 rounded-lg ${
+                className={`mt-3 p-3 rounded-lg ${
                   currentAnswer.is_correct
                     ? 'bg-green-50 border border-green-200'
                     : 'bg-red-50 border border-red-200'
@@ -429,7 +445,7 @@ export default function QuizPage() {
             {isAnswerSubmitted && (
               <Button
                 variant="primary"
-                className="w-full mt-4"
+                className="w-full mt-3"
                 onClick={handleNextQuestion}
               >
                 {progress.current === progress.total

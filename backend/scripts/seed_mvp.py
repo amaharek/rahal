@@ -66,7 +66,6 @@ COUNTRIES_DATA = [
     {"code": "OMN", "name_ar": "عُمان", "name_en": "Oman", "continent": "Asia", "region": "Middle East", "capital_ar": "مسقط", "capital_en": "Muscat", "flag_emoji": "🇴🇲", "population": 5106626},
     {"code": "YEM", "name_ar": "اليمن", "name_en": "Yemen", "continent": "Asia", "region": "Middle East", "capital_ar": "صنعاء", "capital_en": "Sanaa", "flag_emoji": "🇾🇪", "population": 29825964},
     {"code": "PSE", "name_ar": "فلسطين", "name_en": "Palestine", "continent": "Asia", "region": "Middle East", "capital_ar": "القدس", "capital_en": "Jerusalem", "flag_emoji": "🇵🇸", "population": 5101414},
-    {"code": "ISR", "name_ar": "إسرائيل", "name_en": "Israel", "continent": "Asia", "region": "Middle East", "capital_ar": "القدس", "capital_en": "Jerusalem", "flag_emoji": "🇮🇱", "population": 8655535},
     {"code": "TUR", "name_ar": "تركيا", "name_en": "Turkey", "continent": "Asia", "region": "Middle East", "capital_ar": "أنقرة", "capital_en": "Ankara", "flag_emoji": "🇹🇷", "population": 84339067},
     {"code": "IRN", "name_ar": "إيران", "name_en": "Iran", "continent": "Asia", "region": "Middle East", "capital_ar": "طهران", "capital_en": "Tehran", "flag_emoji": "🇮🇷", "population": 83992949},
 
@@ -121,6 +120,7 @@ COUNTRIES_DATA = [
     {"code": "SRB", "name_ar": "صربيا", "name_en": "Serbia", "continent": "Europe", "region": "Eastern Europe", "capital_ar": "بلغراد", "capital_en": "Belgrade", "flag_emoji": "🇷🇸", "population": 8737371},
     {"code": "HRV", "name_ar": "كرواتيا", "name_en": "Croatia", "continent": "Europe", "region": "Eastern Europe", "capital_ar": "زغرب", "capital_en": "Zagreb", "flag_emoji": "🇭🇷", "population": 4105267},
     {"code": "SVK", "name_ar": "سلوفاكيا", "name_en": "Slovakia", "continent": "Europe", "region": "Eastern Europe", "capital_ar": "براتيسلافا", "capital_en": "Bratislava", "flag_emoji": "🇸🇰", "population": 5459642},
+    {"code": "SVN", "name_ar": "سلوفينيا", "name_en": "Slovenia", "continent": "Europe", "region": "Eastern Europe", "capital_ar": "ليوبليانا", "capital_en": "Ljubljana", "flag_emoji": "🇸🇮", "population": 2078938},
     {"code": "IRL", "name_ar": "أيرلندا", "name_en": "Ireland", "continent": "Europe", "region": "Northern Europe", "capital_ar": "دبلن", "capital_en": "Dublin", "flag_emoji": "🇮🇪", "population": 4937786},
 
     # Asia
@@ -174,13 +174,13 @@ BORDERS_DATA = [
     # Middle East borders
     ("SAU", "JOR"), ("SAU", "IRQ"), ("SAU", "KWT"), ("SAU", "QAT"),
     ("SAU", "ARE"), ("SAU", "OMN"), ("SAU", "YEM"),
-    ("JOR", "SYR"), ("JOR", "IRQ"), ("JOR", "ISR"), ("JOR", "PSE"),
-    ("LBN", "SYR"), ("LBN", "ISR"),
-    ("SYR", "TUR"), ("SYR", "IRQ"), ("SYR", "ISR"),
+    ("JOR", "SYR"), ("JOR", "IRQ"), ("JOR", "PSE"),
+    ("LBN", "SYR"), ("LBN", "PSE"),
+    ("SYR", "TUR"), ("SYR", "IRQ"), ("SYR", "PSE"),
     ("IRQ", "TUR"), ("IRQ", "IRN"), ("IRQ", "KWT"),
     ("IRN", "TUR"), ("IRN", "AFG"), ("IRN", "PAK"), ("IRN", "TKM"),
     ("OMN", "ARE"), ("OMN", "YEM"),
-    ("ISR", "EGY"), ("ISR", "PSE"),
+    ("PSE", "EGY"),
     ("TUR", "GRC"), ("TUR", "BGR"),
 
     # North Africa borders
@@ -208,9 +208,10 @@ BORDERS_DATA = [
     ("FRA", "ESP"), ("FRA", "BEL"), ("FRA", "DEU"), ("FRA", "CHE"), ("FRA", "ITA"),
     ("ESP", "PRT"),
     ("DEU", "NLD"), ("DEU", "BEL"), ("DEU", "CHE"), ("DEU", "AUT"), ("DEU", "POL"), ("DEU", "CZE"), ("DEU", "DNK"),
-    ("ITA", "CHE"), ("ITA", "AUT"), ("ITA", "FRA"),
+    ("ITA", "CHE"), ("ITA", "AUT"), ("ITA", "FRA"), ("ITA", "SVN"),
     ("CHE", "AUT"),
-    ("AUT", "CZE"), ("AUT", "HUN"), ("AUT", "SVK"),
+    ("AUT", "CZE"), ("AUT", "HUN"), ("AUT", "SVK"), ("AUT", "SVN"),
+    ("SVN", "HRV"), ("SVN", "HUN"),
     ("POL", "CZE"), ("POL", "SVK"), ("POL", "UKR"), ("POL", "RUS"),
     ("HUN", "SVK"), ("HUN", "UKR"), ("HUN", "ROU"), ("HUN", "SRB"), ("HUN", "HRV"),
     ("ROU", "UKR"), ("ROU", "BGR"), ("ROU", "SRB"), ("ROU", "HUN"),
@@ -778,8 +779,8 @@ async def seed_daily_challenges(session: AsyncSession, country_map: dict[str, Co
             "date": today,
             "start": "SAU",
             "end": "EGY",
-            "shortest_path": 2,  # SAU -> JOR -> EGY (via Israel/Palestine)
-            "solution": ["SAU", "JOR", "ISR", "EGY"],
+            "shortest_path": 2,  # SAU -> JOR -> EGY (via Palestine)
+            "solution": ["SAU", "JOR", "PSE", "EGY"],
         },
         # Yesterday's challenge: Morocco -> Tunisia (via Algeria)
         {

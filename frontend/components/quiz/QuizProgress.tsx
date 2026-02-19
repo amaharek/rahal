@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { useIsRTL } from '@/lib/hooks/useDirection';
 
 interface CategoryStat {
   correct: number;
@@ -20,7 +21,6 @@ interface QuizProgressProps {
   correctAnswers?: number;
   milestones?: string[];
   compact?: boolean;
-  locale: 'ar' | 'en';
 }
 
 function formatTimeElapsed(seconds: number): string {
@@ -52,9 +52,8 @@ export default function QuizProgress({
   correctAnswers,
   milestones,
   compact = false,
-  locale,
 }: QuizProgressProps) {
-  const isRTL = locale === 'ar';
+  const isRTL = useIsRTL();
   const progressPercentage = (currentQuestion / totalQuestions) * 100;
   const isComplete = currentQuestion === totalQuestions;
   const prevScoreRef = useRef(score);
@@ -79,7 +78,7 @@ export default function QuizProgress({
       aria-label={isRTL ? 'التقدم' : 'progress'}
       dir={isRTL ? 'rtl' : 'ltr'}
       className={cn(
-        'bg-surface rounded-xl border border-border p-4 shadow-sm',
+        'bg-surface rounded-xl border border-border p-3 shadow-sm',
         compact && 'compact small p-2'
       )}
     >
@@ -89,7 +88,7 @@ export default function QuizProgress({
         aria-valuenow={currentQuestion}
         aria-valuemax={totalQuestions}
         aria-label={`question ${currentQuestion} progress`}
-        className="w-full h-2 bg-border rounded-full overflow-hidden mb-4"
+        className="w-full h-2 bg-border rounded-full overflow-hidden mb-3"
       >
         <div
           className="h-full bg-primary rounded-full transition-all duration-300"
@@ -98,7 +97,7 @@ export default function QuizProgress({
       </div>
 
       {/* Main stats row */}
-      <div className={cn('flex items-center justify-between gap-4 mb-4', isRTL && 'flex-row-reverse')}>
+      <div className={cn('flex items-center justify-between gap-3 mb-3', isRTL && 'flex-row-reverse')}>
         {/* Question progress */}
         <div className={cn('flex items-center gap-2', isRTL && 'flex-row-reverse')}>
           <span className="text-lg font-bold text-text-primary">

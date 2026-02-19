@@ -60,7 +60,7 @@ This document defines the canonical schema structure and data format standards f
 ```json
 {
   "country_a": "EGY",
-  "country_b": "ISR",
+  "country_b": "PSE",
   "border_type": "land"
 }
 ```

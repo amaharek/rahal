@@ -15,7 +15,8 @@
     "submit": "Submit",
     "share": "Share",
     "copy": "Copy",
-    "copied": "Copied!"
+    "copied": "Copied!",
+    "home": "Home"
   },
   "nav": {
     "home": "Home",
@@ -47,7 +48,12 @@
     "noGuessesYet": "No guesses yet",
     "startTyping": "Start typing a country name",
     "hints": "Hints",
+    "nextHint": "Reveal Next Hint",
     "hintsRemaining": "hints remaining",
+    "routeModes": {
+      "shortest": "Shortest Route",
+      "explorer": "Explorer"
+    },
     "hintTypes": {
       "border": "Border Hint",
       "allBorders": "All Borders",
@@ -58,6 +64,7 @@
     "score": "Score",
     "totalGuesses": "Total Guesses",
     "shortestPath": "Shortest Path",
+    "pathCountriesUnit": "countries",
     "optimal": "Optimal!",
     "shareResult": "Share Result",
     "playAgainTomorrow": "Play again tomorrow",
@@ -76,7 +83,26 @@
       "offPath": "Wrong Guess",
       "showMap": "Show Map",
       "hideMap": "Hide Map"
+    },
+    "hintDisplay": {
+      "borderHint": "Borders of {country}: {countries}",
+      "pathHint": "Suggested route: {countries}",
+      "firstLettersHint": "First letters: {letters}"
     }
+  },
+  "admin": {
+    "title": "Question Management",
+    "signInRequired": "Sign in with an admin account to manage questions.",
+    "forbidden": "You do not have admin access.",
+    "search": "Search by question or answer...",
+    "questionAr": "Question (Arabic)",
+    "correctAnswer": "Correct answer",
+    "optionsCsv": "Options CSV (for multiple choice)",
+    "hint": "Hint",
+    "create": "Create Question",
+    "questions": "Questions",
+    "activate": "Activate",
+    "deactivate": "Deactivate"
   },
   "quiz": {
     "title": "Quiz",
@@ -103,6 +129,20 @@
     "points": "points",
     "useHint": "Use Hint",
     "nextQuestion": "Next Question",
+    "submitAnswer": "Submit Answer",
+    "ready": "Ready to start?",
+    "description": "Answer 10 questions to test your geography knowledge",
+    "questions": "Questions",
+    "secondsPerQuestion": "seconds per question",
+    "start": "Start Quiz",
+    "perfect": "Perfect Score!",
+    "completed": "Quiz Complete!",
+    "completedMessage": "Great job! You've completed the quiz.",
+    "accuracy": "Accuracy",
+    "hintsUsed": "Hints Used",
+    "playAgain": "Play Again",
+    "viewResults": "View Results",
+    "hintsRemaining": "Hints Remaining",
     "quizComplete": "Quiz Complete!",
     "finalScore": "Final Score",
     "questionsCorrect": "correct answers",
@@ -114,6 +154,7 @@
   },
   "stats": {
     "title": "Statistics",
+    "signInRequired": "Sign in to view your personal statistics.",
     "gameStats": "Game Statistics",
     "quizStats": "Quiz Statistics",
     "gamesPlayed": "Games",
@@ -132,6 +173,9 @@
     "title": "Profile",
     "username": "Username",
     "displayName": "Display Name",
+    "homeCountry": "Home Country",
+    "homeCountryPlaceholder": "Search for your country...",
+    "onboardingTitle": "Complete your profile",
     "memberSince": "Member since",
     "achievements": "Achievements",
     "noAchievements": "No achievements yet",
@@ -158,10 +202,33 @@
     "score": "Score",
     "games": "Games",
     "yourRank": "Your Rank",
+    "empty": "No leaderboard entries yet.",
+    "anonymous": "Anonymous",
+    "country": "Country",
+    "currentFilter": "Current filter: {filter}",
     "types": {
       "streak": "Longest Streak",
       "wins": "Wins",
-      "accuracy": "Accuracy"
+      "accuracy": "Accuracy",
+      "maxStreak": "Longest Streak",
+      "gamesWon": "Games Won",
+      "currentStreak": "Current Streak"
+    }
+  },
+  "practice": {
+    "title": "Practice Mode",
+    "subtitle": "Play unlimited runs without affecting daily challenge progress.",
+    "cta": "Want to warm up first?",
+    "setupTitle": "Create a Practice Route",
+    "startCountry": "Start Country",
+    "endCountry": "End Country",
+    "startCountryPlaceholder": "Choose start country",
+    "endCountryPlaceholder": "Choose destination country",
+    "startButton": "Start Practice",
+    "completedMessage": "Practice run complete.",
+    "newRun": "New Practice Run",
+    "errors": {
+      "sameCountry": "Start and end countries must be different."
     }
   },
   "auth": {

@@ -179,15 +179,14 @@ class ScoreCalculator:
         total_guesses: int,
         hints_used: int,
         shortest_path: int,
+        mode: str = "shortest",
     ) -> int:
         """
         Calculate the final game score.
 
-        Scoring formula:
-        - Base score: 1000
-        - Penalty per extra guess: -50
-        - Penalty per hint: -100
-        - Bonus for optimal path: +200
+        Scoring formula by mode:
+        - shortest: strict optimal scoring
+        - explorer: softer penalties and rewards near-optimal discovery
 
         Args:
             total_guesses: Number of guesses made
@@ -198,19 +197,66 @@ class ScoreCalculator:
             Final score (minimum 0)
         """
         base_score = 1000
+        gap = max(0, total_guesses - shortest_path)
 
-        # Penalty for extra guesses beyond optimal
-        extra_guesses = max(0, total_guesses - shortest_path)
-        guess_penalty = extra_guesses * 50
-
-        # Penalty for hints
-        hint_penalty = hints_used * 100
-
-        # Bonus for optimal path
-        optimal_bonus = 200 if total_guesses == shortest_path else 0
-
-        score = base_score - guess_penalty - hint_penalty + optimal_bonus
+        if mode == "explorer":
+            if gap == 0:
+                gap_penalty = 0
+                bonus = 120
+            elif gap == 1:
+                gap_penalty = 25
+                bonus = 80
+            elif gap == 2:
+                gap_penalty = 80
+                bonus = 40
+            elif gap <= 4:
+                gap_penalty = 180
+                bonus = 0
+            else:
+                gap_penalty = 320
+                bonus = 0
+            hint_penalty = hints_used * 70
+            score = base_score - gap_penalty - hint_penalty + bonus
+        else:
+            guess_penalty = gap * 50
+            hint_penalty = hints_used * 100
+            optimal_bonus = 200 if total_guesses == shortest_path else 0
+            score = base_score - guess_penalty - hint_penalty + optimal_bonus
         return max(0, score)  # Minimum score is 0
+
+    def get_quality_tier(
+        self,
+        total_guesses: int,
+        shortest_path: int,
+    ) -> str:
+        """Get route quality tier based on gap from optimal."""
+        gap = max(0, total_guesses - shortest_path)
+        if gap == 0:
+            return "perfect"
+        if gap <= 1:
+            return "near_optimal"
+        if gap <= 3:
+            return "good_discovery"
+        return "scenic"
+
+    def get_quality_explanation_ar(
+        self,
+        *,
+        mode: str,
+        total_guesses: int,
+        shortest_path: int,
+    ) -> str:
+        """Human-readable Arabic explanation of route quality."""
+        gap = max(0, total_guesses - shortest_path)
+        tier = self.get_quality_tier(total_guesses, shortest_path)
+        mode_label = "أقصر مسار" if mode == "shortest" else "المستكشف"
+        messages = {
+            "perfect": "مسارك مثالي ومطابق للأقصر.",
+            "near_optimal": "مسارك قريب جدًا من الحل الأمثل.",
+            "good_discovery": "مسار جيد وفيه استكشاف مفيد.",
+            "scenic": "مسار استكشافي ممتع لكنه أبعد من الأمثل.",
+        }
+        return f"{mode_label}: {messages[tier]} (الفارق: {gap})."
 
     def get_share_text(
         self,

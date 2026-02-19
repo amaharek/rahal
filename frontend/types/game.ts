@@ -2,6 +2,8 @@
  * Game-related TypeScript types
  */
 
+export type RouteMode = 'shortest' | 'explorer';
+
 export interface Country {
   id: string;
   code: string;
@@ -32,6 +34,7 @@ export interface DailyChallenge {
   start_country: Country;
   end_country: Country;
   shortest_path: number;
+  mode: RouteMode;
   path_country_codes: string[];
   user_progress: UserProgress | null;
 }
@@ -40,6 +43,7 @@ export interface GuessEntry {
   country_id: string;
   country_code: string;
   name_ar: string;
+  name_en?: string;
   flag_emoji: string | null;
   emoji: ScoreEmoji;
   order: number;
@@ -50,6 +54,7 @@ export type ScoreEmoji = '🟢' | '🟡' | '🟠' | '🔴' | '⚫';
 export interface GuessRequest {
   challenge_id: string;
   country_id: string;
+  mode: RouteMode;
 }
 
 export interface GuessResponse {
@@ -60,17 +65,20 @@ export interface GuessResponse {
   is_destination: boolean;
   game_complete: boolean;
   total_guesses: number;
+  score: number | null;
+  route_mode: RouteMode;
+  gap_from_optimal: number | null;
+  quality_tier: 'perfect' | 'near_optimal' | 'good_discovery' | 'scenic' | null;
+  quality_explanation_ar: string | null;
 }
-
-export type HintType = 'border_hint' | 'all_borders_hint' | 'first_letter_hint';
 
 export interface HintRequest {
   challenge_id: string;
-  hint_type: HintType;
+  mode: RouteMode;
 }
 
 export interface HintResponse {
-  hint_type: string;
+  hint_type: 'progressive_1' | 'progressive_2' | 'progressive_3';
   hint_data: Record<string, unknown>;
   hints_remaining: number;
 }
@@ -84,6 +92,34 @@ export interface GameStats {
   average_guesses: number;
   hints_used_total: number;
   last_played: string | null;
+}
+
+export interface PracticeSessionRequest {
+  start_country_id: string;
+  end_country_id: string;
+  mode: RouteMode;
+}
+
+export interface PracticeSession {
+  session_id: string;
+  mode: 'practice';
+  route_mode: RouteMode;
+  start_country: Country;
+  end_country: Country;
+  shortest_path: number;
+  path_country_codes: string[];
+  user_progress: UserProgress | null;
+}
+
+export interface PracticeGuessRequest {
+  session_id: string;
+  country_id: string;
+  mode: RouteMode;
+}
+
+export interface PracticeHintRequest {
+  session_id: string;
+  mode: RouteMode;
 }
 
 export interface GameCompleteData {

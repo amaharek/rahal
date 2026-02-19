@@ -34,6 +34,10 @@ class Profile(Base, TimestampMixin):
     username: Mapped[str | None] = mapped_column(String(50), unique=True)
     display_name: Mapped[str | None] = mapped_column(String(100))
     avatar_url: Mapped[str | None] = mapped_column(Text)
+    home_country_code: Mapped[str | None] = mapped_column(
+        String(3),
+        ForeignKey("countries.code", ondelete="SET NULL"),
+    )
 
     # Game statistics
     current_streak: Mapped[int] = mapped_column(Integer, default=0)

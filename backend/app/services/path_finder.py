@@ -261,7 +261,7 @@ class PathFinderService:
         self,
         db: AsyncSession,
         challenge: DailyChallenge,
-        hint_type: str,
+        hint_step: int,
         previous_guesses: list[dict[str, Any]],
     ) -> dict[str, Any]:
         """
@@ -270,7 +270,7 @@ class PathFinderService:
         Args:
             db: Database session
             challenge: The daily challenge
-            hint_type: Type of hint to generate
+            hint_step: Progressive hint step (1-3)
             previous_guesses: Previous guesses made
 
         Returns:
@@ -295,7 +295,7 @@ class PathFinderService:
             if cid not in guessed_ids
         ]
 
-        if hint_type == "border_hint":
+        if hint_step == 1:
             # Show neighbors of one country on path
             if unguessed_on_path:
                 target_id = unguessed_on_path[0]
@@ -311,19 +311,7 @@ class PathFinderService:
                     "border_countries": neighbor_names,
                 }
 
-        elif hint_type == "all_borders_hint":
-            # Show all countries on shortest path
-            path_names = [
-                self._countries[cid].name_ar
-                for cid in path
-                if cid in self._countries
-            ]
-            return {
-                "path_countries": path_names,
-                "path_length": len(path),
-            }
-
-        elif hint_type == "first_letter_hint":
+        elif hint_step == 2:
             # Show first letters of unguessed countries on path
             from app.utils.arabic import get_first_letter
 
@@ -337,7 +325,19 @@ class PathFinderService:
                 "remaining_countries": len(unguessed_on_path),
             }
 
-        return {"error": "Unknown hint type"}
+        elif hint_step == 3:
+            # Show all countries on shortest path
+            path_names = [
+                self._countries[cid].name_ar
+                for cid in path
+                if cid in self._countries
+            ]
+            return {
+                "path_countries": path_names,
+                "path_length": len(path),
+            }
+
+        return {"error": "Unknown hint step"}
 
     def clear_cache(self) -> None:
         """Clear the cached graph (useful for testing or updates)."""

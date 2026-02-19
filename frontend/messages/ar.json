@@ -1,7 +1,7 @@
 {
   "common": {
     "appName": "رحال",
-    "tagline": "اكتشف العالم من خلال اللعب",
+    "tagline": "رحلتك الممتعة لاكتشاف العالم",
     "loading": "جاري التحميل...",
     "error": "حدث خطأ",
     "retry": "إعادة المحاولة",
@@ -15,12 +15,13 @@
     "submit": "إرسال",
     "share": "مشاركة",
     "copy": "نسخ",
-    "copied": "تم النسخ!"
+    "copied": "تم النسخ!",
+    "home": "الرئيسية"
   },
   "nav": {
     "home": "الرئيسية",
-    "game": "لعبة المسار",
-    "quiz": "الأسئلة",
+    "game": "مسار الرحالة",
+    "quiz": "تحدي المعرفة",
     "stats": "الإحصائيات",
     "profile": "الملف الشخصي",
     "settings": "الإعدادات",
@@ -28,9 +29,9 @@
   },
   "home": {
     "welcomeTitle": "مرحباً بك في رحال!",
-    "welcomeDescription": "اختبر معلوماتك الجغرافية واكتشف العالم",
-    "dailyChallenge": "تحدي اليوم",
-    "startGame": "ابدأ اللعب",
+    "welcomeDescription": "ابدأ مغامرتك الجغرافية واكتشف خبايا العالم",
+    "dailyChallenge": "رحلة اليوم",
+    "startGame": "ابدأ الرحلة",
     "quickQuiz": "اختبار سريع",
     "yourStats": "إحصائياتك",
     "currentStreak": "السلسلة الحالية",
@@ -38,29 +39,35 @@
     "accuracy": "الدقة"
   },
   "game": {
-    "title": "لعبة المسار",
-    "subtitle": "انتقل من دولة إلى أخرى",
+    "title": "مسار الرحالة",
+    "subtitle": "هل تستطيع الترحال من بلد لأخرى وإيجاد كل الدول بينهما؟",
     "from": "من",
     "to": "إلى",
     "enterCountry": "اكتب اسم الدولة...",
     "guesses": "التخمينات",
-    "noGuessesYet": "لم تقم بأي تخمين بعد",
+    "noGuessesYet": "انطلق في رحلتك!",
     "startTyping": "ابدأ بكتابة اسم دولة",
     "hints": "التلميحات",
+    "nextHint": "اكشف التلميح التالي",
     "hintsRemaining": "تلميحات متبقية",
+    "routeModes": {
+      "shortest": "أقصر مسار",
+      "explorer": "المستكشف"
+    },
     "hintTypes": {
       "border": "تلميح الحدود",
       "allBorders": "جميع الحدود",
       "firstLetter": "الحروف الأولى"
     },
     "completed": "تهانينا! 🎉",
-    "completedMessage": "لقد أكملت تحدي اليوم",
+    "completedMessage": "أحسنت! لقد أتممت رحلة اليوم بنجاح",
     "score": "النتيجة",
     "totalGuesses": "عدد التخمينات",
     "shortestPath": "أقصر مسار",
+    "pathCountriesUnit": "دول",
     "optimal": "مثالي!",
-    "shareResult": "مشاركة النتيجة",
-    "playAgainTomorrow": "العب مرة أخرى غداً",
+    "shareResult": "شارك إنجازك",
+    "playAgainTomorrow": "عد إلينا غداً لرحلة جديدة",
     "emojiDescriptions": {
       "excellent": "ممتاز",
       "good": "جيد",
@@ -76,11 +83,30 @@
       "offPath": "تخمين خاطئ",
       "showMap": "إظهار الخريطة",
       "hideMap": "إخفاء الخريطة"
+    },
+    "hintDisplay": {
+      "borderHint": "حدود {country}: {countries}",
+      "pathHint": "المسار المقترح: {countries}",
+      "firstLettersHint": "الحروف الأولى: {letters}"
     }
   },
+  "admin": {
+    "title": "إدارة الأسئلة",
+    "signInRequired": "سجّل الدخول بحساب مسؤول لإدارة الأسئلة.",
+    "forbidden": "لا تملك صلاحية المسؤول.",
+    "search": "ابحث بالسؤال أو الإجابة...",
+    "questionAr": "نص السؤال بالعربية",
+    "correctAnswer": "الإجابة الصحيحة",
+    "optionsCsv": "خيارات مفصولة بفواصل (للاختيار المتعدد)",
+    "hint": "تلميح",
+    "create": "إضافة سؤال",
+    "questions": "الأسئلة",
+    "activate": "تفعيل",
+    "deactivate": "تعطيل"
+  },
   "quiz": {
-    "title": "الأسئلة",
-    "subtitle": "اختبر معلوماتك الجغرافية",
+    "title": "تحدي المعرفة",
+    "subtitle": "هل أنت خبير في الجغرافيا؟ دعنا نختبر ذلك",
     "categories": {
       "capitals": "العواصم",
       "flags": "الأعلام",
@@ -96,6 +122,7 @@
       "medium": "متوسط",
       "hard": "صعب"
     },
+    "hints": "التلميحات",
     "questionOf": "السؤال {current} من {total}",
     "correct": "صحيح! ✓",
     "incorrect": "خطأ ✗",
@@ -103,6 +130,20 @@
     "points": "نقطة",
     "useHint": "استخدم تلميح",
     "nextQuestion": "السؤال التالي",
+    "submitAnswer": "إرسال الإجابة",
+    "ready": "هل أنت مستعد للمغامرة؟",
+    "description": "أجب على 10 أسئلة لتثبت خبرتك الجغرافية",
+    "questions": "الأسئلة",
+    "secondsPerQuestion": "ثانية لكل سؤال",
+    "start": "ابدأ التحدي",
+    "perfect": "نتيجة مثالية!",
+    "completed": "تم إنهاء الاختبار!",
+    "completedMessage": "أحسنت! لقد أكملت الاختبار.",
+    "accuracy": "الدقة",
+    "hintsUsed": "التلميحات المستخدمة",
+    "playAgain": "العب مرة أخرى",
+    "viewResults": "عرض النتائج",
+    "hintsRemaining": "التلميحات المتبقية",
     "quizComplete": "انتهى الاختبار!",
     "finalScore": "النتيجة النهائية",
     "questionsCorrect": "إجابات صحيحة",
@@ -110,10 +151,11 @@
     "selectCategory": "اختر فئة",
     "selectDifficulty": "اختر المستوى",
     "startQuiz": "ابدأ الاختبار",
-    "dailyQuiz": "اختبار اليوم"
+    "dailyQuiz": "تحدي اليوم"
   },
   "stats": {
     "title": "الإحصائيات",
+    "signInRequired": "سجّل الدخول لعرض إحصائياتك الشخصية.",
     "gameStats": "إحصائيات اللعبة",
     "quizStats": "إحصائيات الأسئلة",
     "gamesPlayed": "الألعاب",
@@ -132,6 +174,9 @@
     "title": "الملف الشخصي",
     "username": "اسم المستخدم",
     "displayName": "الاسم المعروض",
+    "homeCountry": "دولة الملف",
+    "homeCountryPlaceholder": "ابحث عن دولتك...",
+    "onboardingTitle": "أكمل ملفك الشخصي",
     "memberSince": "عضو منذ",
     "achievements": "الإنجازات",
     "noAchievements": "لا إنجازات بعد",
@@ -158,10 +203,33 @@
     "score": "النتيجة",
     "games": "الألعاب",
     "yourRank": "ترتيبك",
+    "empty": "لا توجد نتائج بعد.",
+    "anonymous": "مجهول",
+    "country": "الدولة",
+    "currentFilter": "الفلتر الحالي: {filter}",
     "types": {
       "streak": "أطول سلسلة",
       "wins": "الانتصارات",
-      "accuracy": "الدقة"
+      "accuracy": "الدقة",
+      "maxStreak": "أطول سلسلة",
+      "gamesWon": "أكثر انتصارات",
+      "currentStreak": "السلسلة الحالية"
+    }
+  },
+  "practice": {
+    "title": "وضع التدريب",
+    "subtitle": "العب جولات غير محدودة بدون التأثير على تقدم تحدي اليوم.",
+    "cta": "تريد الإحماء أولاً؟",
+    "setupTitle": "إنشاء مسار تدريب",
+    "startCountry": "دولة البداية",
+    "endCountry": "دولة النهاية",
+    "startCountryPlaceholder": "اختر دولة البداية",
+    "endCountryPlaceholder": "اختر دولة النهاية",
+    "startButton": "ابدأ التدريب",
+    "completedMessage": "اكتملت جولة التدريب.",
+    "newRun": "جولة تدريب جديدة",
+    "errors": {
+      "sameCountry": "يجب أن تكون دولتا البداية والنهاية مختلفتين."
     }
   },
   "auth": {

@@ -2,6 +2,7 @@
 
 import { cn } from '@/lib/utils';
 import { QuestionCategory, QuestionDifficulty, QuestionType, DIFFICULTY_COLORS } from '@/types/quiz';
+import { useIsRTL } from '@/lib/hooks/useDirection';
 
 interface QuestionCardProps {
   question: {
@@ -14,7 +15,6 @@ interface QuestionCardProps {
   };
   currentQuestion: number;
   totalQuestions: number;
-  locale: 'ar' | 'en';
 }
 
 const DIFFICULTY_CLASS_MAP: Record<QuestionDifficulty, string> = {
@@ -27,9 +27,8 @@ export default function QuestionCard({
   question,
   currentQuestion,
   totalQuestions,
-  locale,
 }: QuestionCardProps) {
-  const isRTL = locale === 'ar';
+  const isRTL = useIsRTL();
 
   return (
     <article
@@ -37,12 +36,12 @@ export default function QuestionCard({
       aria-label={`question ${currentQuestion} of ${totalQuestions}`}
       tabIndex={0}
       className={cn(
-        'bg-surface rounded-xl border border-border p-6 shadow-sm',
+        'bg-surface rounded-xl border border-border p-4 shadow-sm',
         'focus:outline-none focus:ring-2 focus:ring-primary'
       )}
     >
       {/* Header with question number and badges */}
-      <div className={cn('flex items-center justify-between mb-4', isRTL && 'flex-row-reverse')}>
+      <div className={cn('flex items-center justify-between mb-3', isRTL && 'flex-row-reverse')}>
         <div className={cn('flex items-center gap-2', isRTL && 'flex-row-reverse')}>
           <span data-testid="question-number" className="text-lg font-bold text-text-primary">
             {currentQuestion}

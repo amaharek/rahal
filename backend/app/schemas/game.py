@@ -10,6 +10,8 @@ from pydantic import BaseModel, Field
 
 from app.schemas.country import CountryBrief
 
+RouteMode = Literal["shortest", "explorer"]
+
 
 class UserProgress(BaseModel):
     """User's progress on a challenge."""
@@ -28,6 +30,7 @@ class DailyChallengeResponse(BaseModel):
     start_country: CountryBrief
     end_country: CountryBrief
     shortest_path: int
+    mode: RouteMode = "shortest"
     path_country_codes: list[str] = Field(default_factory=list)
     user_progress: UserProgress | None = None
 
@@ -40,6 +43,7 @@ class GuessRequest(BaseModel):
 
     challenge_id: UUID
     country_id: UUID
+    mode: RouteMode = "shortest"
 
 
 class GuessEntry(BaseModel):
@@ -62,27 +66,24 @@ class GuessResponse(BaseModel):
     is_destination: bool
     game_complete: bool
     total_guesses: int
-
-
-class HintType(BaseModel):
-    """Available hint types."""
-
-    BORDER_HINT: str = "border_hint"
-    ALL_BORDERS_HINT: str = "all_borders_hint"
-    FIRST_LETTER_HINT: str = "first_letter_hint"
+    score: int | None = None
+    route_mode: RouteMode = "shortest"
+    gap_from_optimal: int | None = None
+    quality_tier: Literal["perfect", "near_optimal", "good_discovery", "scenic"] | None = None
+    quality_explanation_ar: str | None = None
 
 
 class HintRequest(BaseModel):
     """Request for using a hint."""
 
     challenge_id: UUID
-    hint_type: Literal["border_hint", "all_borders_hint", "first_letter_hint"]
+    mode: RouteMode = "shortest"
 
 
 class HintResponse(BaseModel):
     """Response with hint data."""
 
-    hint_type: str
+    hint_type: Literal["progressive_1", "progressive_2", "progressive_3"]
     hint_data: dict[str, Any]
     hints_remaining: int
 
@@ -109,3 +110,39 @@ class GameStatsResponse(BaseModel):
     average_guesses: float
     hints_used_total: int
     last_played: date | None
+
+
+class PracticeSessionCreateRequest(BaseModel):
+    """Request to start a practice session."""
+
+    start_country_id: UUID
+    end_country_id: UUID
+    mode: RouteMode = "shortest"
+
+
+class PracticeSessionResponse(BaseModel):
+    """Practice session response."""
+
+    session_id: UUID
+    mode: Literal["practice"] = "practice"
+    route_mode: RouteMode = "shortest"
+    start_country: CountryBrief
+    end_country: CountryBrief
+    shortest_path: int
+    path_country_codes: list[str] = Field(default_factory=list)
+    user_progress: UserProgress | None = None
+
+
+class PracticeGuessRequest(BaseModel):
+    """Request for submitting a practice guess."""
+
+    session_id: UUID
+    country_id: UUID
+    mode: RouteMode = "shortest"
+
+
+class PracticeHintRequest(BaseModel):
+    """Request for using a hint in practice mode."""
+
+    session_id: UUID
+    mode: RouteMode = "shortest"
