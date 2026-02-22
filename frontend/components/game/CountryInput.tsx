@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Search } from 'lucide-react';
 import { searchCountries } from '@/lib/api/game';
 import { Input } from '@/components/ui/Input';
 import { cn } from '@/lib/utils';
@@ -41,7 +42,6 @@ export function CountryInput({
   const listRef = useRef<HTMLUListElement>(null);
   const direction = useDirection();
 
-  // Debounce the search query
   const debouncedSetQuery = useCallback(
     debounce((value: string) => {
       setDebouncedQuery(value);
@@ -53,7 +53,6 @@ export function CountryInput({
     debouncedSetQuery(query);
   }, [query, debouncedSetQuery]);
 
-  // Fetch suggestions
   const { data, isLoading } = useQuery({
     queryKey: ['countries', debouncedQuery],
     queryFn: () => searchCountries(debouncedQuery),
@@ -63,7 +62,6 @@ export function CountryInput({
 
   const suggestions = data?.suggestions || [];
 
-  // Handle keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!isOpen || suggestions.length === 0) return;
 
@@ -101,7 +99,6 @@ export function CountryInput({
     inputRef.current?.focus();
   };
 
-  // Show dropdown when typing
   useEffect(() => {
     setIsOpen(debouncedQuery.length >= 1 && suggestions.length > 0);
     setSelectedIndex(0);
@@ -129,18 +126,24 @@ export function CountryInput({
         dir={direction}
       />
 
-      {/* Loading indicator */}
       {isLoading && (
-        <div className="absolute start-4 top-1/2 -translate-y-1/2">
-          <span className="animate-spin inline-block">⏳</span>
+        <div className="absolute end-4 top-1/2 -translate-y-1/2">
+          <svg
+            className="h-5 w-5 animate-spin text-primary"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+          </svg>
         </div>
       )}
 
-      {/* Suggestions dropdown */}
       {isOpen && suggestions.length > 0 && (
         <ul
           ref={listRef}
-          className="absolute z-50 w-full mt-2 bg-surface border border-border rounded-lg shadow-lg max-h-60 overflow-auto"
+          className="absolute z-50 w-full mt-2 bg-surface border border-border rounded-2xl shadow-lg max-h-60 overflow-auto"
           role="listbox"
         >
           {suggestions.map((country, index) => (
@@ -149,16 +152,16 @@ export function CountryInput({
               role="option"
               aria-selected={index === selectedIndex}
               className={cn(
-                'flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors',
+                'flex items-center gap-3 px-4 py-3.5 cursor-pointer transition-colors first:rounded-t-2xl last:rounded-b-2xl',
                 index === selectedIndex
-                  ? 'bg-primary/10 text-primary'
-                  : 'hover:bg-gray-50'
+                  ? 'bg-primary/5 text-primary'
+                  : 'hover:bg-background'
               )}
               onClick={() => handleSelect(country)}
             >
-              <span className="text-2xl">{country.flag_emoji}</span>
-              <span className="font-medium">{country.name_ar}</span>
-              <span className="text-text-secondary text-sm">
+              <span className="text-xl">{country.flag_emoji}</span>
+              <span className="font-medium text-sm">{country.name_ar}</span>
+              <span className="text-text-muted text-xs">
                 ({country.name_en})
               </span>
             </li>

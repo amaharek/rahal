@@ -15,9 +15,9 @@ export function Card({ children, className, hover, onClick, ...props }: CardProp
   return (
     <div
       className={cn(
-        'bg-surface rounded-xl border border-border p-6 shadow-sm',
-        hover &&
-          'hover:shadow-md hover:border-primary/30 transition-all cursor-pointer',
+        'bg-surface rounded-xl border border-border p-6',
+        'shadow-xs',
+        hover && 'card-hover',
         className
       )}
       onClick={onClick}
@@ -57,7 +57,7 @@ interface CardDescriptionProps {
 
 export function CardDescription({ children, className }: CardDescriptionProps) {
   return (
-    <p className={cn('text-sm text-text-secondary mt-1', className)}>
+    <p className={cn('text-sm text-text-secondary mt-1 leading-relaxed', className)}>
       {children}
     </p>
   );

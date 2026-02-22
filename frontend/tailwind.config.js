@@ -13,46 +13,56 @@ module.exports = {
         mono: ['IBM Plex Mono', 'monospace'],
       },
       colors: {
-        // Primary Colors
         primary: {
-          DEFAULT: '#0D7377',
-          light: '#14919B',
-          dark: '#0A5A5E',
+          DEFAULT: 'var(--color-primary)',
+          light: 'var(--color-primary-light)',
+          dark: 'var(--color-primary-dark)',
+          50: 'var(--color-primary-50)',
         },
-        // Secondary Colors
         secondary: {
-          DEFAULT: '#D4A574',
-          light: '#E5C49A',
-          dark: '#B8885A',
+          DEFAULT: 'var(--color-secondary)',
+          light: 'var(--color-secondary-light)',
+          dark: 'var(--color-secondary-dark)',
         },
-        // Score Colors (Emoji feedback)
+        accent: 'var(--color-accent)',
         score: {
-          excellent: '#2ECC71', // 🟢
-          good: '#F1C40F',      // 🟡
-          okay: '#E67E22',      // 🟠
-          far: '#E74C3C',       // 🔴
-          wrong: '#2C3E50',     // ⚫
+          excellent: 'var(--color-score-excellent)',
+          good: 'var(--color-score-good)',
+          okay: 'var(--color-score-okay)',
+          far: 'var(--color-score-far)',
+          wrong: 'var(--color-score-wrong)',
         },
-        // Semantic Colors
-        success: '#2ECC71',
-        warning: '#F39C12',
-        error: '#E74C3C',
-        info: '#3498DB',
-        // Neutral Colors (using CSS variables for dark mode support)
+        success: 'var(--color-success)',
+        warning: 'var(--color-warning)',
+        error: 'var(--color-error)',
+        info: 'var(--color-info)',
         background: 'var(--color-background)',
-        surface: 'var(--color-surface)',
-        border: 'var(--color-border)',
+        surface: {
+          DEFAULT: 'var(--color-surface)',
+          raised: 'var(--color-surface-raised)',
+        },
+        border: {
+          DEFAULT: 'var(--color-border)',
+          light: 'var(--color-border-light)',
+        },
         'text-primary': 'var(--color-text-primary)',
         'text-secondary': 'var(--color-text-secondary)',
         'text-muted': 'var(--color-text-muted)',
       },
       borderRadius: {
-        'xl': '1rem',
+        'xl': '1.25rem',
         '2xl': '1.5rem',
       },
       spacing: {
         '18': '4.5rem',
         '22': '5.5rem',
+      },
+      boxShadow: {
+        'xs': 'var(--shadow-xs)',
+        'sm': 'var(--shadow-sm)',
+        'md': 'var(--shadow-md)',
+        'lg': 'var(--shadow-lg)',
+        'xl': 'var(--shadow-xl)',
       },
     },
   },
