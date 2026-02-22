@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
+  trackABOutcomeCompletion,
   trackCompletionPanelViewed,
   trackComboStateChanged,
   trackEfficiencyBenchmarkShown,
@@ -11,6 +12,7 @@ import {
   trackNarrativeMilestoneShown,
   trackPostgameRecapShared,
   trackPresentationVariantAssigned,
+  trackRecapCardViewed,
   trackRetryCtaClicked,
 } from '@/lib/telemetry/gameTelemetry';
 
@@ -36,12 +38,13 @@ describe('gameTelemetry', () => {
     trackGuessSubmission(challengeId, 'shortest', 'EGY');
 
     vi.setSystemTime(new Date('2026-02-19T12:00:08Z'));
-    trackGuessSubmission(challengeId, 'shortest', 'JOR');
+    trackGuessSubmission(challengeId, 'shortest', 'JOR', 'hybrid');
 
     const events = listener.mock.calls.map((args: any[]) => (args[0] as CustomEvent).detail.eventName);
 
     expect(events).toContain('focus_to_submit_ms');
     expect(events).toContain('guess_to_guess_ms');
+    expect(events).toContain('ab_outcome_guess_latency');
 
     window.removeEventListener('rahal:telemetry', listener as EventListener);
   });
@@ -161,12 +164,35 @@ describe('gameTelemetry', () => {
       mode: 'shortest',
       shareMethod: 'clipboard',
     });
+    trackRecapCardViewed({
+      challengeId: 'challenge-4',
+      mode: 'shortest',
+      variant: 'hybrid',
+    });
+    trackRecapCardViewed({
+      challengeId: 'challenge-4',
+      mode: 'shortest',
+      variant: 'hybrid',
+    });
+    trackABOutcomeCompletion({
+      challengeId: 'challenge-4',
+      mode: 'shortest',
+      variant: 'hybrid',
+      score: 90,
+      totalGuesses: 5,
+      qualityTier: 'good_discovery',
+    });
 
     const eventNames = listener.mock.calls.map((args: any[]) => (args[0] as CustomEvent).detail.eventName);
 
+    expect(eventNames.filter((name: string) => name === 'milestone_card_shown')).toHaveLength(1);
     expect(eventNames.filter((name: string) => name === 'narrative_milestone_shown')).toHaveLength(1);
+    expect(eventNames.filter((name: string) => name === 'ab_variant_assigned')).toHaveLength(1);
     expect(eventNames.filter((name: string) => name === 'presentation_variant_assigned')).toHaveLength(1);
+    expect(eventNames.filter((name: string) => name === 'recap_card_viewed')).toHaveLength(1);
+    expect(eventNames).toContain('recap_share_clicked');
     expect(eventNames).toContain('postgame_recap_shared');
+    expect(eventNames).toContain('ab_outcome_completion');
 
     window.removeEventListener('rahal:telemetry', listener as EventListener);
   });

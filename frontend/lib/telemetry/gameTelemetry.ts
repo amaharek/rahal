@@ -17,6 +17,12 @@ export type GameTelemetryEventName =
   | 'combo_state_changed'
   | 'completion_panel_viewed'
   | 'retry_cta_clicked'
+  | 'milestone_card_shown'
+  | 'recap_card_viewed'
+  | 'recap_share_clicked'
+  | 'ab_variant_assigned'
+  | 'ab_outcome_completion'
+  | 'ab_outcome_guess_latency'
   | 'narrative_milestone_shown'
   | 'postgame_recap_shared'
   | 'presentation_variant_assigned';
@@ -102,6 +108,49 @@ export interface PresentationVariantAssignedPayload {
   variant: GamePresentationVariant;
 }
 
+export interface MilestoneCardShownPayload {
+  challengeId: string;
+  mode: RouteMode;
+  milestone: NarrativeMilestone;
+  variant: GamePresentationVariant;
+}
+
+export interface RecapCardViewedPayload {
+  challengeId: string;
+  mode: RouteMode;
+  variant: GamePresentationVariant;
+}
+
+export interface RecapShareClickedPayload {
+  challengeId: string;
+  mode: RouteMode;
+  variant: GamePresentationVariant;
+  shareMethod: 'native' | 'clipboard';
+}
+
+export interface ABVariantAssignedPayload {
+  challengeId: string;
+  mode: RouteMode;
+  variant: GamePresentationVariant;
+}
+
+export interface ABOutcomeCompletionPayload {
+  challengeId: string;
+  mode: RouteMode;
+  variant: GamePresentationVariant;
+  score: number;
+  totalGuesses: number;
+  qualityTier: QualityTier | null;
+}
+
+export interface ABOutcomeGuessLatencyPayload {
+  challengeId: string;
+  mode: RouteMode;
+  variant: GamePresentationVariant;
+  metricMs: number;
+  countryCode: string;
+}
+
 export type GameTelemetryPayloadMap = {
   guess_to_guess_ms: GuessToGuessPayload;
   focus_to_submit_ms: FocusToSubmitPayload;
@@ -111,6 +160,12 @@ export type GameTelemetryPayloadMap = {
   combo_state_changed: ComboStateChangedPayload;
   completion_panel_viewed: CompletionPanelViewedPayload;
   retry_cta_clicked: RetryCtaClickedPayload;
+  milestone_card_shown: MilestoneCardShownPayload;
+  recap_card_viewed: RecapCardViewedPayload;
+  recap_share_clicked: RecapShareClickedPayload;
+  ab_variant_assigned: ABVariantAssignedPayload;
+  ab_outcome_completion: ABOutcomeCompletionPayload;
+  ab_outcome_guess_latency: ABOutcomeGuessLatencyPayload;
   narrative_milestone_shown: NarrativeMilestoneShownPayload;
   postgame_recap_shared: PostgameRecapSharedPayload;
   presentation_variant_assigned: PresentationVariantAssignedPayload;
@@ -124,6 +179,7 @@ interface ChallengeTelemetryState {
   completionViewed: boolean;
   shownMilestones: Set<NarrativeMilestone>;
   variantAssigned: boolean;
+  recapViewed: boolean;
 }
 
 const telemetryStateByChallenge = new Map<string, ChallengeTelemetryState>();
@@ -140,6 +196,7 @@ function getChallengeState(challengeId: string): ChallengeTelemetryState {
     lastHudHash: null,
     lastBenchmarkHash: null,
     completionViewed: false,
+    recapViewed: false,
     shownMilestones: new Set(),
     variantAssigned: false,
   };
@@ -181,18 +238,30 @@ export function trackInputFocusStart(challengeId: string): void {
 export function trackGuessSubmission(
   challengeId: string,
   mode: RouteMode,
-  countryCode: string
+  countryCode: string,
+  variant?: GamePresentationVariant
 ): void {
   const state = getChallengeState(challengeId);
   const now = Date.now();
 
   if (state.lastSubmitTs !== null) {
+    const metricMs = now - state.lastSubmitTs;
     emitGameTelemetry('guess_to_guess_ms', {
       challengeId,
       mode,
-      metricMs: now - state.lastSubmitTs,
+      metricMs,
       countryCode,
     });
+
+    if (variant) {
+      emitGameTelemetry('ab_outcome_guess_latency', {
+        challengeId,
+        mode,
+        variant,
+        metricMs,
+        countryCode,
+      });
+    }
   }
 
   if (state.pendingFocusTs !== null) {
@@ -270,10 +339,22 @@ export function trackNarrativeMilestoneShown(payload: NarrativeMilestoneShownPay
   }
 
   state.shownMilestones.add(payload.milestone);
+  emitGameTelemetry('milestone_card_shown', {
+    challengeId: payload.challengeId,
+    mode: payload.mode,
+    milestone: payload.milestone,
+    variant: 'hybrid',
+  });
   emitGameTelemetry('narrative_milestone_shown', payload);
 }
 
 export function trackPostgameRecapShared(payload: PostgameRecapSharedPayload): void {
+  emitGameTelemetry('recap_share_clicked', {
+    challengeId: payload.challengeId,
+    mode: payload.mode,
+    variant: 'hybrid',
+    shareMethod: payload.shareMethod,
+  });
   emitGameTelemetry('postgame_recap_shared', payload);
 }
 
@@ -284,5 +365,24 @@ export function trackPresentationVariantAssigned(payload: PresentationVariantAss
   }
 
   state.variantAssigned = true;
+  emitGameTelemetry('ab_variant_assigned', {
+    challengeId: payload.challengeId,
+    mode: payload.mode,
+    variant: payload.variant,
+  });
   emitGameTelemetry('presentation_variant_assigned', payload);
+}
+
+export function trackRecapCardViewed(payload: RecapCardViewedPayload): void {
+  const state = getChallengeState(payload.challengeId);
+  if (state.recapViewed) {
+    return;
+  }
+
+  state.recapViewed = true;
+  emitGameTelemetry('recap_card_viewed', payload);
+}
+
+export function trackABOutcomeCompletion(payload: ABOutcomeCompletionPayload): void {
+  emitGameTelemetry('ab_outcome_completion', payload);
 }

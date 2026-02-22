@@ -7,6 +7,7 @@ import { useGameStore } from '@/lib/stores/gameStore';
 import { submitGuess } from '@/lib/api/game';
 
 const mockPush = vi.fn();
+let mockSearchParams = 'presentation=hybrid';
 
 const { mockChallenge } = vi.hoisted(() => ({
   mockChallenge: {
@@ -41,7 +42,7 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockPush,
   }),
-  useSearchParams: () => new URLSearchParams('presentation=hybrid'),
+  useSearchParams: () => new URLSearchParams(mockSearchParams),
 }));
 
 vi.mock('@/components/game/GameMap', () => ({
@@ -140,6 +141,7 @@ function renderPage() {
 describe('DailyGamePage integration', () => {
   beforeEach(() => {
     mockPush.mockReset();
+    mockSearchParams = 'presentation=hybrid';
     useGameStore.setState({
       challenge: null,
       isLoading: false,
@@ -178,12 +180,13 @@ describe('DailyGamePage integration', () => {
       expect(eventNames).toContain('dock_action_triggered');
       expect(eventNames).toContain('efficiency_benchmark_shown');
       expect(eventNames).toContain('combo_state_changed');
-      expect(eventNames).toContain('narrative_milestone_shown');
-      expect(eventNames).toContain('presentation_variant_assigned');
+      expect(eventNames).toContain('milestone_card_shown');
+      expect(eventNames).toContain('ab_variant_assigned');
     });
 
     expect(screen.getByTestId('narrative-milestone-card')).toBeInTheDocument();
     expect(screen.getByTestId('narrative-milestone-card')).toHaveAttribute('data-variant', 'hybrid');
+    expect(screen.getByText('game.narrative.start.title')).toBeInTheDocument();
 
     window.removeEventListener('rahal:telemetry', listener as EventListener);
   });
@@ -247,8 +250,54 @@ describe('DailyGamePage integration', () => {
     const eventNames = listener.mock.calls.map((args: any[]) => (args[0] as CustomEvent).detail.eventName);
     expect(eventNames).toContain('completion_panel_viewed');
     expect(eventNames).toContain('retry_cta_clicked');
-    expect(eventNames).toContain('postgame_recap_shared');
+    expect(eventNames).toContain('recap_card_viewed');
+    expect(eventNames).toContain('recap_share_clicked');
+    expect(eventNames).toContain('ab_outcome_completion');
 
     window.removeEventListener('rahal:telemetry', listener as EventListener);
+  });
+
+  it('hides narrative and recap cards for baseline variant', async () => {
+    mockSearchParams = 'presentation=baseline';
+    const user = userEvent.setup();
+
+    vi.mocked(submitGuess).mockResolvedValueOnce({
+      country: {
+        id: '2',
+        code: 'EGY',
+        name_ar: 'مصر',
+        name_en: 'Egypt',
+        flag_emoji: '🇪🇬',
+      },
+      score_emoji: '🟢',
+      score_description: 'perfect',
+      is_on_shortest_path: true,
+      is_destination: true,
+      game_complete: true,
+      total_guesses: 1,
+      score: 100,
+      route_mode: 'shortest',
+      gap_from_optimal: 0,
+      quality_tier: 'perfect',
+      quality_explanation_ar: 'مسار ممتاز',
+    });
+
+    renderPage();
+
+    await waitFor(() => {
+      expect(screen.getAllByTestId('integration-commit').length).toBeGreaterThan(0);
+    });
+
+    expect(screen.queryByTestId('narrative-milestone-card')).not.toBeInTheDocument();
+
+    await user.click(screen.getAllByTestId('integration-focus')[0]);
+    await user.click(screen.getAllByTestId('integration-commit')[0]);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('completion-grade')).toBeInTheDocument();
+    });
+
+    expect(screen.queryByTestId('postgame-recap-card')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('share-recap-button')).not.toBeInTheDocument();
   });
 });

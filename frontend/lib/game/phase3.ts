@@ -22,6 +22,8 @@ export interface ShareRecapInput {
   efficiency: EfficiencyBucket;
 }
 
+const EXPERIMENT_GUEST_ID_KEY = 'rahal:experiment:guest-id';
+
 function hashString(input: string): number {
   let hash = 0;
   for (let index = 0; index < input.length; index += 1) {
@@ -31,16 +33,45 @@ function hashString(input: string): number {
   return Math.abs(hash);
 }
 
+function createGuestIdentity(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return `guest:${crypto.randomUUID()}`;
+  }
+
+  const fallback = `${Date.now()}-${Math.random().toString(16).slice(2, 10)}`;
+  return `guest:${fallback}`;
+}
+
+export function getExperimentIdentity(userId: string | null | undefined): string {
+  if (userId) {
+    return `user:${userId}`;
+  }
+
+  if (typeof window === 'undefined') {
+    return 'guest:ssr';
+  }
+
+  const stored = window.localStorage.getItem(EXPERIMENT_GUEST_ID_KEY);
+  if (stored) {
+    return stored;
+  }
+
+  const nextValue = createGuestIdentity();
+  window.localStorage.setItem(EXPERIMENT_GUEST_ID_KEY, nextValue);
+  return nextValue;
+}
+
 export function resolvePresentationVariant(
   challengeId: string,
   challengeDate: string,
-  override: string | null
+  override: string | null,
+  identityKey: string
 ): GamePresentationVariant {
   if (override === 'baseline' || override === 'hybrid') {
     return override;
   }
 
-  const cohortBucket = hashString(`${challengeId}:${challengeDate}`) % 2;
+  const cohortBucket = hashString(`${identityKey}:${challengeDate}:${challengeId}`) % 2;
   return cohortBucket === 0 ? 'baseline' : 'hybrid';
 }
 

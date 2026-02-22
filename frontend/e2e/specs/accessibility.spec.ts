@@ -207,6 +207,22 @@ test.describe('Accessibility', () => {
     expect(hasAccessibleName).toBeTruthy();
   });
 
+  test('should preserve readable narrative and recap structure in hybrid locale view', async ({ page }) => {
+    await page.goto('/en/game?presentation=hybrid');
+    await gamePage.waitForLoad();
+
+    const milestoneCard = page.getByTestId('narrative-milestone-card');
+    await expect(milestoneCard).toBeVisible();
+    await expect(milestoneCard.getByText(/Journey Brief|Midpoint Checkpoint|Mission Complete/)).toBeVisible();
+
+    await page.getByRole('textbox', { name: 'Enter country name...' }).fill('Egypt');
+    await page.getByRole('option').filter({ hasText: 'Egypt' }).first().click();
+
+    const recapCard = page.getByTestId('postgame-recap-card');
+    await expect(recapCard).toBeVisible();
+    await expect(page.getByTestId('share-recap-button')).toBeVisible();
+  });
+
   test('should maintain focus within modal/dialog when open', async ({ page }) => {
     // This test checks if any modals trap focus properly
     // For now, check basic focus management

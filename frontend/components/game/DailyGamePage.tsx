@@ -12,6 +12,7 @@ import { useGameStore } from '@/lib/stores/gameStore';
 import { useAuthStore } from '@/lib/stores/authStore';
 import {
   trackCompletionPanelViewed,
+  trackABOutcomeCompletion,
   trackComboStateChanged,
   resetChallengeTelemetryState,
   trackDockAction,
@@ -22,6 +23,7 @@ import {
   trackNarrativeMilestoneShown,
   trackPostgameRecapShared,
   trackPresentationVariantAssigned,
+  trackRecapCardViewed,
   trackRetryCtaClicked,
 } from '@/lib/telemetry/gameTelemetry';
 import { MapSkeleton, MapErrorBoundary } from '@/components/game/GameMap';
@@ -36,7 +38,12 @@ import {
   computeComboState,
   computeEfficiencyBenchmark,
 } from '@/lib/game/progression';
-import { buildShareRecapText, getNarrativeMilestone, resolvePresentationVariant } from '@/lib/game/phase3';
+import {
+  buildShareRecapText,
+  getExperimentIdentity,
+  getNarrativeMilestone,
+  resolvePresentationVariant,
+} from '@/lib/game/phase3';
 import type {
   ComboMomentum,
   Country,
@@ -82,6 +89,7 @@ export function DailyGamePage() {
   const [shareStatus, setShareStatus] = useState<'idle' | 'copied' | 'error'>('idle');
 
   const accessToken = useAuthStore((state) => state.accessToken);
+  const userId = useAuthStore((state) => state.user?.id);
 
   const {
     challenge,
@@ -156,9 +164,16 @@ export function DailyGamePage() {
   );
   const efficiencyBucket = benchmark.bucket;
   const presentationOverride = searchParams.get('presentation');
+  const experimentIdentity = getExperimentIdentity(userId);
   const presentationVariant: GamePresentationVariant = challenge
-    ? resolvePresentationVariant(challenge.id, challenge.challenge_date, presentationOverride)
+    ? resolvePresentationVariant(
+        challenge.id,
+        challenge.challenge_date,
+        presentationOverride,
+        experimentIdentity
+      )
     : 'hybrid';
+  const isHybridPresentation = presentationVariant === 'hybrid';
   const narrativeMilestone: NarrativeMilestone = challenge
     ? getNarrativeMilestone({
         guessesCount: guesses.length,
@@ -224,6 +239,21 @@ export function DailyGamePage() {
   }, [challenge, isCompleted, routeMode, score, guesses.length, qualityTier]);
 
   useEffect(() => {
+    if (!challenge || !isCompleted) {
+      return;
+    }
+
+    trackABOutcomeCompletion({
+      challengeId: challenge.id,
+      mode: routeMode,
+      variant: presentationVariant,
+      score: score ?? 0,
+      totalGuesses: guesses.length,
+      qualityTier,
+    });
+  }, [challenge, isCompleted, routeMode, presentationVariant, score, guesses.length, qualityTier]);
+
+  useEffect(() => {
     if (!challenge) {
       return;
     }
@@ -236,7 +266,7 @@ export function DailyGamePage() {
   }, [challenge, routeMode, presentationVariant]);
 
   useEffect(() => {
-    if (!challenge) {
+    if (!challenge || !isHybridPresentation) {
       return;
     }
 
@@ -245,7 +275,19 @@ export function DailyGamePage() {
       mode: routeMode,
       milestone: narrativeMilestone,
     });
-  }, [challenge, routeMode, narrativeMilestone]);
+  }, [challenge, routeMode, narrativeMilestone, isHybridPresentation]);
+
+  useEffect(() => {
+    if (!challenge || !isCompleted || !isHybridPresentation) {
+      return;
+    }
+
+    trackRecapCardViewed({
+      challengeId: challenge.id,
+      mode: routeMode,
+      variant: presentationVariant,
+    });
+  }, [challenge, isCompleted, isHybridPresentation, presentationVariant, routeMode]);
 
   useEffect(() => {
     setShareStatus('idle');
@@ -365,7 +407,7 @@ export function DailyGamePage() {
       return;
     }
 
-    trackGuessSubmission(challenge.id, routeMode, country.code);
+    trackGuessSubmission(challenge.id, routeMode, country.code, presentationVariant);
     guessMutation.mutate(country);
   };
 
@@ -529,7 +571,10 @@ export function DailyGamePage() {
     <main className="min-h-screen pb-[12rem] lg:pb-20">
       <header className="bg-primary text-white py-3 px-4">
         <div className="max-w-7xl mx-auto">
-          <Link href={`/${locale}`} className="text-white/80 text-sm mb-1 inline-block">
+          <Link
+            href={`/${locale}`}
+            className="inline-flex min-h-6 items-center px-1 text-white text-sm mb-1"
+          >
             ← {t('common.back')}
           </Link>
           <h1 className="text-xl font-bold">{t('game.title')}</h1>
@@ -569,28 +614,30 @@ export function DailyGamePage() {
           localeLabel={t}
         />
 
-        <Card
-          className={`mb-3 ${presentationVariant === 'hybrid' ? 'border-primary/35 bg-primary/5' : 'border-border bg-surface'}`}
-          data-testid="narrative-milestone-card"
-          data-variant={presentationVariant}
-          data-milestone={narrativeMilestone}
-        >
-          <CardContent className="py-3">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <p className="text-sm font-semibold text-primary">{milestoneCopy.title}</p>
-                <p className="text-xs text-text-secondary">{milestoneCopy.body}</p>
+        {isHybridPresentation && (
+          <Card
+            className="mb-3 border-primary/35 bg-primary/5"
+            data-testid="narrative-milestone-card"
+            data-variant={presentationVariant}
+            data-milestone={narrativeMilestone}
+          >
+            <CardContent className="py-3">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm font-semibold text-primary">{milestoneCopy.title}</p>
+                  <p className="text-xs text-text-secondary">{milestoneCopy.body}</p>
+                </div>
+                <span className="text-xl" aria-hidden="true">
+                  {narrativeMilestone === 'start'
+                    ? '🧭'
+                    : narrativeMilestone === 'midpoint'
+                      ? '📍'
+                      : '🏁'}
+                </span>
               </div>
-              <span className="text-xl" aria-hidden="true">
-                {narrativeMilestone === 'start'
-                  ? '🧭'
-                  : narrativeMilestone === 'midpoint'
-                    ? '📍'
-                    : '🏁'}
-              </span>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
 
         <GameChallengeCard
           startCountry={challenge.start_country}
@@ -658,47 +705,49 @@ export function DailyGamePage() {
                     <p className="text-base font-bold text-primary">{getCompletionGradeLabel(qualityTier)}</p>
                   </div>
                   {qualityExplanation && <p className="text-sm text-text-secondary">{qualityExplanation}</p>}
-                  <Card
-                    className={`mt-4 border ${presentationVariant === 'hybrid' ? 'border-primary/25 bg-primary/5' : 'border-border bg-surface'}`}
-                    data-testid="postgame-recap-card"
-                  >
-                    <CardContent className="py-3 text-start">
-                      <p className="text-sm font-semibold text-primary">{t('game.recap.title')}</p>
-                      <p className="mt-1 text-xs text-text-secondary">
-                        {t('game.recap.summary', {
-                          from: getCountryNameByLocale(challenge.start_country),
-                          to: getCountryNameByLocale(challenge.end_country),
-                          guesses: guesses.length,
-                          shortestPath: challenge.shortest_path,
-                        })}
-                      </p>
-                      <p className="mt-1 text-xs text-text-secondary">
-                        {t('game.recap.retentionHook')}
-                      </p>
-                      <div className="mt-3 flex flex-col gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={handleShareRecap}
-                          data-testid="share-recap-button"
-                        >
-                          {shareStatus === 'copied'
-                            ? t('common.copied')
-                            : shareStatus === 'error'
-                              ? t('common.retry')
-                              : t('game.recap.shareCta')}
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => router.push(`/${locale}/leaderboard`)}
-                          data-testid="recap-leaderboard-cta"
-                        >
-                          {t('game.recap.leaderboardCta')}
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  {isHybridPresentation && (
+                    <Card
+                      className="mt-4 border border-primary/25 bg-primary/5"
+                      data-testid="postgame-recap-card"
+                    >
+                      <CardContent className="py-3 text-start">
+                        <p className="text-sm font-semibold text-primary">{t('game.recap.title')}</p>
+                        <p className="mt-1 text-xs text-text-secondary">
+                          {t('game.recap.summary', {
+                            from: getCountryNameByLocale(challenge.start_country),
+                            to: getCountryNameByLocale(challenge.end_country),
+                            guesses: guesses.length,
+                            shortestPath: challenge.shortest_path,
+                          })}
+                        </p>
+                        <p className="mt-1 text-xs text-text-secondary">
+                          {t('game.recap.retentionHook')}
+                        </p>
+                        <div className="mt-3 flex flex-col gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={handleShareRecap}
+                            data-testid="share-recap-button"
+                          >
+                            {shareStatus === 'copied'
+                              ? t('common.copied')
+                              : shareStatus === 'error'
+                                ? t('common.retry')
+                                : t('game.recap.shareCta')}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => router.push(`/${locale}/leaderboard`)}
+                            data-testid="recap-leaderboard-cta"
+                          >
+                            {t('game.recap.leaderboardCta')}
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
                   <Button
                     className="mt-4 w-full"
                     onClick={handleRetryCta}

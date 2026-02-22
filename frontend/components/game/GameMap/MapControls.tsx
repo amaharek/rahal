@@ -25,7 +25,7 @@ export function MapControls({
         className="w-10 h-10 p-0 bg-white shadow-md hover:bg-gray-50"
         aria-label="Zoom in"
       >
-        <Plus className="w-5 h-5" />
+        <Plus className="Plus w-5 h-5" />
       </Button>
       <Button
         variant="outline"
@@ -34,7 +34,7 @@ export function MapControls({
         className="w-10 h-10 p-0 bg-white shadow-md hover:bg-gray-50"
         aria-label="Zoom out"
       >
-        <Minus className="w-5 h-5" />
+        <Minus className="Minus w-5 h-5" />
       </Button>
       <Button
         variant="outline"
