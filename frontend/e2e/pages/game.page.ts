@@ -17,6 +17,10 @@ export class GamePage {
   readonly endCountryFlag: Locator;
   readonly endCountryName: Locator;
   readonly shortestPathInfo: Locator;
+  readonly hud: Locator;
+  readonly hudCombo: Locator;
+  readonly hudBenchmark: Locator;
+  readonly hudMomentum: Locator;
 
   // Map elements
   readonly mapContainer: Locator;
@@ -42,6 +46,8 @@ export class GamePage {
   readonly completionCard: Locator;
   readonly scoreDisplay: Locator;
   readonly shareButton: Locator;
+  readonly completionGrade: Locator;
+  readonly retryCta: Locator;
 
   // Loading/Error states
   readonly loadingSpinner: Locator;
@@ -61,6 +67,10 @@ export class GamePage {
     this.endCountryFlag = page.locator('[data-testid="game-challenge-card"] [class*="text-2xl"]').last();
     this.endCountryName = page.locator('[data-testid="game-challenge-card"] [class*="font-bold"]').nth(1);
     this.shortestPathInfo = page.locator('text=/أقصر.*مسار/i');
+    this.hud = page.locator('[data-testid="game-hud"]');
+    this.hudCombo = page.locator('[data-testid="hud-combo"]');
+    this.hudBenchmark = page.locator('[data-testid="hud-benchmark"]');
+    this.hudMomentum = page.locator('[data-testid="hud-momentum-indicator"]');
 
     // Map
     this.mapContainer = page.locator('[data-testid="game-map"]');
@@ -86,6 +96,8 @@ export class GamePage {
     this.completionCard = page.locator('[data-testid="game-completion-card"]');
     this.scoreDisplay = page.locator('text=/النتيجة|score|puntuación/i');
     this.shareButton = page.locator('button:has-text("مشاركة")');
+    this.completionGrade = page.locator('[data-testid="completion-grade"]');
+    this.retryCta = page.locator('[data-testid="completion-retry-cta"]');
 
     // States
     this.loadingSpinner = page.locator('[class*="animate-spin"]');

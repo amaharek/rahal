@@ -92,13 +92,54 @@
     "hud": {
       "streak": "السلسلة",
       "hints": "التلميحات",
+      "combo": "الزخم",
       "efficiency": "الكفاءة",
+      "benchmark": {
+        "label": "مقارنة بالأمثل",
+        "optimal": "مثالي"
+      },
+      "momentum": {
+        "up": "يتحسن",
+        "down": "تراجع",
+        "steady": "ثابت"
+      },
       "efficiencyLevels": {
         "pending": "قيد التتبع",
         "high": "مرتفعة",
         "medium": "متوسطة",
         "low": "منخفضة"
       }
+    },
+    "completion": {
+      "gradeLabel": "التقييم",
+      "retryCta": "أعد نفس الرحلة الآن (تدريب)",
+      "gradeLevels": {
+        "perfect": "مثالي",
+        "near_optimal": "قريب من المثالي",
+        "good_discovery": "اكتشاف جيد",
+        "scenic": "مسار استكشافي"
+      }
+    },
+    "narrative": {
+      "start": {
+        "title": "موجز الرحلة",
+        "body": "رحلتك تبدأ من {from} إلى {to}. حافظ على الزخم من البداية."
+      },
+      "midpoint": {
+        "title": "نقطة منتصف الرحلة",
+        "body": "وصلت إلى {progress} خطوات. الهدف في المنتصف هو {target} خلال الطريق من {from} إلى {to}."
+      },
+      "finish": {
+        "title": "اكتملت المهمة",
+        "body": "أنهيت المسار خلال {guesses} تخمينات، بينما المسار الأمثل {shortestPath}."
+      }
+    },
+    "recap": {
+      "title": "ملخص ما بعد الجولة",
+      "summary": "{from} إلى {to} خلال {guesses} تخمينات (الأمثل {shortestPath}).",
+      "retentionHook": "شارك نتيجتك وارجع غداً لمسار جديد.",
+      "shareCta": "شارك الملخص",
+      "leaderboardCta": "عرض المتصدرين"
     }
   },
   "admin": {

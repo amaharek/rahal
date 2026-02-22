@@ -29,6 +29,9 @@ describe('GameHUD', () => {
         streak={7}
         hintsRemaining={2}
         efficiency="medium"
+        combo={3}
+        momentum="up"
+        benchmarkDelta={1}
         localeLabel={localeLabel}
       />
     );
@@ -36,7 +39,10 @@ describe('GameHUD', () => {
     expect(screen.getByTestId('game-hud')).toBeInTheDocument();
     expect(screen.getByTestId('hud-streak')).toHaveTextContent('7');
     expect(screen.getByTestId('hud-hints-remaining')).toHaveTextContent('2');
+    expect(screen.getByTestId('hud-combo')).toHaveTextContent('x3');
     expect(screen.getByTestId('hud-efficiency-indicator')).toHaveTextContent('game.hud.efficiencyLevels.medium');
+    expect(screen.getByTestId('hud-benchmark')).toHaveTextContent('+1');
+    expect(screen.getByTestId('hud-momentum-indicator')).toHaveTextContent('game.hud.momentum.up');
   });
 
   it('renders fallback streak value when not available', () => {
@@ -47,6 +53,9 @@ describe('GameHUD', () => {
         streak={null}
         hintsRemaining={3}
         efficiency="pending"
+        combo={0}
+        momentum="steady"
+        benchmarkDelta={0}
         localeLabel={localeLabel}
       />
     );

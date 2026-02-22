@@ -92,13 +92,54 @@
     "hud": {
       "streak": "Streak",
       "hints": "Hints",
+      "combo": "Combo",
       "efficiency": "Efficiency",
+      "benchmark": {
+        "label": "vs Optimal",
+        "optimal": "Optimal"
+      },
+      "momentum": {
+        "up": "Up",
+        "down": "Down",
+        "steady": "Steady"
+      },
       "efficiencyLevels": {
         "pending": "Pending",
         "high": "High",
         "medium": "Medium",
         "low": "Low"
       }
+    },
+    "completion": {
+      "gradeLabel": "Grade",
+      "retryCta": "Retry this route now (Practice)",
+      "gradeLevels": {
+        "perfect": "Perfect",
+        "near_optimal": "Near Optimal",
+        "good_discovery": "Good Discovery",
+        "scenic": "Scenic Route"
+      }
+    },
+    "narrative": {
+      "start": {
+        "title": "Journey Brief",
+        "body": "Your route starts from {from} to {to}. Build momentum early."
+      },
+      "midpoint": {
+        "title": "Midpoint Checkpoint",
+        "body": "You are {progress} steps in. Midpoint target is {target} on the way from {from} to {to}."
+      },
+      "finish": {
+        "title": "Mission Complete",
+        "body": "Route closed in {guesses} guesses. Optimal path was {shortestPath}."
+      }
+    },
+    "recap": {
+      "title": "Post-game Recap",
+      "summary": "{from} to {to} in {guesses} guesses (optimal {shortestPath}).",
+      "retentionHook": "Share this run and come back tomorrow for a fresh route.",
+      "shareCta": "Share Recap",
+      "leaderboardCta": "View Leaderboard"
     }
   },
   "admin": {

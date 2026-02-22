@@ -101,8 +101,11 @@ npm run test QuestionCard.test.tsx
 ### Run E2E Tests
 
 ```bash
-# Run all E2E tests (headless)
+# Run required E2E gate (Chromium, matches CI)
 npm run test:e2e
+
+# Run all configured browser projects (optional local check)
+npm run test:e2e:all
 
 # Run with UI
 npm run test:e2e:ui
@@ -728,11 +731,11 @@ Error: browserType.launch: Executable doesn't exist
 
 **Solution**:
 ```bash
-# Install browsers
-npx playwright install
-
-# Or install specific browser
+# Install required browser for CI-equivalent local validation
 npx playwright install chromium
+
+# Optional: install all configured projects for cross-browser local run
+npx playwright install
 ```
 
 ---

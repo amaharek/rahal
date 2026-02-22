@@ -45,6 +45,28 @@ export async function setupGameMocks(page: Page) {
       }),
     });
   });
+
+  // Mock practice session setup endpoint (used by Phase 2 retry CTA flow)
+  await page.route('**/api/game/practice/session**', async (route: Route) => {
+    const requestBody = JSON.parse(route.request().postData() || '{}');
+    const startCountry = mockCountries.find((country) => country.id === requestBody.start_country_id) || mockCountries[0];
+    const endCountry = mockCountries.find((country) => country.id === requestBody.end_country_id) || mockCountries[1];
+
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        session_id: 'practice-session-1',
+        mode: 'practice',
+        route_mode: requestBody.mode || 'shortest',
+        start_country: startCountry,
+        end_country: endCountry,
+        shortest_path: mockChallenge.shortest_path,
+        path_country_codes: mockChallenge.optimal_path,
+        user_progress: null,
+      }),
+    });
+  });
 }
 
 /**

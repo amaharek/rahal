@@ -4,6 +4,9 @@ import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { DailyGamePage } from '@/components/game/DailyGamePage';
 import { useGameStore } from '@/lib/stores/gameStore';
+import { submitGuess } from '@/lib/api/game';
+
+const mockPush = vi.fn();
 
 const { mockChallenge } = vi.hoisted(() => ({
   mockChallenge: {
@@ -32,6 +35,13 @@ const { mockChallenge } = vi.hoisted(() => ({
 
 vi.mock('next/dynamic', () => ({
   default: () => () => <div data-testid="mock-map" />,
+}));
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: mockPush,
+  }),
+  useSearchParams: () => new URLSearchParams('presentation=hybrid'),
 }));
 
 vi.mock('@/components/game/GameMap', () => ({
@@ -129,6 +139,7 @@ function renderPage() {
 
 describe('DailyGamePage integration', () => {
   beforeEach(() => {
+    mockPush.mockReset();
     useGameStore.setState({
       challenge: null,
       isLoading: false,
@@ -165,7 +176,78 @@ describe('DailyGamePage integration', () => {
       expect(eventNames).toContain('hud_render_state');
       expect(eventNames).toContain('focus_to_submit_ms');
       expect(eventNames).toContain('dock_action_triggered');
+      expect(eventNames).toContain('efficiency_benchmark_shown');
+      expect(eventNames).toContain('combo_state_changed');
+      expect(eventNames).toContain('narrative_milestone_shown');
+      expect(eventNames).toContain('presentation_variant_assigned');
     });
+
+    expect(screen.getByTestId('narrative-milestone-card')).toBeInTheDocument();
+    expect(screen.getByTestId('narrative-milestone-card')).toHaveAttribute('data-variant', 'hybrid');
+
+    window.removeEventListener('rahal:telemetry', listener as EventListener);
+  });
+
+  it('shows completion grade and routes to practice on retry CTA', async () => {
+    vi.mocked(submitGuess).mockResolvedValueOnce({
+      country: {
+        id: '2',
+        code: 'EGY',
+        name_ar: 'مصر',
+        name_en: 'Egypt',
+        flag_emoji: '🇪🇬',
+      },
+      score_emoji: '🟢',
+      score_description: 'perfect',
+      is_on_shortest_path: true,
+      is_destination: true,
+      game_complete: true,
+      total_guesses: 1,
+      score: 100,
+      route_mode: 'shortest',
+      gap_from_optimal: 0,
+      quality_tier: 'perfect',
+      quality_explanation_ar: 'مسار ممتاز',
+    });
+
+    const user = userEvent.setup();
+    const listener = vi.fn();
+    window.addEventListener('rahal:telemetry', listener as EventListener);
+
+    renderPage();
+
+    await waitFor(() => {
+      expect(screen.getAllByTestId('integration-commit').length).toBeGreaterThan(0);
+    });
+
+    await user.click(screen.getAllByTestId('integration-focus')[0]);
+    await user.click(screen.getAllByTestId('integration-commit')[0]);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('completion-grade')).toBeInTheDocument();
+      expect(screen.getByTestId('completion-retry-cta')).toBeInTheDocument();
+      expect(screen.getByTestId('postgame-recap-card')).toBeInTheDocument();
+    });
+
+    const shareMock = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(window.navigator, 'share', {
+      configurable: true,
+      value: shareMock,
+    });
+
+    await user.click(screen.getByTestId('share-recap-button'));
+
+    await user.click(screen.getByTestId('completion-retry-cta'));
+
+    expect(mockPush).toHaveBeenCalledWith(
+      '/ar/game/practice?from=1&to=2&mode=shortest'
+    );
+    expect(shareMock).toHaveBeenCalledTimes(1);
+
+    const eventNames = listener.mock.calls.map((args: any[]) => (args[0] as CustomEvent).detail.eventName);
+    expect(eventNames).toContain('completion_panel_viewed');
+    expect(eventNames).toContain('retry_cta_clicked');
+    expect(eventNames).toContain('postgame_recap_shared');
 
     window.removeEventListener('rahal:telemetry', listener as EventListener);
   });

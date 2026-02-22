@@ -3,6 +3,11 @@
  */
 
 export type RouteMode = 'shortest' | 'explorer';
+export type EfficiencyBucket = 'pending' | 'high' | 'medium' | 'low';
+export type ComboMomentum = 'up' | 'down' | 'steady';
+export type QualityTier = 'perfect' | 'near_optimal' | 'good_discovery' | 'scenic';
+export type GamePresentationVariant = 'baseline' | 'hybrid';
+export type NarrativeMilestone = 'start' | 'midpoint' | 'finish';
 
 export interface Country {
   id: string;
@@ -68,7 +73,7 @@ export interface GuessResponse {
   score: number | null;
   route_mode: RouteMode;
   gap_from_optimal: number | null;
-  quality_tier: 'perfect' | 'near_optimal' | 'good_discovery' | 'scenic' | null;
+  quality_tier: QualityTier | null;
   quality_explanation_ar: string | null;
 }
 

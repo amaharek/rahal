@@ -1,10 +1,25 @@
-import type { RouteMode } from '@/types/game';
+import type {
+  ComboMomentum,
+  EfficiencyBucket,
+  GamePresentationVariant,
+  NarrativeMilestone,
+  QualityTier,
+  RouteMode,
+  ScoreEmoji,
+} from '@/types/game';
 
 export type GameTelemetryEventName =
   | 'guess_to_guess_ms'
   | 'focus_to_submit_ms'
   | 'hud_render_state'
-  | 'dock_action_triggered';
+  | 'dock_action_triggered'
+  | 'efficiency_benchmark_shown'
+  | 'combo_state_changed'
+  | 'completion_panel_viewed'
+  | 'retry_cta_clicked'
+  | 'narrative_milestone_shown'
+  | 'postgame_recap_shared'
+  | 'presentation_variant_assigned';
 
 export interface GuessToGuessPayload {
   challengeId: string;
@@ -36,19 +51,79 @@ export interface DockActionTriggeredPayload {
   action: 'submit_guess' | 'use_hint';
 }
 
+export interface EfficiencyBenchmarkShownPayload {
+  challengeId: string;
+  mode: RouteMode;
+  shortestPath: number;
+  guessesCount: number;
+  deltaFromShortestPath: number;
+  efficiency: EfficiencyBucket;
+}
+
+export interface ComboStateChangedPayload {
+  challengeId: string;
+  mode: RouteMode;
+  previousCombo: number;
+  nextCombo: number;
+  momentum: ComboMomentum;
+  transition: 'increase' | 'reset' | 'no_change';
+  scoreEmoji: ScoreEmoji;
+}
+
+export interface CompletionPanelViewedPayload {
+  challengeId: string;
+  mode: RouteMode;
+  score: number;
+  totalGuesses: number;
+  qualityTier: QualityTier | null;
+}
+
+export interface RetryCtaClickedPayload {
+  challengeId: string;
+  mode: RouteMode;
+  destination: 'practice';
+}
+
+export interface NarrativeMilestoneShownPayload {
+  challengeId: string;
+  mode: RouteMode;
+  milestone: NarrativeMilestone;
+}
+
+export interface PostgameRecapSharedPayload {
+  challengeId: string;
+  mode: RouteMode;
+  shareMethod: 'native' | 'clipboard';
+}
+
+export interface PresentationVariantAssignedPayload {
+  challengeId: string;
+  mode: RouteMode;
+  variant: GamePresentationVariant;
+}
+
 export type GameTelemetryPayloadMap = {
   guess_to_guess_ms: GuessToGuessPayload;
   focus_to_submit_ms: FocusToSubmitPayload;
   hud_render_state: HudRenderStatePayload;
   dock_action_triggered: DockActionTriggeredPayload;
+  efficiency_benchmark_shown: EfficiencyBenchmarkShownPayload;
+  combo_state_changed: ComboStateChangedPayload;
+  completion_panel_viewed: CompletionPanelViewedPayload;
+  retry_cta_clicked: RetryCtaClickedPayload;
+  narrative_milestone_shown: NarrativeMilestoneShownPayload;
+  postgame_recap_shared: PostgameRecapSharedPayload;
+  presentation_variant_assigned: PresentationVariantAssignedPayload;
 };
-
-export type EfficiencyBucket = 'pending' | 'high' | 'medium' | 'low';
 
 interface ChallengeTelemetryState {
   pendingFocusTs: number | null;
   lastSubmitTs: number | null;
   lastHudHash: string | null;
+  lastBenchmarkHash: string | null;
+  completionViewed: boolean;
+  shownMilestones: Set<NarrativeMilestone>;
+  variantAssigned: boolean;
 }
 
 const telemetryStateByChallenge = new Map<string, ChallengeTelemetryState>();
@@ -63,6 +138,10 @@ function getChallengeState(challengeId: string): ChallengeTelemetryState {
     pendingFocusTs: null,
     lastSubmitTs: null,
     lastHudHash: null,
+    lastBenchmarkHash: null,
+    completionViewed: false,
+    shownMilestones: new Set(),
+    variantAssigned: false,
   };
 
   telemetryStateByChallenge.set(challengeId, initial);
@@ -151,4 +230,59 @@ export function trackDockAction(
     mode,
     action,
   });
+}
+
+export function trackEfficiencyBenchmarkShown(payload: EfficiencyBenchmarkShownPayload): void {
+  const state = getChallengeState(payload.challengeId);
+  const nextHash = JSON.stringify(payload);
+
+  if (state.lastBenchmarkHash === nextHash) {
+    return;
+  }
+
+  state.lastBenchmarkHash = nextHash;
+  emitGameTelemetry('efficiency_benchmark_shown', payload);
+}
+
+export function trackComboStateChanged(payload: ComboStateChangedPayload): void {
+  emitGameTelemetry('combo_state_changed', payload);
+}
+
+export function trackCompletionPanelViewed(payload: CompletionPanelViewedPayload): void {
+  const state = getChallengeState(payload.challengeId);
+
+  if (state.completionViewed) {
+    return;
+  }
+
+  state.completionViewed = true;
+  emitGameTelemetry('completion_panel_viewed', payload);
+}
+
+export function trackRetryCtaClicked(payload: RetryCtaClickedPayload): void {
+  emitGameTelemetry('retry_cta_clicked', payload);
+}
+
+export function trackNarrativeMilestoneShown(payload: NarrativeMilestoneShownPayload): void {
+  const state = getChallengeState(payload.challengeId);
+  if (state.shownMilestones.has(payload.milestone)) {
+    return;
+  }
+
+  state.shownMilestones.add(payload.milestone);
+  emitGameTelemetry('narrative_milestone_shown', payload);
+}
+
+export function trackPostgameRecapShared(payload: PostgameRecapSharedPayload): void {
+  emitGameTelemetry('postgame_recap_shared', payload);
+}
+
+export function trackPresentationVariantAssigned(payload: PresentationVariantAssignedPayload): void {
+  const state = getChallengeState(payload.challengeId);
+  if (state.variantAssigned) {
+    return;
+  }
+
+  state.variantAssigned = true;
+  emitGameTelemetry('presentation_variant_assigned', payload);
 }

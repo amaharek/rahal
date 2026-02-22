@@ -1,11 +1,12 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { useLocale, useTranslations } from 'next-intl';
 import { useMutation } from '@tanstack/react-query';
 import { ChevronDown, ChevronUp, Map } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, Button } from '@/components/ui';
 import { CountryInput } from '@/components/game/CountryInput';
 import { EmojiScore } from '@/components/game/EmojiScore';
@@ -39,6 +40,8 @@ const GameMap = dynamic(
 export function PracticePage() {
   const t = useTranslations();
   const locale = useLocale();
+  const searchParams = useSearchParams();
+  const autoSetupTriggeredRef = useRef(false);
   const [startCountry, setStartCountry] = useState<Country | null>(null);
   const [endCountry, setEndCountry] = useState<Country | null>(null);
   const [session, setSession] = useState<PracticeSession | null>(null);
@@ -63,11 +66,11 @@ export function PracticePage() {
   );
 
   const setupMutation = useMutation({
-    mutationFn: () =>
+    mutationFn: (payload: { startCountryId: string; endCountryId: string; mode: RouteMode }) =>
       createPracticeSession({
-        start_country_id: startCountry!.id,
-        end_country_id: endCountry!.id,
-        mode: routeMode,
+        start_country_id: payload.startCountryId,
+        end_country_id: payload.endCountryId,
+        mode: payload.mode,
       }),
     onSuccess: (practiceSession) => {
       setSession(practiceSession);
@@ -179,7 +182,11 @@ export function PracticePage() {
       setErrorMessage(t('practice.errors.sameCountry'));
       return;
     }
-    setupMutation.mutate();
+    setupMutation.mutate({
+      startCountryId: startCountry.id,
+      endCountryId: endCountry.id,
+      mode: routeMode,
+    });
   };
 
   const onGuessCountry = (country: Country) => {
@@ -196,6 +203,29 @@ export function PracticePage() {
     if (!session || isCompleted || hintsUsed >= 3 || hintMutation.isPending) return;
     hintMutation.mutate();
   };
+
+  useEffect(() => {
+    if (autoSetupTriggeredRef.current || session || setupMutation.isPending) {
+      return;
+    }
+
+    const from = searchParams.get('from');
+    const to = searchParams.get('to');
+    const modeParam = searchParams.get('mode');
+    const mode: RouteMode = modeParam === 'explorer' ? 'explorer' : 'shortest';
+
+    if (!from || !to || from === to) {
+      return;
+    }
+
+    autoSetupTriggeredRef.current = true;
+    setRouteMode(mode);
+    setupMutation.mutate({
+      startCountryId: from,
+      endCountryId: to,
+      mode,
+    });
+  }, [searchParams, session, setupMutation]);
 
   return (
     <main className="min-h-screen pb-20">

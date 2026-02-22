@@ -71,6 +71,35 @@ test.describe('Game Flow', () => {
     }
   });
 
+  test('should update competitive HUD on combo increase then reset', async ({ page }) => {
+    await gamePage.goto();
+    await gamePage.waitForLoad();
+
+    await expect(gamePage.hud).toBeVisible();
+
+    // Positive guess (on optimal path) should increase combo.
+    await gamePage.searchCountry('الأردن');
+    await page.waitForTimeout(400);
+    const firstSuggestions = page.locator('[role="option"], [class*="suggestion"]');
+    if (await firstSuggestions.count() > 0) {
+      await firstSuggestions.first().click();
+    }
+
+    await expect(gamePage.hudCombo).toContainText('x1');
+    await expect(gamePage.hudMomentum).toBeVisible();
+
+    // Off-path guess should reset combo.
+    await gamePage.searchCountry('الولايات المتحدة');
+    await page.waitForTimeout(400);
+    const secondSuggestions = page.locator('[role="option"], [class*="suggestion"]');
+    if (await secondSuggestions.count() > 0) {
+      await secondSuggestions.first().click();
+    }
+
+    await expect(gamePage.hudCombo).toContainText('x0');
+    await expect(gamePage.hudBenchmark).toBeVisible();
+  });
+
   test('should complete game when reaching destination', async ({ page }) => {
     // Override to complete game immediately
     await setupGuessMock(page, { scoreEmoji: '🟢', gameComplete: true });
@@ -111,6 +140,26 @@ test.describe('Game Flow', () => {
       await suggestions.first().click();
       await expect(gamePage.completionCard).toBeVisible();
       await expect(gamePage.scoreDisplay).toBeVisible();
+    }
+  });
+
+  test('should show completion grade and retry CTA to practice route', async ({ page }) => {
+    await setupGuessMock(page, { scoreEmoji: '🟢', gameComplete: true });
+
+    await gamePage.goto();
+    await gamePage.waitForLoad();
+
+    await gamePage.searchCountry('مصر');
+    await page.waitForTimeout(400);
+
+    const suggestions = page.locator('[role="option"], [class*="suggestion"]');
+    if (await suggestions.count() > 0) {
+      await suggestions.first().click();
+      await expect(gamePage.completionCard).toBeVisible();
+      await expect(gamePage.completionGrade).toBeVisible();
+      await expect(gamePage.retryCta).toBeVisible();
+      await gamePage.retryCta.click();
+      await expect(page).toHaveURL(/\/ar\/game\/practice\?/);
     }
   });
 

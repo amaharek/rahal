@@ -5,25 +5,48 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { useTranslations, useLocale } from 'next-intl';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useDirection } from '@/lib/hooks/useDirection';
 import { getDailyChallenge, getGameStats, submitGuess, useHint } from '@/lib/api/game';
 import { useGameStore } from '@/lib/stores/gameStore';
 import { useAuthStore } from '@/lib/stores/authStore';
 import {
+  trackCompletionPanelViewed,
+  trackComboStateChanged,
   resetChallengeTelemetryState,
   trackDockAction,
+  trackEfficiencyBenchmarkShown,
   trackGuessSubmission,
   trackHudRenderState,
   trackInputFocusStart,
+  trackNarrativeMilestoneShown,
+  trackPostgameRecapShared,
+  trackPresentationVariantAssigned,
+  trackRetryCtaClicked,
 } from '@/lib/telemetry/gameTelemetry';
 import { MapSkeleton, MapErrorBoundary } from '@/components/game/GameMap';
-import { GameHUD, deriveEfficiencyBucket } from '@/components/game/GameHUD';
+import { GameHUD } from '@/components/game/GameHUD';
 import { GameChallengeCard } from '@/components/game/GameChallengeCard';
 import { GameActionDock } from '@/components/game/GameActionDock';
 import { GameHintsPanel } from '@/components/game/GameHintsPanel';
 import { GameGuessList } from '@/components/game/GameGuessList';
 import { Card, CardContent, Button } from '@/components/ui';
-import type { Country, GuessEntry, HintResponse, RouteMode } from '@/types/game';
+import {
+  computeComboFromGuesses,
+  computeComboState,
+  computeEfficiencyBenchmark,
+} from '@/lib/game/progression';
+import { buildShareRecapText, getNarrativeMilestone, resolvePresentationVariant } from '@/lib/game/phase3';
+import type {
+  ComboMomentum,
+  Country,
+  GamePresentationVariant,
+  GuessEntry,
+  HintResponse,
+  NarrativeMilestone,
+  QualityTier,
+  RouteMode,
+} from '@/types/game';
 
 const GameMap = dynamic(
   () =>
@@ -45,12 +68,18 @@ const GameMap = dynamic(
 );
 
 export function DailyGamePage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const t = useTranslations();
   const locale = useLocale();
   const direction = useDirection();
   const [routeMode, setRouteMode] = useState<RouteMode>('shortest');
   const [currentHint, setCurrentHint] = useState<HintResponse | null>(null);
   const [qualityExplanation, setQualityExplanation] = useState<string | null>(null);
+  const [qualityTier, setQualityTier] = useState<QualityTier | null>(null);
+  const [combo, setCombo] = useState(0);
+  const [momentum, setMomentum] = useState<ComboMomentum>('steady');
+  const [shareStatus, setShareStatus] = useState<'idle' | 'copied' | 'error'>('idle');
 
   const accessToken = useAuthStore((state) => state.accessToken);
 
@@ -88,6 +117,8 @@ export function DailyGamePage() {
       setChallenge(data);
       setCurrentHint(null);
       setQualityExplanation(null);
+      setQualityTier(null);
+      setMomentum('steady');
     }
   }, [data, setChallenge]);
 
@@ -112,10 +143,29 @@ export function DailyGamePage() {
     [guesses]
   );
 
-  const efficiencyBucket = useMemo(
-    () => (challenge ? deriveEfficiencyBucket(guesses.length, challenge.shortest_path) : 'pending'),
+  useEffect(() => {
+    setCombo(computeComboFromGuesses(guesses));
+  }, [guesses]);
+
+  const benchmark = useMemo(
+    () =>
+      challenge
+        ? computeEfficiencyBenchmark(guesses.length, challenge.shortest_path)
+        : computeEfficiencyBenchmark(0, 1),
     [challenge, guesses.length]
   );
+  const efficiencyBucket = benchmark.bucket;
+  const presentationOverride = searchParams.get('presentation');
+  const presentationVariant: GamePresentationVariant = challenge
+    ? resolvePresentationVariant(challenge.id, challenge.challenge_date, presentationOverride)
+    : 'hybrid';
+  const narrativeMilestone: NarrativeMilestone = challenge
+    ? getNarrativeMilestone({
+        guessesCount: guesses.length,
+        shortestPath: challenge.shortest_path,
+        isCompleted,
+      })
+    : 'start';
 
   const hintsRemaining = Math.max(0, 3 - hintsUsed);
   const streakValue = statsData?.current_streak ?? null;
@@ -144,6 +194,63 @@ export function DailyGamePage() {
     isCompleted,
   ]);
 
+  useEffect(() => {
+    if (!challenge || guesses.length === 0) {
+      return;
+    }
+
+    trackEfficiencyBenchmarkShown({
+      challengeId: challenge.id,
+      mode: routeMode,
+      shortestPath: challenge.shortest_path,
+      guessesCount: guesses.length,
+      deltaFromShortestPath: benchmark.deltaFromShortestPath,
+      efficiency: benchmark.bucket,
+    });
+  }, [challenge, routeMode, guesses.length, benchmark.deltaFromShortestPath, benchmark.bucket]);
+
+  useEffect(() => {
+    if (!challenge || !isCompleted) {
+      return;
+    }
+
+    trackCompletionPanelViewed({
+      challengeId: challenge.id,
+      mode: routeMode,
+      score: score ?? 0,
+      totalGuesses: guesses.length,
+      qualityTier,
+    });
+  }, [challenge, isCompleted, routeMode, score, guesses.length, qualityTier]);
+
+  useEffect(() => {
+    if (!challenge) {
+      return;
+    }
+
+    trackPresentationVariantAssigned({
+      challengeId: challenge.id,
+      mode: routeMode,
+      variant: presentationVariant,
+    });
+  }, [challenge, routeMode, presentationVariant]);
+
+  useEffect(() => {
+    if (!challenge) {
+      return;
+    }
+
+    trackNarrativeMilestoneShown({
+      challengeId: challenge.id,
+      mode: routeMode,
+      milestone: narrativeMilestone,
+    });
+  }, [challenge, routeMode, narrativeMilestone]);
+
+  useEffect(() => {
+    setShareStatus('idle');
+  }, [challenge?.id, routeMode]);
+
   const guessMutation = useMutation({
     mutationFn: (country: Country) =>
       submitGuess({
@@ -152,6 +259,22 @@ export function DailyGamePage() {
         mode: routeMode,
       }),
     onSuccess: (response) => {
+      const comboState = computeComboState(combo, response.score_emoji);
+      setCombo(comboState.nextCombo);
+      setMomentum(comboState.momentum);
+
+      if (challenge && comboState.transition !== 'no_change') {
+        trackComboStateChanged({
+          challengeId: challenge.id,
+          mode: routeMode,
+          previousCombo: comboState.previousCombo,
+          nextCombo: comboState.nextCombo,
+          momentum: comboState.momentum,
+          transition: comboState.transition,
+          scoreEmoji: response.score_emoji,
+        });
+      }
+
       const newGuess: GuessEntry = {
         country_id: response.country.id,
         country_code: response.country.code,
@@ -166,6 +289,7 @@ export function DailyGamePage() {
       if (response.game_complete) {
         completeGame(response.score ?? 0);
         setQualityExplanation(response.quality_explanation_ar);
+        setQualityTier(response.quality_tier);
       }
     },
     onError: (mutationError: Error) => {
@@ -264,6 +388,113 @@ export function DailyGamePage() {
   const getCountryNameByLocale = (country: { name_ar: string; name_en: string }) =>
     locale === 'ar' ? country.name_ar : country.name_en || country.name_ar;
 
+  const getCompletionGradeLabel = (tier: QualityTier | null): string => {
+    if (!tier) {
+      return t('game.completion.gradeLevels.good_discovery');
+    }
+    return t(`game.completion.gradeLevels.${tier}`);
+  };
+
+  const getMilestoneCopy = (milestone: NarrativeMilestone): { title: string; body: string } => {
+    if (!challenge) {
+      return {
+        title: t('game.narrative.start.title'),
+        body: t('game.narrative.start.body', { from: '-', to: '-' }),
+      };
+    }
+
+    const from = getCountryNameByLocale(challenge.start_country);
+    const to = getCountryNameByLocale(challenge.end_country);
+    const midpointTarget = Math.max(1, Math.ceil(challenge.shortest_path / 2));
+
+    if (milestone === 'finish') {
+      return {
+        title: t('game.narrative.finish.title'),
+        body: t('game.narrative.finish.body', {
+          guesses: guesses.length,
+          shortestPath: challenge.shortest_path,
+        }),
+      };
+    }
+
+    if (milestone === 'midpoint') {
+      return {
+        title: t('game.narrative.midpoint.title'),
+        body: t('game.narrative.midpoint.body', {
+          from,
+          to,
+          progress: guesses.length,
+          target: midpointTarget,
+        }),
+      };
+    }
+
+    return {
+      title: t('game.narrative.start.title'),
+      body: t('game.narrative.start.body', { from, to }),
+    };
+  };
+
+  const handleRetryCta = () => {
+    if (!challenge) {
+      return;
+    }
+
+    trackRetryCtaClicked({
+      challengeId: challenge.id,
+      mode: routeMode,
+      destination: 'practice',
+    });
+
+    const params = new URLSearchParams({
+      from: challenge.start_country.id,
+      to: challenge.end_country.id,
+      mode: routeMode,
+    });
+    router.push(`/${locale}/game/practice?${params.toString()}`);
+  };
+
+  const handleShareRecap = async () => {
+    if (!challenge || !isCompleted) {
+      return;
+    }
+
+    const shareText = buildShareRecapText({
+      locale,
+      startCountry: getCountryNameByLocale(challenge.start_country),
+      endCountry: getCountryNameByLocale(challenge.end_country),
+      guessesCount: guesses.length,
+      shortestPath: challenge.shortest_path,
+      score,
+      qualityTier,
+      efficiency: efficiencyBucket,
+    });
+
+    try {
+      if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+        await navigator.share({ text: shareText });
+        trackPostgameRecapShared({
+          challengeId: challenge.id,
+          mode: routeMode,
+          shareMethod: 'native',
+        });
+      } else if (typeof navigator !== 'undefined' && navigator.clipboard) {
+        await navigator.clipboard.writeText(shareText);
+        trackPostgameRecapShared({
+          challengeId: challenge.id,
+          mode: routeMode,
+          shareMethod: 'clipboard',
+        });
+      } else {
+        throw new Error('share unavailable');
+      }
+
+      setShareStatus('copied');
+    } catch {
+      setShareStatus('error');
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -291,6 +522,8 @@ export function DailyGamePage() {
   if (!challenge) {
     return null;
   }
+
+  const milestoneCopy = getMilestoneCopy(narrativeMilestone);
 
   return (
     <main className="min-h-screen pb-[12rem] lg:pb-20">
@@ -330,8 +563,34 @@ export function DailyGamePage() {
           streak={streakValue}
           hintsRemaining={hintsRemaining}
           efficiency={efficiencyBucket}
+          combo={combo}
+          momentum={momentum}
+          benchmarkDelta={benchmark.deltaFromShortestPath}
           localeLabel={t}
         />
+
+        <Card
+          className={`mb-3 ${presentationVariant === 'hybrid' ? 'border-primary/35 bg-primary/5' : 'border-border bg-surface'}`}
+          data-testid="narrative-milestone-card"
+          data-variant={presentationVariant}
+          data-milestone={narrativeMilestone}
+        >
+          <CardContent className="py-3">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold text-primary">{milestoneCopy.title}</p>
+                <p className="text-xs text-text-secondary">{milestoneCopy.body}</p>
+              </div>
+              <span className="text-xl" aria-hidden="true">
+                {narrativeMilestone === 'start'
+                  ? '🧭'
+                  : narrativeMilestone === 'midpoint'
+                    ? '📍'
+                    : '🏁'}
+              </span>
+            </div>
+          </CardContent>
+        </Card>
 
         <GameChallengeCard
           startCountry={challenge.start_country}
@@ -394,7 +653,59 @@ export function DailyGamePage() {
                       <div className="text-sm text-text-secondary">{t('game.totalGuesses')}</div>
                     </div>
                   </div>
+                  <div className="mb-4" data-testid="completion-grade">
+                    <p className="text-xs text-text-secondary">{t('game.completion.gradeLabel')}</p>
+                    <p className="text-base font-bold text-primary">{getCompletionGradeLabel(qualityTier)}</p>
+                  </div>
                   {qualityExplanation && <p className="text-sm text-text-secondary">{qualityExplanation}</p>}
+                  <Card
+                    className={`mt-4 border ${presentationVariant === 'hybrid' ? 'border-primary/25 bg-primary/5' : 'border-border bg-surface'}`}
+                    data-testid="postgame-recap-card"
+                  >
+                    <CardContent className="py-3 text-start">
+                      <p className="text-sm font-semibold text-primary">{t('game.recap.title')}</p>
+                      <p className="mt-1 text-xs text-text-secondary">
+                        {t('game.recap.summary', {
+                          from: getCountryNameByLocale(challenge.start_country),
+                          to: getCountryNameByLocale(challenge.end_country),
+                          guesses: guesses.length,
+                          shortestPath: challenge.shortest_path,
+                        })}
+                      </p>
+                      <p className="mt-1 text-xs text-text-secondary">
+                        {t('game.recap.retentionHook')}
+                      </p>
+                      <div className="mt-3 flex flex-col gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={handleShareRecap}
+                          data-testid="share-recap-button"
+                        >
+                          {shareStatus === 'copied'
+                            ? t('common.copied')
+                            : shareStatus === 'error'
+                              ? t('common.retry')
+                              : t('game.recap.shareCta')}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => router.push(`/${locale}/leaderboard`)}
+                          data-testid="recap-leaderboard-cta"
+                        >
+                          {t('game.recap.leaderboardCta')}
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Button
+                    className="mt-4 w-full"
+                    onClick={handleRetryCta}
+                    data-testid="completion-retry-cta"
+                  >
+                    {t('game.completion.retryCta')}
+                  </Button>
                 </CardContent>
               </Card>
             ) : (

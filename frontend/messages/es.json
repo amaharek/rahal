@@ -92,13 +92,54 @@
     "hud": {
       "streak": "Racha",
       "hints": "Pistas",
+      "combo": "Combo",
       "efficiency": "Eficiencia",
+      "benchmark": {
+        "label": "vs Optimo",
+        "optimal": "Optimo"
+      },
+      "momentum": {
+        "up": "Sube",
+        "down": "Baja",
+        "steady": "Estable"
+      },
       "efficiencyLevels": {
         "pending": "Pendiente",
         "high": "Alta",
         "medium": "Media",
         "low": "Baja"
       }
+    },
+    "completion": {
+      "gradeLabel": "Nivel",
+      "retryCta": "Reintentar esta ruta ahora (Practica)",
+      "gradeLevels": {
+        "perfect": "Perfecto",
+        "near_optimal": "Casi optimo",
+        "good_discovery": "Buen descubrimiento",
+        "scenic": "Ruta panoramica"
+      }
+    },
+    "narrative": {
+      "start": {
+        "title": "Resumen del Viaje",
+        "body": "Tu ruta comienza de {from} a {to}. Mantén el impulso desde el inicio."
+      },
+      "midpoint": {
+        "title": "Control de Mitad",
+        "body": "Llevas {progress} pasos. El objetivo intermedio es {target} en la ruta de {from} a {to}."
+      },
+      "finish": {
+        "title": "Mision Completada",
+        "body": "Cerraste la ruta en {guesses} intentos. El camino optimo era {shortestPath}."
+      }
+    },
+    "recap": {
+      "title": "Resumen Post-juego",
+      "summary": "{from} a {to} en {guesses} intentos (optimo {shortestPath}).",
+      "retentionHook": "Comparte esta ronda y vuelve mañana para una ruta nueva.",
+      "shareCta": "Compartir Resumen",
+      "leaderboardCta": "Ver Clasificacion"
     }
   },
   "admin": {
