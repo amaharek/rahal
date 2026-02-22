@@ -56,6 +56,13 @@ export function GameMap({
     () => calculateMapView(startCountryCode, endCountryCode, pathCountryCodes),
     [startCountryCode, endCountryCode, pathCountryCodes]
   );
+  const guessedNameByCode = useMemo(
+    () =>
+      new Map(
+        guessedCountryCodes.map((guessedCountry) => [guessedCountry.code, guessedCountry.name])
+      ),
+    [guessedCountryCodes]
+  );
 
   // Internal state for zoom and center (if not controlled externally)
   const [internalZoom, setInternalZoom] = useState(defaultView.zoom);
@@ -222,12 +229,14 @@ export function GameMap({
                 const fillColor = mapColors.colors[countryState];
                 const isHighlighted = countryState !== 'default';
 
-                // Get tooltip text for start/end countries
+                // Keep start/end labels as priority, then fall back to guessed labels.
                 let tooltipText = '';
                 if (alpha3Code === startCountryCode && startCountryName) {
                   tooltipText = startCountryName;
                 } else if (alpha3Code === endCountryCode && endCountryName) {
                   tooltipText = endCountryName;
+                } else {
+                  tooltipText = guessedNameByCode.get(alpha3Code) || '';
                 }
 
                 // Use geo.id or fallback to index for unique key

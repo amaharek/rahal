@@ -177,6 +177,21 @@ test.describe('Map Interaction', () => {
         expect(uniqueNew.length).toBeGreaterThanOrEqual(uniqueInitial.length);
       }
     });
+
+    test('should include guessed country name as map hover title', async ({ page }) => {
+      await gamePage.waitForMap();
+
+      const beforeGuessTitleCount = await page.locator('svg path > title').count();
+
+      await gamePage.submitGuess('الأردن');
+      await page.waitForTimeout(500);
+
+      const guessedTitle = page.locator('svg path > title', { hasText: 'الأردن' });
+      await expect(guessedTitle.first()).toContainText('الأردن');
+
+      const afterGuessTitleCount = await page.locator('svg path > title').count();
+      expect(afterGuessTitleCount).toBeGreaterThan(beforeGuessTitleCount);
+    });
   });
 
   test('should support pan/drag interaction', async ({ page }) => {

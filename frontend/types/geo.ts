@@ -19,6 +19,7 @@ export interface GameMapProps {
   guessedCountryCodes: {
     code: string;
     isOnPath: boolean;
+    name: string;
   }[];
   hintCountryCodes?: string[];
   pathCountryCodes?: string[];

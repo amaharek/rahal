@@ -147,8 +147,9 @@ export function DailyGamePage() {
       guesses.map((guess) => ({
         code: guess.country_code,
         isOnPath: guess.emoji === '🟢' || guess.emoji === '🟡',
+        name: locale === 'ar' ? guess.name_ar : guess.name_en || guess.name_ar,
       })),
-    [guesses]
+    [guesses, locale]
   );
 
   useEffect(() => {
