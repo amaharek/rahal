@@ -19,6 +19,8 @@ interface Country {
 
 interface CountryInputProps {
   onSelect: (country: Country) => void;
+  onFocusStart?: () => void;
+  onCountryCommitted?: (countryCode: string) => void;
   placeholder?: string;
   disabled?: boolean;
   autoFocus?: boolean;
@@ -26,7 +28,9 @@ interface CountryInputProps {
 
 export function CountryInput({
   onSelect,
-  placeholder = '\u0627\u0643\u062A\u0628 \u0627\u0633\u0645 \u0627\u0644\u062F\u0648\u0644\u0629...',
+  onFocusStart,
+  onCountryCommitted,
+  placeholder = 'اكتب اسم الدولة...',
   disabled,
   autoFocus,
 }: CountryInputProps) {
@@ -87,6 +91,7 @@ export function CountryInput({
   };
 
   const handleSelect = (country: Country) => {
+    onCountryCommitted?.(country.code);
     onSelect(country);
     setQuery('');
     setDebouncedQuery('');
@@ -101,25 +106,25 @@ export function CountryInput({
 
   return (
     <div className="relative w-full">
-      <div className="relative">
-        <div className="absolute start-4 top-1/2 -translate-y-1/2 pointer-events-none">
-          <Search className="w-5 h-5 text-text-muted" />
-        </div>
-        <Input
-          ref={inputRef}
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onFocus={() => debouncedQuery.length >= 1 && setIsOpen(true)}
-          onBlur={() => setTimeout(() => setIsOpen(false), 200)}
-          placeholder={placeholder}
-          disabled={disabled}
-          autoFocus={autoFocus}
-          className="text-base ps-12 h-14 rounded-2xl"
-          autoComplete="off"
-          dir="rtl"
-        />
-      </div>
+      <Input
+        ref={inputRef}
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        onKeyDown={handleKeyDown}
+        onFocus={() => {
+          onFocusStart?.();
+          if (debouncedQuery.length >= 1) {
+            setIsOpen(true);
+          }
+        }}
+        onBlur={() => setTimeout(() => setIsOpen(false), 200)}
+        placeholder={placeholder}
+        disabled={disabled}
+        autoFocus={autoFocus}
+        className="text-lg"
+        autoComplete="off"
+        dir={direction}
+      />
 
       {isLoading && (
         <div className="absolute end-4 top-1/2 -translate-y-1/2">

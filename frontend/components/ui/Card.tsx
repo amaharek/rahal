@@ -8,9 +8,10 @@ interface CardProps {
   className?: string;
   hover?: boolean;
   onClick?: () => void;
+  [key: string]: unknown;
 }
 
-export function Card({ children, className, hover, onClick }: CardProps) {
+export function Card({ children, className, hover, onClick, ...props }: CardProps) {
   return (
     <div
       className={cn(
@@ -20,8 +21,7 @@ export function Card({ children, className, hover, onClick }: CardProps) {
         className
       )}
       onClick={onClick}
-      role={onClick ? 'button' : undefined}
-      tabIndex={onClick ? 0 : undefined}
+      {...props}
     >
       {children}
     </div>
@@ -44,9 +44,9 @@ interface CardTitleProps {
 
 export function CardTitle({ children, className }: CardTitleProps) {
   return (
-    <h3 className={cn('text-lg font-bold text-text-primary', className)}>
+    <h2 className={cn('text-xl font-bold text-text-primary', className)}>
       {children}
-    </h3>
+    </h2>
   );
 }
 
@@ -66,10 +66,15 @@ export function CardDescription({ children, className }: CardDescriptionProps) {
 interface CardContentProps {
   children: ReactNode;
   className?: string;
+  [key: string]: unknown;
 }
 
-export function CardContent({ children, className }: CardContentProps) {
-  return <div className={cn('', className)}>{children}</div>;
+export function CardContent({ children, className, ...props }: CardContentProps) {
+  return (
+    <div className={cn('text-text-secondary', className)} {...props}>
+      {children}
+    </div>
+  );
 }
 
 interface CardFooterProps {

@@ -1,4 +1,100 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page, type Route } from '@playwright/test';
+
+async function mockDailyGameRoutes(page: Page) {
+  await page.route('**/api/game/challenge/daily**', async (route: Route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        id: '00000000-0000-0000-0000-000000000900',
+        challenge_date: '2026-02-20',
+        mode: 'shortest',
+        shortest_path: 1,
+        path_country_codes: ['EGY', 'SDN'],
+        start_country: {
+          id: '00000000-0000-0000-0000-000000000010',
+          code: 'EGY',
+          name_ar: 'مصر',
+          name_en: 'Egypt',
+          flag_emoji: '🇪🇬',
+        },
+        end_country: {
+          id: '00000000-0000-0000-0000-000000000011',
+          code: 'SDN',
+          name_ar: 'السودان',
+          name_en: 'Sudan',
+          flag_emoji: '🇸🇩',
+        },
+        user_progress: null,
+      }),
+    });
+  });
+
+  await page.route('**/api/game/stats**', async (route: Route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        games_played: 10,
+        games_won: 7,
+        win_rate: 70,
+        current_streak: 3,
+        max_streak: 5,
+        average_guesses: 4.2,
+        hints_used_total: 2,
+        last_played: '2026-02-19',
+      }),
+    });
+  });
+
+  await page.route('**/api/autocomplete/countries**', async (route: Route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        query: 'sud',
+        suggestions: [
+          {
+            id: '00000000-0000-0000-0000-000000000011',
+            code: 'SDN',
+            name_ar: 'السودان',
+            name_en: 'Sudan',
+            flag_emoji: '🇸🇩',
+            similarity: 1,
+          },
+        ],
+        total: 1,
+      }),
+    });
+  });
+
+  await page.route('**/api/game/guess', async (route: Route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        country: {
+          id: '00000000-0000-0000-0000-000000000011',
+          code: 'SDN',
+          name_ar: 'السودان',
+          name_en: 'Sudan',
+          flag_emoji: '🇸🇩',
+        },
+        score_emoji: '🟢',
+        score_description: 'excellent',
+        is_on_shortest_path: true,
+        is_destination: true,
+        game_complete: true,
+        total_guesses: 1,
+        score: 100,
+        route_mode: 'shortest',
+        gap_from_optimal: 0,
+        quality_tier: 'perfect',
+        quality_explanation_ar: 'مسار ممتاز',
+      }),
+    });
+  });
+}
 
 test.describe('Phase 3 Critical Paths', () => {
   test('leaderboard loads and filter changes API query type', async ({ page }) => {
@@ -146,5 +242,56 @@ test.describe('Phase 3 Critical Paths', () => {
     await expect(page.getByText('Shortest Path: 1 countries')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Guesses (0)' })).toBeVisible();
     await expect(page.getByRole('textbox', { name: 'Enter country name...' })).toBeVisible();
+  });
+
+  test('daily game shows narrative milestone and post-game recap surfaces', async ({ page }) => {
+    await mockDailyGameRoutes(page);
+    await page.addInitScript(() => {
+      (window as any).__rahalTelemetryEvents = [];
+      (navigator as any).share = async () => {};
+      window.addEventListener('rahal:telemetry', (event: Event) => {
+        const customEvent = event as CustomEvent;
+        (window as any).__rahalTelemetryEvents.push(customEvent.detail.eventName);
+      });
+    });
+
+    await page.goto('/en/game?presentation=hybrid');
+    await expect(page.getByTestId('narrative-milestone-card')).toBeVisible();
+
+    await page.getByRole('textbox', { name: 'Enter country name...' }).fill('Sudan');
+    await page.getByRole('option').filter({ hasText: 'Sudan' }).first().click();
+
+    await expect(page.getByTestId('postgame-recap-card')).toBeVisible();
+    await expect(page.getByTestId('share-recap-button')).toBeVisible();
+    await page.getByTestId('share-recap-button').click();
+
+    const eventNames = await page.evaluate(() => (window as any).__rahalTelemetryEvents as string[]);
+    expect(eventNames).toContain('ab_variant_assigned');
+    expect(eventNames).toContain('ab_outcome_completion');
+    expect(eventNames).toContain('recap_share_clicked');
+  });
+
+  test('daily game baseline variant hides milestone and recap surfaces', async ({ page }) => {
+    await mockDailyGameRoutes(page);
+    await page.addInitScript(() => {
+      (window as any).__rahalTelemetryEvents = [];
+      window.addEventListener('rahal:telemetry', (event: Event) => {
+        const customEvent = event as CustomEvent;
+        (window as any).__rahalTelemetryEvents.push(customEvent.detail.eventName);
+      });
+    });
+
+    await page.goto('/en/game?presentation=baseline');
+    await expect(page.getByTestId('narrative-milestone-card')).toHaveCount(0);
+
+    await page.getByRole('textbox', { name: 'Enter country name...' }).fill('Sudan');
+    await page.getByRole('option').filter({ hasText: 'Sudan' }).first().click();
+
+    await expect(page.getByTestId('postgame-recap-card')).toHaveCount(0);
+    await expect(page.getByTestId('share-recap-button')).toHaveCount(0);
+
+    const eventNames = await page.evaluate(() => (window as any).__rahalTelemetryEvents as string[]);
+    expect(eventNames).toContain('ab_variant_assigned');
+    expect(eventNames).not.toContain('recap_card_viewed');
   });
 });

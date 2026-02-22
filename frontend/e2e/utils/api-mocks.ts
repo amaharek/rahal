@@ -7,16 +7,22 @@ import mockCountries from '../fixtures/mock-countries.json';
  */
 export async function setupGameMocks(page: Page) {
   // Mock daily challenge endpoint
-  await page.route('**/api/challenge/daily', async (route: Route) => {
+  await page.route('**/api/game/daily**', async (route: Route) => {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
-      body: JSON.stringify(mockChallenge),
+      body: JSON.stringify({
+        ...mockChallenge,
+        challenge_date: mockChallenge.date,
+        mode: 'shortest',
+        path_country_codes: mockChallenge.optimal_path,
+        user_progress: null,
+      }),
     });
   });
 
   // Mock countries search endpoint
-  await page.route('**/api/countries/search**', async (route: Route) => {
+  await page.route('**/api/autocomplete/countries**', async (route: Route) => {
     const url = new URL(route.request().url());
     const query = url.searchParams.get('q')?.toLowerCase() || '';
 
@@ -29,7 +35,36 @@ export async function setupGameMocks(page: Page) {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
-      body: JSON.stringify(filteredCountries.slice(0, 5)),
+      body: JSON.stringify({
+        query,
+        suggestions: filteredCountries.slice(0, 5).map((country) => ({
+          ...country,
+          similarity: 0.9,
+        })),
+        total: filteredCountries.length,
+      }),
+    });
+  });
+
+  // Mock practice session setup endpoint (used by Phase 2 retry CTA flow)
+  await page.route('**/api/game/practice/session**', async (route: Route) => {
+    const requestBody = JSON.parse(route.request().postData() || '{}');
+    const startCountry = mockCountries.find((country) => country.id === requestBody.start_country_id) || mockCountries[0];
+    const endCountry = mockCountries.find((country) => country.id === requestBody.end_country_id) || mockCountries[1];
+
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        session_id: 'practice-session-1',
+        mode: 'practice',
+        route_mode: requestBody.mode || 'shortest',
+        start_country: startCountry,
+        end_country: endCountry,
+        shortest_path: mockChallenge.shortest_path,
+        path_country_codes: mockChallenge.optimal_path,
+        user_progress: null,
+      }),
     });
   });
 }
@@ -46,7 +81,7 @@ export async function setupGuessMock(
 ) {
   const { scoreEmoji = '🟡', gameComplete = false } = options || {};
 
-  await page.route('**/api/guess', async (route: Route) => {
+  await page.route('**/api/game/guess', async (route: Route) => {
     const requestBody = JSON.parse(route.request().postData() || '{}');
     const countryId = requestBody.country_id;
 
@@ -58,8 +93,16 @@ export async function setupGuessMock(
       body: JSON.stringify({
         country: country || mockCountries[0],
         score_emoji: scoreEmoji,
+        score_description: 'mock',
+        is_on_shortest_path: scoreEmoji === '🟢' || scoreEmoji === '🟡',
+        is_destination: gameComplete,
         game_complete: gameComplete,
         total_guesses: 1,
+        score: gameComplete ? 100 : null,
+        route_mode: 'shortest',
+        gap_from_optimal: null,
+        quality_tier: gameComplete ? 'perfect' : null,
+        quality_explanation_ar: gameComplete ? 'مسار ممتاز' : null,
       }),
     });
   });
@@ -72,7 +115,7 @@ export async function setupDynamicGuessMock(page: Page) {
   let guessCount = 0;
   const optimalPath = mockChallenge.optimal_path;
 
-  await page.route('**/api/guess', async (route: Route) => {
+  await page.route('**/api/game/guess', async (route: Route) => {
     const requestBody = JSON.parse(route.request().postData() || '{}');
     const countryId = requestBody.country_id;
     const country = mockCountries.find((c) => c.id === countryId);
@@ -103,8 +146,16 @@ export async function setupDynamicGuessMock(page: Page) {
       body: JSON.stringify({
         country: country || mockCountries[0],
         score_emoji: isComplete ? '🟢' : scoreEmoji,
+        score_description: 'mock',
+        is_on_shortest_path: Boolean(countryCode && optimalPath.includes(countryCode)),
+        is_destination: isComplete,
         game_complete: isComplete,
         total_guesses: guessCount,
+        score: isComplete ? 100 : null,
+        route_mode: 'shortest',
+        gap_from_optimal: null,
+        quality_tier: isComplete ? 'perfect' : null,
+        quality_explanation_ar: isComplete ? 'مسار ممتاز' : null,
       }),
     });
   });
@@ -114,7 +165,7 @@ export async function setupDynamicGuessMock(page: Page) {
  * Sets up API error mock
  */
 export async function setupApiErrorMock(page: Page, endpoint: string, statusCode = 500) {
-  await page.route(`**${endpoint}`, async (route: Route) => {
+  await page.route(`**${endpoint}**`, async (route: Route) => {
     await route.fulfill({
       status: statusCode,
       contentType: 'application/json',

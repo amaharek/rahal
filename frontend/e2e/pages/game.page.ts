@@ -17,6 +17,10 @@ export class GamePage {
   readonly endCountryFlag: Locator;
   readonly endCountryName: Locator;
   readonly shortestPathInfo: Locator;
+  readonly hud: Locator;
+  readonly hudCombo: Locator;
+  readonly hudBenchmark: Locator;
+  readonly hudMomentum: Locator;
 
   // Map elements
   readonly mapContainer: Locator;
@@ -42,6 +46,8 @@ export class GamePage {
   readonly completionCard: Locator;
   readonly scoreDisplay: Locator;
   readonly shareButton: Locator;
+  readonly completionGrade: Locator;
+  readonly retryCta: Locator;
 
   // Loading/Error states
   readonly loadingSpinner: Locator;
@@ -56,41 +62,47 @@ export class GamePage {
     this.pageTitle = page.locator('h1');
 
     // Challenge card
-    this.startCountryFlag = page.locator('[class*="text-3xl"]').first();
-    this.startCountryName = page.locator('[class*="font-bold"]').first();
-    this.endCountryFlag = page.locator('[class*="text-3xl"]').last();
-    this.endCountryName = page.locator('[class*="font-bold"]').nth(1);
+    this.startCountryFlag = page.locator('[data-testid="game-challenge-card"] [class*="text-2xl"]').first();
+    this.startCountryName = page.locator('[data-testid="game-challenge-card"] [class*="font-bold"]').first();
+    this.endCountryFlag = page.locator('[data-testid="game-challenge-card"] [class*="text-2xl"]').last();
+    this.endCountryName = page.locator('[data-testid="game-challenge-card"] [class*="font-bold"]').nth(1);
     this.shortestPathInfo = page.locator('text=/أقصر.*مسار/i');
+    this.hud = page.locator('[data-testid="game-hud"]');
+    this.hudCombo = page.locator('[data-testid="hud-combo"]');
+    this.hudBenchmark = page.locator('[data-testid="hud-benchmark"]');
+    this.hudMomentum = page.locator('[data-testid="hud-momentum-indicator"]');
 
     // Map
-    this.mapContainer = page.locator('[class*="aspect-[16/10]"]');
-    this.mapToggleButton = page.locator('button:has-text("الخريطة")');
-    this.zoomInButton = page.locator('button').filter({ has: page.locator('[class*="Plus"]') });
-    this.zoomOutButton = page.locator('button').filter({ has: page.locator('[class*="Minus"]') });
-    this.resetViewButton = page.locator('button').filter({ has: page.locator('[class*="RotateCcw"]') });
+    this.mapContainer = page.locator('[data-testid="game-map"]');
+    this.mapToggleButton = page.locator('[data-testid="game-action-dock"]:visible button').first();
+    this.zoomInButton = page.getByRole('button', { name: /zoom in/i });
+    this.zoomOutButton = page.getByRole('button', { name: /zoom out/i });
+    this.resetViewButton = page.getByRole('button', { name: /reset view/i });
 
     // Input
-    this.countryInput = page.locator('input[type="text"]');
+    this.countryInput = page.locator('[data-testid="game-action-dock"]:visible input[type="text"]').first();
     this.autocompleteDropdown = page.locator('[role="listbox"], [class*="dropdown"], [class*="suggestions"]');
 
     // Guesses
-    this.guessesCard = page.locator('section, div').filter({ hasText: /التخمينات/ });
+    this.guessesCard = page.locator('[data-testid="game-guess-list"]');
     this.guessItems = page.locator('[class*="bg-gray-50"][class*="rounded-lg"]');
     this.noGuessesMessage = page.locator('text=/لم تقم بأي تخمين/');
 
     // Hints
-    this.hintsCard = page.locator('section, div').filter({ hasText: /تلميحات/ });
-    this.hintButtons = page.locator('button').filter({ hasText: /حدود|الحرف الأول/ });
+    this.hintsCard = page.locator('text=/تلميحات|Hints|Pistas/');
+    this.hintButtons = page.locator('[data-testid="game-hint-button"]');
 
     // Completion
-    this.completionCard = page.locator('[class*="bg-success"]');
-    this.scoreDisplay = page.locator('text=/النقاط/');
+    this.completionCard = page.locator('[data-testid="game-completion-card"]');
+    this.scoreDisplay = page.locator('text=/النتيجة|score|puntuación/i');
     this.shareButton = page.locator('button:has-text("مشاركة")');
+    this.completionGrade = page.locator('[data-testid="completion-grade"]');
+    this.retryCta = page.locator('[data-testid="completion-retry-cta"]');
 
     // States
     this.loadingSpinner = page.locator('[class*="animate-spin"]');
     this.errorMessage = page.locator('[class*="text-error"]');
-    this.retryButton = page.locator('button:has-text("إعادة المحاولة")');
+    this.retryButton = page.locator('button:has-text("إعادة المحاولة"), button:has-text("Retry")');
   }
 
   /**

@@ -2,16 +2,6 @@ import { test, expect } from '@playwright/test';
 import { GamePage } from '../pages/game.page';
 import { setupGameMocks, setupDynamicGuessMock } from '../utils/api-mocks';
 
-// Map color constants (matching the application)
-const MAP_COLORS = {
-  start: '#0D7377', // teal
-  end: '#D4A574', // tan
-  guessedOnPath: '#22C55E', // green
-  guessedOffPath: '#9CA3AF', // gray
-  hint: '#FDE68A', // yellow
-  default: '#E5E7EB', // light gray
-};
-
 test.describe('Map Interaction', () => {
   let gamePage: GamePage;
 
@@ -43,13 +33,9 @@ test.describe('Map Interaction', () => {
   test('should display map controls', async ({ page }) => {
     await gamePage.waitForMap();
 
-    // Verify zoom controls are present
-    const zoomControls = page.locator('button').filter({
-      has: page.locator('[class*="Plus"], [class*="Minus"], [class*="Rotate"]'),
-    });
-
-    const controlCount = await zoomControls.count();
-    expect(controlCount).toBeGreaterThanOrEqual(2); // At least zoom in and zoom out
+    await expect(page.getByRole('button', { name: /zoom in/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /zoom out/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /reset view/i })).toBeVisible();
   });
 
   test('should zoom in on button click', async ({ page }) => {
@@ -125,38 +111,18 @@ test.describe('Map Interaction', () => {
   test.describe('Mobile Map Toggle', () => {
     test.use({ viewport: { width: 375, height: 667 } }); // iPhone SE
 
-    test('should show map toggle button on mobile', async ({ page }) => {
+    test('should show action dock on mobile', async ({ page }) => {
       await gamePage.waitForLoad();
 
-      // Toggle button should be visible on mobile
-      const toggleButton = page.locator('button').filter({
-        hasText: /الخريطة|إظهار|إخفاء/,
-      });
-
-      await expect(toggleButton.first()).toBeVisible();
+      const actionDock = page.locator('[data-testid="game-action-dock"]:visible').first();
+      await expect(actionDock).toBeVisible();
     });
 
-    test('should toggle map visibility on mobile', async ({ page }) => {
+    test('should keep map visible on mobile', async ({ page }) => {
       await gamePage.waitForLoad();
 
-      const toggleButton = page.locator('button').filter({
-        hasText: /الخريطة|إظهار|إخفاء/,
-      });
-
-      // Get initial map visibility
-      const mapSection = page.locator('[class*="aspect-[16/10]"]');
-      const initiallyHidden = await mapSection.isHidden().catch(() => true);
-
-      // Toggle
-      await toggleButton.first().click();
-      await page.waitForTimeout(300);
-
-      // State should have changed
-      const afterToggle = await mapSection.isHidden().catch(() => true);
-
-      // If map was hidden, it should now be visible (or vice versa)
-      // The behavior depends on initial state
-      expect(initiallyHidden !== afterToggle || true).toBe(true);
+      const mapSection = page.locator('[data-testid="game-map"]');
+      await expect(mapSection).toBeVisible();
     });
   });
 
@@ -210,6 +176,46 @@ test.describe('Map Interaction', () => {
         // Either we have new colors or the distribution changed
         expect(uniqueNew.length).toBeGreaterThanOrEqual(uniqueInitial.length);
       }
+    });
+
+    test('should show visible guessed-country tooltip on hover', async ({ page }) => {
+      await gamePage.waitForMap();
+
+      await gamePage.submitGuess('الأردن');
+      await page.waitForTimeout(500);
+
+      const hoverTriggered = await page.evaluate(() => {
+        const title = Array.from(document.querySelectorAll('svg path > title')).find((el) =>
+          el.textContent?.includes('الأردن')
+        );
+
+        if (!title || !title.parentElement) {
+          return false;
+        }
+
+        const path = title.parentElement as SVGPathElement;
+        path.dispatchEvent(
+          new MouseEvent('mouseenter', {
+            bubbles: true,
+            clientX: 220,
+            clientY: 220,
+          })
+        );
+        path.dispatchEvent(
+          new MouseEvent('mousemove', {
+            bubbles: true,
+            clientX: 220,
+            clientY: 220,
+          })
+        );
+        return true;
+      });
+
+      expect(hoverTriggered).toBeTruthy();
+
+      const tooltip = page.getByTestId('map-country-tooltip');
+      await expect(tooltip).toBeVisible();
+      await expect(tooltip).toContainText('الأردن');
     });
   });
 

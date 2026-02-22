@@ -93,6 +93,10 @@ yarn-error.log*
 # ===========================================
 coverage/
 .nyc_output/
+playwright-report/
+test-results/
+frontend/playwright-report/
+frontend/test-results/
 
 # ===========================================
 # Build outputs
