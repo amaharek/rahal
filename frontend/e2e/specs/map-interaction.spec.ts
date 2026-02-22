@@ -178,19 +178,44 @@ test.describe('Map Interaction', () => {
       }
     });
 
-    test('should include guessed country name as map hover title', async ({ page }) => {
+    test('should show visible guessed-country tooltip on hover', async ({ page }) => {
       await gamePage.waitForMap();
-
-      const beforeGuessTitleCount = await page.locator('svg path > title').count();
 
       await gamePage.submitGuess('الأردن');
       await page.waitForTimeout(500);
 
-      const guessedTitle = page.locator('svg path > title', { hasText: 'الأردن' });
-      await expect(guessedTitle.first()).toContainText('الأردن');
+      const hoverTriggered = await page.evaluate(() => {
+        const title = Array.from(document.querySelectorAll('svg path > title')).find((el) =>
+          el.textContent?.includes('الأردن')
+        );
 
-      const afterGuessTitleCount = await page.locator('svg path > title').count();
-      expect(afterGuessTitleCount).toBeGreaterThan(beforeGuessTitleCount);
+        if (!title || !title.parentElement) {
+          return false;
+        }
+
+        const path = title.parentElement as SVGPathElement;
+        path.dispatchEvent(
+          new MouseEvent('mouseenter', {
+            bubbles: true,
+            clientX: 220,
+            clientY: 220,
+          })
+        );
+        path.dispatchEvent(
+          new MouseEvent('mousemove', {
+            bubbles: true,
+            clientX: 220,
+            clientY: 220,
+          })
+        );
+        return true;
+      });
+
+      expect(hoverTriggered).toBeTruthy();
+
+      const tooltip = page.getByTestId('map-country-tooltip');
+      await expect(tooltip).toBeVisible();
+      await expect(tooltip).toContainText('الأردن');
     });
   });
 

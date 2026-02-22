@@ -1,6 +1,14 @@
 'use client';
 
-import { useState, useCallback, useMemo, useEffect, startTransition } from 'react';
+import {
+  useState,
+  useCallback,
+  useMemo,
+  useEffect,
+  useRef,
+  startTransition,
+  type MouseEvent,
+} from 'react';
 import {
   ComposableMap,
   Geographies,
@@ -33,6 +41,11 @@ const fetchTopoJSON = async () => {
 const MIN_ZOOM = 1;
 const MAX_ZOOM = 8;
 const ZOOM_STEP = 0.5;
+const TOOLTIP_MAX_WIDTH = 220;
+const TOOLTIP_HEIGHT = 36;
+const TOOLTIP_MARGIN = 8;
+const TOOLTIP_CURSOR_OFFSET_X = 12;
+const TOOLTIP_CURSOR_OFFSET_Y = 16;
 
 export function GameMap({
   startCountryCode,
@@ -71,6 +84,12 @@ export function GameMap({
   const [topoData, setTopoData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
+  const [hoverTooltip, setHoverTooltip] = useState<{
+    text: string;
+    x: number;
+    y: number;
+  } | null>(null);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
 
   // Fetch TopoJSON on mount
   useEffect(() => {
@@ -137,6 +156,83 @@ export function GameMap({
     [onCenterChange, onZoomChange]
   );
 
+  const getTooltipText = useCallback(
+    (countryCode: string): string => {
+      if (countryCode === startCountryCode && startCountryName) {
+        return startCountryName;
+      }
+      if (countryCode === endCountryCode && endCountryName) {
+        return endCountryName;
+      }
+      return guessedNameByCode.get(countryCode) || '';
+    },
+    [
+      startCountryCode,
+      startCountryName,
+      endCountryCode,
+      endCountryName,
+      guessedNameByCode,
+    ]
+  );
+
+  const updateTooltipPosition = useCallback(
+    (clientX: number, clientY: number, text: string) => {
+      const rect = mapContainerRef.current?.getBoundingClientRect();
+      if (!rect) {
+        return;
+      }
+
+      const maxX = Math.max(
+        TOOLTIP_MARGIN,
+        rect.width - TOOLTIP_MAX_WIDTH - TOOLTIP_MARGIN
+      );
+      const maxY = Math.max(
+        TOOLTIP_MARGIN,
+        rect.height - TOOLTIP_HEIGHT - TOOLTIP_MARGIN
+      );
+
+      const x = Math.min(
+        Math.max(TOOLTIP_MARGIN, clientX - rect.left + TOOLTIP_CURSOR_OFFSET_X),
+        maxX
+      );
+      const y = Math.min(
+        Math.max(TOOLTIP_MARGIN, clientY - rect.top - TOOLTIP_CURSOR_OFFSET_Y),
+        maxY
+      );
+
+      setHoverTooltip({ text, x, y });
+    },
+    []
+  );
+
+  const handleGeographyMouseEnter = useCallback(
+    (event: MouseEvent<SVGPathElement>, countryCode: string) => {
+      const tooltipText = getTooltipText(countryCode);
+      if (!tooltipText) {
+        setHoverTooltip(null);
+        return;
+      }
+      updateTooltipPosition(event.clientX, event.clientY, tooltipText);
+    },
+    [getTooltipText, updateTooltipPosition]
+  );
+
+  const handleGeographyMouseMove = useCallback(
+    (event: MouseEvent<SVGPathElement>, countryCode: string) => {
+      const tooltipText = getTooltipText(countryCode);
+      if (!tooltipText) {
+        setHoverTooltip(null);
+        return;
+      }
+      updateTooltipPosition(event.clientX, event.clientY, tooltipText);
+    },
+    [getTooltipText, updateTooltipPosition]
+  );
+
+  const handleGeographyMouseLeave = useCallback(() => {
+    setHoverTooltip(null);
+  }, []);
+
   if (isLoading) {
     return (
       <div
@@ -189,6 +285,7 @@ export function GameMap({
 
   return (
     <div
+      ref={mapContainerRef}
       className={cn(
         'relative w-full aspect-[16/10] rounded-lg overflow-hidden border border-border',
         className
@@ -229,15 +326,7 @@ export function GameMap({
                 const fillColor = mapColors.colors[countryState];
                 const isHighlighted = countryState !== 'default';
 
-                // Keep start/end labels as priority, then fall back to guessed labels.
-                let tooltipText = '';
-                if (alpha3Code === startCountryCode && startCountryName) {
-                  tooltipText = startCountryName;
-                } else if (alpha3Code === endCountryCode && endCountryName) {
-                  tooltipText = endCountryName;
-                } else {
-                  tooltipText = guessedNameByCode.get(alpha3Code) || '';
-                }
+                const tooltipText = getTooltipText(alpha3Code);
 
                 // Use geo.id or fallback to index for unique key
                 const geoKey =
@@ -250,6 +339,13 @@ export function GameMap({
                     fill={fillColor}
                     stroke={mapColors.borderColor}
                     strokeWidth={0.5}
+                    onMouseEnter={(event) =>
+                      handleGeographyMouseEnter(event, alpha3Code)
+                    }
+                    onMouseMove={(event) =>
+                      handleGeographyMouseMove(event, alpha3Code)
+                    }
+                    onMouseLeave={handleGeographyMouseLeave}
                     style={{
                       default: {
                         outline: 'none',
@@ -273,6 +369,20 @@ export function GameMap({
           </Geographies>
         </ZoomableGroup>
       </ComposableMap>
+
+      {hoverTooltip && (
+        <div
+          data-testid="map-country-tooltip"
+          className="pointer-events-none absolute z-20 rounded-md bg-black/80 px-2.5 py-1.5 text-xs font-medium text-white shadow-md"
+          style={{
+            left: `${hoverTooltip.x}px`,
+            top: `${hoverTooltip.y}px`,
+            maxWidth: `${TOOLTIP_MAX_WIDTH}px`,
+          }}
+        >
+          {hoverTooltip.text}
+        </div>
+      )}
 
       <MapControls
         onZoomIn={handleZoomIn}
