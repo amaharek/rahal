@@ -36,7 +36,14 @@
     "yourStats": "إحصائياتك",
     "currentStreak": "السلسلة الحالية",
     "gamesPlayed": "الألعاب",
-    "accuracy": "الدقة"
+    "accuracy": "الدقة",
+    "howToPlay": "كيف تلعب؟",
+    "step1Title": "اختر التحدي اليومي أو الاختبار السريع",
+    "step1Description": "تحديات جديدة كل يوم",
+    "step2Title": "اكتشف الطريق بين الدول",
+    "step2Description": "خمّن الدول المتجاورة للوصول إلى الهدف",
+    "step3Title": "شارك نتيجتك وتنافس مع أصدقائك",
+    "step3Description": "حافظ على سلسلة انتصاراتك"
   },
   "game": {
     "title": "مسار الرحالة",

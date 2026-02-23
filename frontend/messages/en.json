@@ -36,7 +36,14 @@
     "yourStats": "Your Stats",
     "currentStreak": "Current Streak",
     "gamesPlayed": "Games",
-    "accuracy": "Accuracy"
+    "accuracy": "Accuracy",
+    "howToPlay": "How to Play?",
+    "step1Title": "Choose Daily Challenge or Quick Quiz",
+    "step1Description": "New challenges every day",
+    "step2Title": "Discover the path between countries",
+    "step2Description": "Guess neighboring countries to reach the goal",
+    "step3Title": "Share your score and compete with friends",
+    "step3Description": "Keep your winning streak"
   },
   "game": {
     "title": "Path Game",
