@@ -125,7 +125,36 @@ export const scoring = {
   optimalBonus: 200,
 } as const;
 
+// ─── Spacing extensions ───────────────────────────────────────────────────────
+
+export const spacing = {
+  '18': '4.5rem',
+  '22': '5.5rem',
+} as const;
+
+// ─── Animation durations ──────────────────────────────────────────────────────
+
+export const animation = {
+  fast: '150ms',
+  normal: '300ms',
+  slow: '600ms',
+} as const;
+
+// ─── Blur ─────────────────────────────────────────────────────────────────────
+
+export const blur = {
+  hud: 'blur(12px)',  // glassmorphism HUD
+} as const;
+
+// ─── Overlay ─────────────────────────────────────────────────────────────────
+
+export const overlay = {
+  dark: 'rgba(0,0,0,0.7)',
+} as const;
+
 // ─── Type exports ─────────────────────────────────────────────────────────────
 
 export type ColorToken = keyof typeof colors;
 export type ThemeToken = keyof typeof lightTheme;
+export type AnimationToken = keyof typeof animation;
+export type BlurToken = keyof typeof blur;

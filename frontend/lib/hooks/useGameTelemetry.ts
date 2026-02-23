@@ -55,11 +55,11 @@ export interface UseGameTelemetryActions {
     previousCombo: number;
     nextCombo: number;
     momentum: ComboMomentum;
-    transition: string;
+    transition: 'increase' | 'reset' | 'no_change';
     scoreEmoji: ScoreEmoji;
   }) => void;
   trackShare: (method: 'native' | 'clipboard') => void;
-  trackRetry: (destination: string) => void;
+  trackRetry: (destination: 'practice') => void;
 }
 
 export function useGameTelemetry(params: UseGameTelemetryParams): UseGameTelemetryActions {
@@ -204,7 +204,7 @@ export function useGameTelemetry(params: UseGameTelemetryParams): UseGameTelemet
     previousCombo: number;
     nextCombo: number;
     momentum: ComboMomentum;
-    transition: string;
+    transition: 'increase' | 'reset' | 'no_change';
     scoreEmoji: ScoreEmoji;
   }) => {
     if (!challengeId || comboParams.transition === 'no_change') return;
@@ -220,7 +220,7 @@ export function useGameTelemetry(params: UseGameTelemetryParams): UseGameTelemet
     trackPostgameRecapShared({ challengeId, mode: routeMode, shareMethod: method });
   };
 
-  const trackRetry = (destination: string) => {
+  const trackRetry = (destination: 'practice') => {
     if (!challengeId) return;
     trackRetryCtaClicked({ challengeId, mode: routeMode, destination });
   };

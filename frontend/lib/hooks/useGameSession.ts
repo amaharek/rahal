@@ -15,6 +15,7 @@ import { buildShareRecapText, getExperimentIdentity, resolvePresentationVariant 
 import type {
   ComboMomentum,
   Country,
+  DailyChallenge,
   GamePresentationVariant,
   GuessEntry,
   HintResponse,
@@ -27,13 +28,13 @@ export interface ComboTransition {
   previousCombo: number;
   nextCombo: number;
   momentum: ComboMomentum;
-  transition: string;
+  transition: 'increase' | 'reset' | 'no_change';
   scoreEmoji: ScoreEmoji;
 }
 
 export interface UseGameSessionReturn {
   // Challenge data
-  challenge: ReturnType<typeof useGameStore>['challenge'] | null;
+  challenge: DailyChallenge | null;
   guesses: GuessEntry[];
   hintsUsed: number;
   isCompleted: boolean;

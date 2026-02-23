@@ -1,5 +1,7 @@
-/** @type {import('tailwindcss').Config} */
-module.exports = {
+import type { Config } from 'tailwindcss';
+import { radius, shadows, spacing } from './lib/design/tokens';
+
+const config: Config = {
   darkMode: 'class',
   content: [
     './app/**/*.{js,ts,jsx,tsx,mdx}',
@@ -13,6 +15,8 @@ module.exports = {
         mono: ['IBM Plex Mono', 'monospace'],
       },
       colors: {
+        // Colors use CSS custom properties for runtime dark/light mode theming.
+        // Actual values live in globals.css; hex references are in lib/design/tokens.ts.
         primary: {
           DEFAULT: 'var(--color-primary)',
           light: 'var(--color-primary-light)',
@@ -49,24 +53,20 @@ module.exports = {
         'text-secondary': 'var(--color-text-secondary)',
         'text-muted': 'var(--color-text-muted)',
       },
-      borderRadius: {
-        'xl': '1.25rem',
-        '2xl': '1.5rem',
-      },
-      spacing: {
-        '18': '4.5rem',
-        '22': '5.5rem',
-      },
+      borderRadius: radius,
+      spacing,
       boxShadow: {
-        'xs': 'var(--shadow-xs)',
-        'sm': 'var(--shadow-sm)',
-        'md': 'var(--shadow-md)',
-        'lg': 'var(--shadow-lg)',
-        'xl': 'var(--shadow-xl)',
+        xs: shadows.xs,
+        sm: shadows.sm,
+        md: shadows.md,
+        lg: shadows.lg,
+        xl: shadows.xl,
       },
     },
   },
   plugins: [
     require('tailwindcss-rtl'),
   ],
-}
+};
+
+export default config;
