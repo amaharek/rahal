@@ -21,45 +21,47 @@ describe('deriveEfficiencyBucket', () => {
 });
 
 describe('GameHUD', () => {
-  it('renders streak, hints, and efficiency indicator', () => {
-    const localeLabel = (key: string) => key;
-
+  it('renders streak, guess count, and combo', () => {
     render(
       <GameHUD
         streak={7}
-        hintsRemaining={2}
-        efficiency="medium"
-        combo={3}
+        guessCount={3}
+        combo={2}
         momentum="up"
-        benchmarkDelta={1}
-        localeLabel={localeLabel}
       />
     );
 
     expect(screen.getByTestId('game-hud')).toBeInTheDocument();
     expect(screen.getByTestId('hud-streak')).toHaveTextContent('7');
-    expect(screen.getByTestId('hud-hints-remaining')).toHaveTextContent('2');
-    expect(screen.getByTestId('hud-combo')).toHaveTextContent('x3');
-    expect(screen.getByTestId('hud-efficiency-indicator')).toHaveTextContent('game.hud.efficiencyLevels.medium');
-    expect(screen.getByTestId('hud-benchmark')).toHaveTextContent('+1');
-    expect(screen.getByTestId('hud-momentum-indicator')).toHaveTextContent('game.hud.momentum.up');
+    expect(screen.getByTestId('hud-guess-count')).toHaveTextContent('3');
+    expect(screen.getByTestId('hud-combo')).toHaveTextContent('x2');
+    expect(screen.getByTestId('hud-combo')).toHaveTextContent('↗');
   });
 
   it('renders fallback streak value when not available', () => {
-    const localeLabel = (key: string) => key;
-
     render(
       <GameHUD
         streak={null}
-        hintsRemaining={3}
-        efficiency="pending"
+        guessCount={0}
         combo={0}
         momentum="steady"
-        benchmarkDelta={0}
-        localeLabel={localeLabel}
       />
     );
 
     expect(screen.getByTestId('hud-streak')).toHaveTextContent('--');
+    expect(screen.getByTestId('hud-combo')).toHaveTextContent('→');
+  });
+
+  it('shows down momentum glyph', () => {
+    render(
+      <GameHUD
+        streak={3}
+        guessCount={5}
+        combo={1}
+        momentum="down"
+      />
+    );
+
+    expect(screen.getByTestId('hud-combo')).toHaveTextContent('↘');
   });
 });

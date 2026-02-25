@@ -11,7 +11,7 @@ import {
   computeComboState,
   computeEfficiencyBenchmark,
 } from '@/lib/game/progression';
-import { buildShareRecapText, getExperimentIdentity, resolvePresentationVariant } from '@/lib/game/phase3';
+import { buildShareCard, computeChallengeNumber, getExperimentIdentity, resolvePresentationVariant } from '@/lib/game/phase3';
 import type {
   ComboMomentum,
   Country,
@@ -251,15 +251,15 @@ export function useGameSession(presentationOverride?: string | null): UseGameSes
   const handleShareRecap = async () => {
     if (!challenge || !isCompleted) return;
 
-    const shareText = buildShareRecapText({
+    const shareText = buildShareCard({
       locale,
-      startCountry: getCountryNameByLocale(challenge.start_country),
-      endCountry: getCountryNameByLocale(challenge.end_country),
-      guessesCount: guesses.length,
+      challengeNumber: computeChallengeNumber(challenge.challenge_date),
+      startFlagEmoji: challenge.start_country.flag_emoji ?? '',
+      endFlagEmoji: challenge.end_country.flag_emoji ?? '',
+      guesses,
       shortestPath: challenge.shortest_path,
       score,
-      qualityTier,
-      efficiency: benchmark.bucket,
+      isCompleted,
     });
 
     try {

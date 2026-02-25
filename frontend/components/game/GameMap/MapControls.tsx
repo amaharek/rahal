@@ -14,7 +14,7 @@ export function MapControls({
   return (
     <div
       className={cn(
-        'absolute bottom-4 left-4 flex flex-col gap-2 z-10',
+        'absolute bottom-4 left-4 flex flex-col gap-2 z-[1000]',
         className
       )}
     >

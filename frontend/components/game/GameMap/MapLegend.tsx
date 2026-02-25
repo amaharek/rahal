@@ -20,7 +20,7 @@ export function MapLegend({ className }: MapLegendProps) {
   return (
     <div
       className={cn(
-        'absolute top-4 right-4 bg-surface/90 backdrop-blur-sm rounded-lg p-2 shadow-md z-10 border border-border',
+        'absolute top-4 right-4 bg-surface/90 backdrop-blur-sm rounded-lg p-2 shadow-md z-[1000] border border-border',
         className
       )}
     >

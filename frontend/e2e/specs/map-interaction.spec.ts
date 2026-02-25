@@ -135,7 +135,7 @@ test.describe('Map Interaction', () => {
 
       // Check that we have paths with different fill colors
       const fills = await paths.evaluateAll((elements) =>
-        elements.map((el) => el.getAttribute('fill')).filter(Boolean)
+        elements.map((el) => (el as HTMLElement).style.fill || el.getAttribute('fill')).filter(Boolean)
       );
 
       const uniqueFills = [...new Set(fills)];
@@ -150,7 +150,7 @@ test.describe('Map Interaction', () => {
       // Get initial path fills
       const getPathFills = async () => {
         return await page.locator('svg path').evaluateAll((elements) =>
-          elements.map((el) => el.getAttribute('fill')).filter(Boolean)
+          elements.map((el) => (el as HTMLElement).style.fill || el.getAttribute('fill')).filter(Boolean)
         );
       };
 
@@ -185,30 +185,27 @@ test.describe('Map Interaction', () => {
       await page.waitForTimeout(500);
 
       const hoverTriggered = await page.evaluate(() => {
+        // Legacy impl: find SVG path with embedded <title> matching the country
         const title = Array.from(document.querySelectorAll('svg path > title')).find((el) =>
           el.textContent?.includes('الأردن')
         );
 
-        if (!title || !title.parentElement) {
-          return false;
+        if (title && title.parentElement) {
+          const path = title.parentElement as unknown as SVGPathElement;
+          path.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true, clientX: 220, clientY: 220 }));
+          path.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: 220, clientY: 220 }));
+          return true;
         }
 
-        const path = title.parentElement as SVGPathElement;
-        path.dispatchEvent(
-          new MouseEvent('mouseenter', {
-            bubbles: true,
-            clientX: 220,
-            clientY: 220,
-          })
-        );
-        path.dispatchEvent(
-          new MouseEvent('mousemove', {
-            bubbles: true,
-            clientX: 220,
-            clientY: 220,
-          })
-        );
-        return true;
+        // Leaflet impl: find path by data-country-code attribute set during onEachFeature
+        const jorPath = document.querySelector('[data-country-code="JOR"]');
+        if (jorPath) {
+          jorPath.dispatchEvent(new MouseEvent('mouseover', { bubbles: true, clientX: 220, clientY: 220 }));
+          jorPath.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: 220, clientY: 220 }));
+          return true;
+        }
+
+        return false;
       });
 
       expect(hoverTriggered).toBeTruthy();
@@ -238,5 +235,50 @@ test.describe('Map Interaction', () => {
       // Map should still be functional
       await expect(mapContainer).toBeVisible();
     }
+  });
+});
+
+test.describe('Leaflet Map Seam Regression', () => {
+  test.beforeEach(async ({ page }) => {
+    await setupGameMocks(page);
+    await setupDynamicGuessMock(page);
+    await page.goto('/ar/game?map=leaflet');
+    await page.waitForSelector('[data-testid="game-map"]', { state: 'visible', timeout: 10000 });
+    await page.waitForSelector('[data-country-code]', { state: 'visible', timeout: 10000 });
+  });
+
+  test('renders countries fill without direct stroke and uses separate border mesh layer', async ({
+    page,
+  }) => {
+    const fillPane = page.locator('.leaflet-countries-fill-pane [data-country-code]');
+    const borderPane = page.locator('.leaflet-country-borders-pane path');
+
+    await expect(fillPane.first()).toBeVisible();
+    await expect(borderPane.first()).toBeVisible();
+
+    const stats = await page.evaluate(() => {
+      const fillPaths = Array.from(
+        document.querySelectorAll<SVGPathElement>('.leaflet-countries-fill-pane [data-country-code]')
+      );
+      const borderPaths = Array.from(
+        document.querySelectorAll<SVGPathElement>('.leaflet-country-borders-pane path')
+      );
+
+      const strokedFillCount = fillPaths.filter((path) => {
+        const stroke = path.getAttribute('stroke');
+        const strokeWidth = path.getAttribute('stroke-width');
+        return stroke !== null && stroke !== 'none' && strokeWidth !== '0';
+      }).length;
+
+      return {
+        fillCount: fillPaths.length,
+        borderCount: borderPaths.length,
+        strokedFillCount,
+      };
+    });
+
+    expect(stats.fillCount).toBeGreaterThan(120);
+    expect(stats.borderCount).toBeGreaterThan(0);
+    expect(stats.strokedFillCount).toBe(0);
   });
 });

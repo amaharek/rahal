@@ -25,7 +25,7 @@ const LIGHT_MAP_COLORS: Record<CountryState, string> = {
 
 // Dark mode: Vibrant, saturated colors that "glow" against dark backgrounds
 const DARK_MAP_COLORS: Record<CountryState, string> = {
-  default: '#243244',
+  default: '#2C3E52',
   'guessed-on-path': '#34D399',
   'guessed-off-path': '#94A3B8',
   start: '#3BC6CF',
@@ -91,15 +91,15 @@ export function useMapColors(): MapColorPalette {
       oceanBg: isDark ? '#0A1B2D' : '#A7C8E5',
       borderColor: isDark
         ? prefersHighContrast
-          ? 'rgba(148, 163, 184, 0.75)'
-          : 'rgba(74, 85, 104, 0.6)'
+          ? 'rgba(203, 213, 225, 0.85)'
+          : 'rgba(148, 163, 184, 0.55)'
         : prefersHighContrast
           ? 'rgba(15, 23, 42, 0.55)'
           : 'rgba(30, 41, 59, 0.42)',
       hoverDefault: isDark
         ? prefersHighContrast
-          ? '#475569'
-          : '#374151'
+          ? '#4A6FA5'
+          : '#2E5480'
         : prefersHighContrast
           ? '#D2DEC9'
           : '#C8D7C4',

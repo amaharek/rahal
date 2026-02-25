@@ -1,4 +1,5 @@
 const createNextIntlPlugin = require('next-intl/plugin');
+const path = require('path');
 
 const withNextIntl = createNextIntlPlugin('./lib/i18n.ts');
 
@@ -6,6 +7,7 @@ const withNextIntl = createNextIntlPlugin('./lib/i18n.ts');
 const nextConfig = {
   // Enable React strict mode
   reactStrictMode: true,
+  outputFileTracingRoot: path.join(__dirname, '..'),
 
   // Image optimization
   images: {
@@ -25,6 +27,16 @@ const nextConfig = {
   env: {
     NEXT_PUBLIC_APP_NAME: 'Rahal',
     NEXT_PUBLIC_APP_NAME_AR: 'رحال',
+  },
+
+  // Force single d3-selection instance to prevent duplicate module split
+  // that breaks selection.interrupt (used by d3-zoom via ZoomableGroup)
+  webpack: (config) => {
+    config.resolve.alias['d3-selection'] = path.resolve(
+      __dirname,
+      'node_modules/d3-selection'
+    );
+    return config;
   },
 
   // Experimental features

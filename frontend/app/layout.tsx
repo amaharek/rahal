@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import './globals.css';
+import 'leaflet/dist/leaflet.css';
 
 export const metadata: Metadata = {
   title: 'رحال - Rahal',

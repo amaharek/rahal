@@ -1,3 +1,5 @@
+'use client';
+
 import { useTranslations, useLocale } from 'next-intl';
 import Link from 'next/link';
 import {
@@ -14,11 +16,26 @@ import {
   Home,
   HelpCircle,
   ArrowLeft,
+  CheckCircle2,
+  LogIn,
 } from 'lucide-react';
+import { useHomeStats } from '@/lib/hooks/useHomeStats';
+import { StreakHero } from '@/components/home/StreakHero';
+import { Skeleton } from '@/components/ui';
 
 export default function HomePage() {
   const t = useTranslations();
   const locale = useLocale();
+
+  const {
+    streak,
+    gamesPlayed,
+    accuracy,
+    playedToday,
+    isLoading,
+    isAuthenticated,
+    justExtended,
+  } = useHomeStats();
 
   return (
     <main className="min-h-screen pb-24">
@@ -74,6 +91,10 @@ export default function HomePage() {
             </span>
           </div>
 
+          {isAuthenticated && (
+            <StreakHero streak={streak} isLoading={isLoading} justExtended={justExtended} />
+          )}
+
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight text-balance">
             {t('common.tagline')}
           </h1>
@@ -108,16 +129,36 @@ export default function HomePage() {
           <div className="grid md:grid-cols-2 gap-6">
             {/* Daily Challenge Card */}
             <Link href={`/${locale}/game`} className="group block">
-              <div className="relative overflow-hidden bg-surface rounded-2xl border border-border p-8 transition-all duration-300 hover:shadow-lg hover:border-primary hover:-translate-y-1">
+              <div
+                className={`relative overflow-hidden bg-surface rounded-2xl border p-8 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${
+                  isAuthenticated && !playedToday && !isLoading
+                    ? 'border-success ring-2 ring-success hover:border-success'
+                    : 'border-border hover:border-primary'
+                }`}
+              >
                 <div className="absolute top-0 left-0 w-full h-1 bg-primary" />
                 <div className="flex items-start gap-5">
                   <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
                     <MapPin className="w-7 h-7 text-primary" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-xl font-bold text-text-primary mb-2">
-                      {t('home.dailyChallenge')}
-                    </h3>
+                    <div className="flex items-center gap-2 mb-2">
+                      <h3 className="text-xl font-bold text-text-primary">
+                        {t('home.dailyChallenge')}
+                      </h3>
+                      {isAuthenticated && !isLoading && (
+                        playedToday ? (
+                          <span className="inline-flex items-center gap-1 text-xs font-semibold text-success bg-success/10 px-2 py-0.5 rounded-full">
+                            <CheckCircle2 className="w-3 h-3" />
+                            {t('home.playedToday')}
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-xs font-semibold text-white bg-success px-2 py-0.5 rounded-full animate-pulse">
+                            {t('home.playNow')}
+                          </span>
+                        )
+                      )}
+                    </div>
                     <p className="text-text-secondary leading-relaxed mb-6">
                       {t('game.subtitle')}
                     </p>
@@ -167,35 +208,58 @@ export default function HomePage() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
-            <div className="bg-surface rounded-2xl border border-border p-5 text-center">
-              <div className="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center mx-auto mb-3">
-                <Flame className="w-5 h-5 text-orange-500" />
+          {isLoading ? (
+            <div className="grid grid-cols-3 gap-4">
+              <Skeleton className="h-28 rounded-2xl" />
+              <Skeleton className="h-28 rounded-2xl" />
+              <Skeleton className="h-28 rounded-2xl" />
+            </div>
+          ) : isAuthenticated ? (
+            <div className="grid grid-cols-3 gap-4">
+              <div className="bg-surface rounded-2xl border border-border p-5 text-center">
+                <div className="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center mx-auto mb-3">
+                  <Flame className="w-5 h-5 text-orange-500" />
+                </div>
+                <div className="text-2xl font-bold text-text-primary">{streak ?? 0}</div>
+                <div className="text-xs text-text-muted mt-1">
+                  {t('home.currentStreak')}
+                </div>
               </div>
-              <div className="text-2xl font-bold text-text-primary">0</div>
-              <div className="text-xs text-text-muted mt-1">
-                {t('home.currentStreak')}
+              <div className="bg-surface rounded-2xl border border-border p-5 text-center">
+                <div className="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center mx-auto mb-3">
+                  <Target className="w-5 h-5 text-primary" />
+                </div>
+                <div className="text-2xl font-bold text-text-primary">{gamesPlayed ?? 0}</div>
+                <div className="text-xs text-text-muted mt-1">
+                  {t('home.gamesPlayed')}
+                </div>
+              </div>
+              <div className="bg-surface rounded-2xl border border-border p-5 text-center">
+                <div className="w-10 h-10 rounded-xl bg-yellow-50 flex items-center justify-center mx-auto mb-3">
+                  <Trophy className="w-5 h-5 text-yellow-600" />
+                </div>
+                <div className="text-2xl font-bold text-text-primary">
+                  {accuracy !== null ? `${accuracy}%` : '0%'}
+                </div>
+                <div className="text-xs text-text-muted mt-1">
+                  {t('home.accuracy')}
+                </div>
               </div>
             </div>
-            <div className="bg-surface rounded-2xl border border-border p-5 text-center">
-              <div className="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center mx-auto mb-3">
-                <Target className="w-5 h-5 text-primary" />
+          ) : (
+            <div className="bg-surface rounded-2xl border border-border p-8 text-center">
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                <LogIn className="w-6 h-6 text-primary" />
               </div>
-              <div className="text-2xl font-bold text-text-primary">0</div>
-              <div className="text-xs text-text-muted mt-1">
-                {t('home.gamesPlayed')}
-              </div>
+              <p className="text-text-secondary mb-4">{t('home.signInForStats')}</p>
+              <Link
+                href={`/${locale}/auth/sign-in`}
+                className="inline-flex items-center gap-2 bg-primary text-white font-semibold px-5 py-2.5 rounded-xl hover:bg-primary/90 transition-colors"
+              >
+                {t('home.signIn')}
+              </Link>
             </div>
-            <div className="bg-surface rounded-2xl border border-border p-5 text-center">
-              <div className="w-10 h-10 rounded-xl bg-yellow-50 flex items-center justify-center mx-auto mb-3">
-                <Trophy className="w-5 h-5 text-yellow-600" />
-              </div>
-              <div className="text-2xl font-bold text-text-primary">0%</div>
-              <div className="text-xs text-text-muted mt-1">
-                {t('home.accuracy')}
-              </div>
-            </div>
-          </div>
+          )}
         </section>
 
         {/* How It Works Section */}

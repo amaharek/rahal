@@ -43,7 +43,13 @@
     "step2Title": "Discover the path between countries",
     "step2Description": "Guess neighboring countries to reach the goal",
     "step3Title": "Share your score and compete with friends",
-    "step3Description": "Keep your winning streak"
+    "step3Description": "Keep your winning streak",
+    "playNow": "Play Now",
+    "playedToday": "Played Today",
+    "dayStreak": "day streak",
+    "streakExtended": "Streak extended!",
+    "signInForStats": "Sign in to see your progress",
+    "signIn": "Sign In"
   },
   "game": {
     "title": "Path Game",
@@ -59,7 +65,9 @@
     "hintsRemaining": "hints remaining",
     "routeModes": {
       "shortest": "Shortest Route",
-      "explorer": "Explorer"
+      "shortestDesc": "Find the path that crosses the fewest borders between the two countries.",
+      "explorer": "Explorer",
+      "explorerDesc": "Roam freely — choose any path you like with no restrictions."
     },
     "hintTypes": {
       "border": "Border Hint",
@@ -98,6 +106,7 @@
     },
     "hud": {
       "streak": "Streak",
+      "guesses": "Guesses",
       "hints": "Hints",
       "combo": "Combo",
       "efficiency": "Efficiency",

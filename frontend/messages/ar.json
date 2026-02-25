@@ -43,7 +43,13 @@
     "step2Title": "اكتشف الطريق بين الدول",
     "step2Description": "خمّن الدول المتجاورة للوصول إلى الهدف",
     "step3Title": "شارك نتيجتك وتنافس مع أصدقائك",
-    "step3Description": "حافظ على سلسلة انتصاراتك"
+    "step3Description": "حافظ على سلسلة انتصاراتك",
+    "playNow": "العب الآن",
+    "playedToday": "لعبت اليوم",
+    "dayStreak": "يوم متتالي",
+    "streakExtended": "سلسلة ممتدة!",
+    "signInForStats": "سجّل دخولك لعرض تقدمك",
+    "signIn": "تسجيل الدخول"
   },
   "game": {
     "title": "مسار الرحالة",
@@ -59,7 +65,9 @@
     "hintsRemaining": "تلميحات متبقية",
     "routeModes": {
       "shortest": "أقصر مسار",
-      "explorer": "المستكشف"
+      "shortestDesc": "ابحث عن المسار الذي يعبر أقل عدد من الحدود بين الدولتين.",
+      "explorer": "المستكشف",
+      "explorerDesc": "تجوّل بحرية — اختر أي مسار تشاء دون قيود."
     },
     "hintTypes": {
       "border": "تلميح الحدود",
@@ -83,9 +91,9 @@
       "wrongContinent": "قارة مختلفة"
     },
     "map": {
-      "start": "نقطة البداية",
-      "end": "نقطة النهاية",
-      "pathCountry": "على المسار الصحيح",
+      "start": "البداية",
+      "end": "النهاية",
+      "pathCountry": "مسار صحيح",
       "onPath": "تخمين صحيح",
       "offPath": "تخمين خاطئ",
       "showMap": "إظهار الخريطة",
@@ -98,6 +106,7 @@
     },
     "hud": {
       "streak": "السلسلة",
+      "guesses": "التخمينات",
       "hints": "التلميحات",
       "combo": "الزخم",
       "efficiency": "الكفاءة",

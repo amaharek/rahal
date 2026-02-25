@@ -13,6 +13,7 @@ from fastapi import APIRouter, HTTPException, status
 from app.core.deps import DBSession, OptionalUser, CurrentUser
 from app.crud.country import country_crud
 from app.crud.game import daily_challenge_crud, game_result_crud
+from app.crud.user import achievement_crud, user_achievement_crud, profile_crud
 from app.schemas.game import (
     DailyChallengeResponse,
     GameCompleteResponse,
@@ -39,6 +40,32 @@ path_finder_service = PathFinderService()
 score_calculator = ScoreCalculator()
 
 PRACTICE_SESSION_TTL_MINUTES = 60
+
+
+async def award_achievements(db, user_id: UUID, profile) -> None:
+    """Award achievements based on current profile state. Idempotent."""
+    from app.models.user import Profile as ProfileModel
+    checks = [
+        ("first_steps",    profile.games_won == 1),
+        ("streak_starter", profile.current_streak == 3),
+        ("week_warrior",   profile.current_streak == 7),
+        ("pathfinder",     profile.games_won == 10),
+    ]
+    for code, condition in checks:
+        if not condition:
+            continue
+        achievement = await achievement_crud.get_by_code(db, code)
+        if achievement:
+            await user_achievement_crud.unlock_achievement(db, user_id, achievement.id)
+
+
+async def award_perfect_route(db, user_id: UUID, game_result, challenge) -> None:
+    """Award 'perfect_route' if solved optimally with no hints."""
+    if (game_result.total_guesses == challenge.shortest_path
+            and game_result.hints_used == 0):
+        achievement = await achievement_crud.get_by_code(db, "perfect_route")
+        if achievement:
+            await user_achievement_crud.unlock_achievement(db, user_id, achievement.id)
 
 
 @dataclass
@@ -237,6 +264,17 @@ async def submit_guess(
         )
 
     await db.flush()
+
+    # Update profile stats and award achievements on game completion
+    if game_result.completed and current_user:
+        profile = await profile_crud.get(db, current_user.id)
+        if profile:
+            await profile_crud.increment_stats(
+                db, profile, games_played=1, games_won=1
+            )
+            await profile_crud.update_streak(db, profile, won=True)
+            await award_achievements(db, current_user.id, profile)
+            await award_perfect_route(db, current_user.id, game_result, challenge)
 
     return GuessResponse(
         country=CountryBrief(

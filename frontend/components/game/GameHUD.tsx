@@ -1,88 +1,93 @@
 'use client';
 
-import { Card, CardContent } from '@/components/ui';
-import type { ComboMomentum, EfficiencyBucket } from '@/types/game';
+import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
+import type { ComboMomentum } from '@/types/game';
 import { deriveEfficiencyBucket } from '@/lib/game/progression';
 
 interface GameHUDProps {
   streak: number | null;
-  hintsRemaining: number;
-  efficiency: EfficiencyBucket;
+  guessCount: number;
   combo: number;
   momentum: ComboMomentum;
-  benchmarkDelta: number;
-  localeLabel: (key: string) => string;
+  /** 'card' = sidebar card with labels (desktop), 'compact' = map overlay (mobile) */
+  variant?: 'card' | 'compact';
 }
 
 function getMomentumGlyph(momentum: ComboMomentum): string {
-  if (momentum === 'up') {
-    return '↗';
-  }
-  if (momentum === 'down') {
-    return '↘';
-  }
+  if (momentum === 'up') return '↗';
+  if (momentum === 'down') return '↘';
   return '→';
 }
 
-function getBenchmarkLabel(benchmarkDelta: number, localeLabel: (key: string) => string): string {
-  if (benchmarkDelta === 0) {
-    return localeLabel('game.hud.benchmark.optimal');
-  }
-
-  if (benchmarkDelta > 0) {
-    return `+${benchmarkDelta}`;
-  }
-
-  return `${benchmarkDelta}`;
-}
-
-export function GameHUD({
-  streak,
-  hintsRemaining,
-  efficiency,
-  combo,
-  momentum,
-  benchmarkDelta,
-  localeLabel,
-}: GameHUDProps) {
+export function GameHUD({ streak, guessCount, combo, momentum, variant = 'card' }: GameHUDProps) {
+  const t = useTranslations('game.hud');
   const streakValue = streak === null ? '--' : String(streak);
-  const momentumAnimatedClass =
+  const momentumClass =
     momentum === 'up'
-      ? 'motion-safe:animate-pulse text-success'
+      ? 'text-success'
       : momentum === 'down'
-        ? 'motion-safe:animate-pulse text-error'
+        ? 'text-error'
         : 'text-text-secondary';
 
+  if (variant === 'compact') {
+    return (
+      <div
+        className="flex items-center justify-center gap-4 bg-surface/95 backdrop-blur-sm rounded-lg px-4 py-2 shadow-lg"
+        data-testid="game-hud"
+      >
+        <span className="text-sm font-semibold text-primary">🔥 {streakValue}</span>
+        <span className="text-text-muted">·</span>
+        <motion.span
+          key={guessCount}
+          initial={{ y: -6, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+          className="text-sm font-semibold text-primary"
+        >
+          🎯 {guessCount}
+        </motion.span>
+        <span className="text-text-muted">·</span>
+        <span className={`text-sm font-semibold ${momentumClass}`}>
+          ⚡ x{combo} {getMomentumGlyph(momentum)}
+        </span>
+      </div>
+    );
+  }
+
   return (
-    <Card className="mb-3" data-testid="game-hud">
-      <CardContent className="py-3">
-        <div className="grid grid-cols-2 gap-3 text-center sm:grid-cols-5">
-          <div data-testid="hud-streak">
-            <div className="text-lg font-bold text-primary">{streakValue}</div>
-            <div className="text-xs text-text-secondary">{localeLabel('game.hud.streak')}</div>
-          </div>
-          <div data-testid="hud-hints-remaining">
-            <div className="text-lg font-bold text-primary">{hintsRemaining}</div>
-            <div className="text-xs text-text-secondary">{localeLabel('game.hud.hints')}</div>
-          </div>
-          <div data-testid="hud-combo">
-            <div className="text-lg font-bold text-primary">x{combo}</div>
-            <div className="text-xs text-text-secondary">{localeLabel('game.hud.combo')}</div>
-          </div>
-          <div data-testid="hud-efficiency-indicator">
-            <div className="text-sm font-bold text-primary">{localeLabel(`game.hud.efficiencyLevels.${efficiency}`)}</div>
-            <div className="text-xs text-text-secondary">{localeLabel('game.hud.efficiency')}</div>
-          </div>
-          <div data-testid="hud-benchmark">
-            <div className="text-sm font-bold text-primary">{getBenchmarkLabel(benchmarkDelta, localeLabel)}</div>
-            <div className="text-xs text-text-secondary">{localeLabel('game.hud.benchmark.label')}</div>
-            <div className={`text-xs mt-1 ${momentumAnimatedClass}`} data-testid="hud-momentum-indicator">
-              {getMomentumGlyph(momentum)} {localeLabel(`game.hud.momentum.${momentum}`)}
-            </div>
-          </div>
+    <div
+      className="grid grid-cols-3 gap-3 bg-surface/95 backdrop-blur-sm rounded-xl px-4 py-3 shadow-lg border border-border"
+      data-testid="game-hud"
+    >
+      <div className="flex flex-col items-center gap-0.5" data-testid="hud-streak">
+        <span className="text-base">🔥</span>
+        <div className="text-xl font-bold text-primary leading-none">{streakValue}</div>
+        <div className="text-[10px] text-text-secondary uppercase tracking-wide">{t('streak')}</div>
+      </div>
+      <div className="flex flex-col items-center gap-0.5" data-testid="hud-guess-count">
+        <span className="text-base">🎯</span>
+        <motion.span
+          key={guessCount}
+          initial={{ y: -8, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+          className="block text-xl font-bold text-primary leading-none"
+        >
+          {guessCount}
+        </motion.span>
+        <div className="text-[10px] text-text-secondary uppercase tracking-wide">
+          {t('guesses')}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+      <div className="flex flex-col items-center gap-0.5" data-testid="hud-combo">
+        <span className="text-base">⚡</span>
+        <div className={`text-xl font-bold leading-none ${momentumClass}`}>
+          x{combo} {getMomentumGlyph(momentum)}
+        </div>
+        <div className="text-[10px] text-text-secondary uppercase tracking-wide">{t('combo')}</div>
+      </div>
+    </div>
   );
 }
 

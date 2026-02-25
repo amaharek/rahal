@@ -7,9 +7,10 @@ import { useDirection } from '@/lib/hooks/useDirection';
 import { useGameSession } from '@/lib/hooks/useGameSession';
 import { useGameTelemetry } from '@/lib/hooks/useGameTelemetry';
 import { useGameNarrative } from '@/lib/hooks/useGameNarrative';
-import { MapSkeleton, MapErrorBoundary } from '@/components/game/GameMap';
+import { MapSkeleton, MapErrorBoundary, resolveMapVariant } from '@/components/game/GameMap';
 import { GameHUD } from '@/components/game/GameHUD';
-import { GameChallengeCard } from '@/components/game/GameChallengeCard';
+import { GameHeaderBar } from '@/components/game/GameHeaderBar';
+import { GameCompletionSheet } from '@/components/game/GameCompletionSheet';
 import { GameActionDock } from '@/components/game/GameActionDock';
 import { GameHintsPanel } from '@/components/game/GameHintsPanel';
 import { GameGuessList } from '@/components/game/GameGuessList';
@@ -38,8 +39,8 @@ export function DailyGamePage() {
   const direction = useDirection();
 
   const presentationOverride = searchParams.get('presentation');
+  const mapVariant = resolveMapVariant(searchParams.get('map'));
 
-  // ── Core session (data, mutations, state) ───────────────────────────────
   const session = useGameSession(presentationOverride);
 
   const {
@@ -51,7 +52,6 @@ export function DailyGamePage() {
     mapZoom,
     mapCenter,
     currentHint,
-    qualityExplanation,
     qualityTier,
     shareStatus,
     streakValue,
@@ -76,7 +76,6 @@ export function DailyGamePage() {
     getCountryNameByLocale,
   } = session;
 
-  // ── Narrative / presentation variant ───────────────────────────────────
   const { isHybridPresentation, narrativeMilestone, milestoneCopy, milestoneEmoji } =
     useGameNarrative({
       challengeId: challenge?.id,
@@ -89,7 +88,6 @@ export function DailyGamePage() {
       presentationOverride,
     });
 
-  // ── Telemetry ───────────────────────────────────────────────────────────
   const telemetry = useGameTelemetry({
     challengeId: challenge?.id,
     routeMode,
@@ -109,12 +107,10 @@ export function DailyGamePage() {
     momentum,
   });
 
-  // Fire combo telemetry when transition changes
   if (lastComboTransition && lastComboTransition.transition !== 'no_change') {
     telemetry.trackCombo(lastComboTransition);
   }
 
-  // ── Helpers ─────────────────────────────────────────────────────────────
   const formatHintDisplay = (hint: typeof currentHint): string => {
     if (!hint) return '';
     const { hint_type, hint_data } = hint;
@@ -147,11 +143,6 @@ export function DailyGamePage() {
       }
     }
     return JSON.stringify(hint_data);
-  };
-
-  const getCompletionGradeLabel = () => {
-    if (!qualityTier) return t('game.completion.gradeLevels.good_discovery');
-    return t(`game.completion.gradeLevels.${qualityTier}`);
   };
 
   const handleHintRequest = () => {
@@ -198,7 +189,6 @@ export function DailyGamePage() {
     }
   };
 
-  // ── Loading / error states ──────────────────────────────────────────────
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -225,92 +215,40 @@ export function DailyGamePage() {
 
   if (!challenge) return null;
 
-  // ── Render ──────────────────────────────────────────────────────────────
+  const dockSharedProps = {
+    onCountrySelect: handleCountrySelectWithTelemetry,
+    onInputFocusStart: handleInputFocusStart,
+    onCountryCommitted: handleCountryCommitted,
+    onHintRequest: handleHintRequest,
+    hintDisabled: hintsUsed >= 3,
+    hintPending: isHintPending,
+    disabled: isGuessPending,
+    placeholder: t('game.enterCountry'),
+    hintLabel: t('game.nextHint'),
+  };
+
   return (
     <GameLayout
       title={t('game.title')}
       subtitle={t('game.subtitle')}
       showMobileDock={!isCompleted}
-      dockProps={
-        !isCompleted
-          ? {
-              onCountrySelect: handleCountrySelectWithTelemetry,
-              onInputFocusStart: handleInputFocusStart,
-              onCountryCommitted: handleCountryCommitted,
-              onHintRequest: handleHintRequest,
-              hintDisabled: hintsUsed >= 3,
-              hintPending: isHintPending,
-              disabled: isGuessPending,
-              placeholder: t('game.enterCountry'),
-              hintLabel: t('game.nextHint'),
-            }
-          : undefined
-      }
+      dockProps={!isCompleted ? dockSharedProps : undefined}
     >
-      {/* Route mode selector */}
-      <Card className="mb-3">
-        <CardContent className="py-3 flex gap-2">
-          <Button
-            variant={routeMode === 'shortest' ? 'primary' : 'outline'}
-            size="sm"
-            className="flex-1"
-            onClick={() => setRouteMode('shortest')}
-          >
-            {t('game.routeModes.shortest')}
-          </Button>
-          <Button
-            variant={routeMode === 'explorer' ? 'primary' : 'outline'}
-            size="sm"
-            className="flex-1"
-            onClick={() => setRouteMode('explorer')}
-          >
-            {t('game.routeModes.explorer')}
-          </Button>
-        </CardContent>
-      </Card>
-
-      <GameHUD
-        streak={streakValue}
-        hintsRemaining={hintsRemaining}
-        efficiency={efficiencyBucket}
-        combo={combo}
-        momentum={momentum}
-        benchmarkDelta={benchmark.deltaFromShortestPath}
-        localeLabel={t}
-      />
-
-      {isHybridPresentation && (
-        <Card
-          className="mb-3 border-primary/35 bg-primary/5"
-          data-testid="narrative-milestone-card"
-          data-variant={session.presentationVariant}
-          data-milestone={narrativeMilestone}
-        >
-          <CardContent className="py-3">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <p className="text-sm font-semibold text-primary">{milestoneCopy.title}</p>
-                <p className="text-xs text-text-secondary">{milestoneCopy.body}</p>
-              </div>
-              <span className="text-xl" aria-hidden="true">{milestoneEmoji}</span>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      <GameChallengeCard
+      <GameHeaderBar
         startCountry={challenge.start_country}
         endCountry={challenge.end_country}
-        shortestPath={challenge.shortest_path}
-        direction={direction}
+        routeMode={routeMode}
+        onRouteModeChange={setRouteMode}
         getCountryNameByLocale={getCountryNameByLocale}
-        t={t}
+        direction={direction}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div data-testid="game-map">
+      <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-4 mt-3">
+        {/* Left: map hero with HUD overlay */}
+        <div className="relative min-h-[50vh] overflow-hidden rounded-lg" data-testid="game-map">
           <MapErrorBoundary>
             <GameMap
+              variant={mapVariant}
               startCountryCode={challenge.start_country.code}
               endCountryCode={challenge.end_country.code}
               startCountryName={getCountryNameByLocale(challenge.start_country)}
@@ -323,100 +261,76 @@ export function DailyGamePage() {
               onCenterChange={setMapCenter}
             />
           </MapErrorBoundary>
+          {/* Mobile overlay — hidden on desktop (sidebar card takes over) */}
+          <div className="absolute bottom-0 left-0 right-0 p-2 lg:hidden">
+            <GameHUD
+              streak={streakValue}
+              guessCount={guesses.length}
+              combo={combo}
+              momentum={momentum}
+              variant="compact"
+            />
+          </div>
         </div>
 
-        <div className="space-y-4">
+        {/* Right: action area */}
+        <div className="space-y-3">
+          {/* Desktop HUD card — hidden on mobile (map overlay takes over) */}
+          <div className="hidden lg:block">
+            <GameHUD
+              streak={streakValue}
+              guessCount={guesses.length}
+              combo={combo}
+              momentum={momentum}
+            />
+          </div>
+
           {!isCompleted && (
             <div className="hidden lg:block">
-              <GameActionDock
-                onCountrySelect={handleCountrySelectWithTelemetry}
-                onInputFocusStart={handleInputFocusStart}
-                onCountryCommitted={handleCountryCommitted}
-                onHintRequest={handleHintRequest}
-                hintDisabled={hintsUsed >= 3}
-                hintPending={isHintPending}
-                disabled={isGuessPending}
-                placeholder={t('game.enterCountry')}
-                hintLabel={t('game.nextHint')}
-              />
+              <GameActionDock {...dockSharedProps} />
             </div>
           )}
 
-          {isCompleted ? (
-            <Card className="bg-success/10 border-success">
-              <CardContent className="text-center" data-testid="game-completion-card">
-                <div className="text-4xl mb-2">🎉</div>
-                <h2 className="text-xl font-bold text-success mb-2">{t('game.completed')}</h2>
-                <div className="grid grid-cols-2 gap-4 mb-4">
+          <GameCompletionSheet
+            isCompleted={isCompleted}
+            guesses={guesses}
+            score={score}
+            shortestPath={challenge.shortest_path}
+            qualityTier={qualityTier}
+            efficiencyBucket={efficiencyBucket}
+            benchmarkDelta={benchmark.deltaFromShortestPath}
+            startCountry={challenge.start_country}
+            endCountry={challenge.end_country}
+            onShare={handleShareRecap}
+            shareStatus={shareStatus}
+            t={t}
+            onRetry={handleRetryCta}
+            onLeaderboard={() => router.push(`/${locale}/leaderboard`)}
+            isHybridPresentation={isHybridPresentation}
+          />
+
+          {isHybridPresentation && (
+            <Card
+              className="border-primary/35 bg-primary/5"
+              data-testid="narrative-milestone-card"
+              data-variant={session.presentationVariant}
+              data-milestone={narrativeMilestone}
+            >
+              <CardContent className="py-3">
+                <div className="flex items-center justify-between gap-3">
                   <div>
-                    <div className="text-2xl font-bold text-primary">{score}</div>
-                    <div className="text-sm text-text-secondary">{t('game.score')}</div>
+                    <p className="text-sm font-semibold text-primary">{milestoneCopy.title}</p>
+                    <p className="text-xs text-text-secondary">{milestoneCopy.body}</p>
                   </div>
-                  <div>
-                    <div className="text-2xl font-bold text-primary">{guesses.length}</div>
-                    <div className="text-sm text-text-secondary">{t('game.totalGuesses')}</div>
-                  </div>
+                  <span className="text-xl" aria-hidden="true">
+                    {milestoneEmoji}
+                  </span>
                 </div>
-                <div className="mb-4" data-testid="completion-grade">
-                  <p className="text-xs text-text-secondary">{t('game.completion.gradeLabel')}</p>
-                  <p className="text-base font-bold text-primary">{getCompletionGradeLabel()}</p>
-                </div>
-                {qualityExplanation && (
-                  <p className="text-sm text-text-secondary">{qualityExplanation}</p>
-                )}
-                {isHybridPresentation && (
-                  <Card
-                    className="mt-4 border border-primary/25 bg-primary/5"
-                    data-testid="postgame-recap-card"
-                  >
-                    <CardContent className="py-3 text-start">
-                      <p className="text-sm font-semibold text-primary">{t('game.recap.title')}</p>
-                      <p className="mt-1 text-xs text-text-secondary">
-                        {t('game.recap.summary', {
-                          from: getCountryNameByLocale(challenge.start_country),
-                          to: getCountryNameByLocale(challenge.end_country),
-                          guesses: guesses.length,
-                          shortestPath: challenge.shortest_path,
-                        })}
-                      </p>
-                      <p className="mt-1 text-xs text-text-secondary">
-                        {t('game.recap.retentionHook')}
-                      </p>
-                      <div className="mt-3 flex flex-col gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={handleShareRecap}
-                          data-testid="share-recap-button"
-                        >
-                          {shareStatus === 'copied'
-                            ? t('common.copied')
-                            : shareStatus === 'error'
-                              ? t('common.retry')
-                              : t('game.recap.shareCta')}
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => router.push(`/${locale}/leaderboard`)}
-                          data-testid="recap-leaderboard-cta"
-                        >
-                          {t('game.recap.leaderboardCta')}
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-                <Button
-                  className="mt-4 w-full"
-                  onClick={handleRetryCta}
-                  data-testid="completion-retry-cta"
-                >
-                  {t('game.completion.retryCta')}
-                </Button>
               </CardContent>
             </Card>
-          ) : (
+          )}
+
+          {!isCompleted && (
             <GameHintsPanel
               hintsUsed={hintsUsed}
               hintsTitle={t('game.hints')}

@@ -1,9 +1,67 @@
 import type {
   EfficiencyBucket,
   GamePresentationVariant,
+  GuessEntry,
   NarrativeMilestone,
   QualityTier,
 } from '@/types/game';
+import { buildEmojiPath } from '@/lib/game/shareEmoji';
+
+const CHALLENGE_EPOCH = '2024-01-01';
+
+export function computeChallengeNumber(challengeDate: string): number {
+  const epoch = new Date(CHALLENGE_EPOCH).getTime();
+  const target = new Date(challengeDate).getTime();
+  return Math.floor((target - epoch) / (1000 * 60 * 60 * 24)) + 1;
+}
+
+export { buildEmojiPath };
+
+export interface ShareCardInput {
+  locale: string;
+  challengeNumber: number | null;
+  startFlagEmoji: string;
+  endFlagEmoji: string;
+  guesses: GuessEntry[];
+  shortestPath: number;
+  score: number | null;
+  isCompleted: boolean;
+}
+
+export function buildShareCard(input: ShareCardInput): string {
+  const emojiPath = buildEmojiPath(input.guesses, input.isCompleted);
+  const challengeTag = input.challengeNumber != null ? ` #${input.challengeNumber}` : '';
+  const scoreVal = input.score ?? 0;
+  const guessCount = input.guesses.length;
+
+  if (input.locale === 'ar') {
+    return [
+      `رحال 🌍${challengeTag}`,
+      `${input.startFlagEmoji} → ${input.endFlagEmoji}`,
+      emojiPath,
+      `${guessCount} تخمينات / ${input.shortestPath} مثالي | ${scoreVal} نقطة`,
+      'rahal.app',
+    ].join('\n');
+  }
+
+  if (input.locale === 'es') {
+    return [
+      `Rahal 🌍${challengeTag}`,
+      `${input.startFlagEmoji} → ${input.endFlagEmoji}`,
+      emojiPath,
+      `${guessCount} intentos / ${input.shortestPath} optimal | ${scoreVal} pts`,
+      'rahal.app',
+    ].join('\n');
+  }
+
+  return [
+    `Rahal 🌍${challengeTag}`,
+    `${input.startFlagEmoji} → ${input.endFlagEmoji}`,
+    emojiPath,
+    `${guessCount} guesses / ${input.shortestPath} optimal | ${scoreVal} pts`,
+    'rahal.app',
+  ].join('\n');
+}
 
 export interface NarrativeMilestoneInput {
   guessesCount: number;

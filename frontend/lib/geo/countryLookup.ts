@@ -8,7 +8,8 @@ import { CountryState, NUMERIC_TO_ALPHA3 } from '@/types/geo';
  * Convert numeric ISO code (used in TopoJSON) to alpha-3 code
  */
 export function numericToAlpha3(numericCode: string): string {
-  return NUMERIC_TO_ALPHA3[numericCode] || '';
+  const stripped = String(parseInt(numericCode, 10));
+  return NUMERIC_TO_ALPHA3[stripped] || '';
 }
 
 /**

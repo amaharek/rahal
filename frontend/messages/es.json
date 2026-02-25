@@ -43,7 +43,13 @@
     "step2Title": "Descubre la ruta entre países",
     "step2Description": "Adivina los países vecinos para llegar al objetivo",
     "step3Title": "Comparte tu puntuación y compite con amigos",
-    "step3Description": "Mantén tu racha ganadora"
+    "step3Description": "Mantén tu racha ganadora",
+    "playNow": "Jugar ahora",
+    "playedToday": "Jugado hoy",
+    "dayStreak": "días seguidos",
+    "streakExtended": "¡Racha extendida!",
+    "signInForStats": "Inicia sesión para ver tu progreso",
+    "signIn": "Iniciar sesión"
   },
   "game": {
     "title": "Juego de Ruta",
@@ -59,7 +65,9 @@
     "hintsRemaining": "pistas restantes",
     "routeModes": {
       "shortest": "Ruta más corta",
-      "explorer": "Explorador"
+      "shortestDesc": "Encuentra el camino que cruza el menor número de fronteras entre los dos países.",
+      "explorer": "Explorador",
+      "explorerDesc": "Explora libremente — elige cualquier camino sin restricciones."
     },
     "hintTypes": {
       "border": "Pista de Frontera",
@@ -98,6 +106,7 @@
     },
     "hud": {
       "streak": "Racha",
+      "guesses": "Intentos",
       "hints": "Pistas",
       "combo": "Combo",
       "efficiency": "Eficiencia",

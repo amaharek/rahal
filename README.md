@@ -61,6 +61,23 @@ docker exec -i rahal-db psql -U postgres -d postgres < supabase/migrations-manua
 make seed
 ```
 
+When frontend dependencies change (`frontend/package.json` or `frontend/package-lock.json`), refresh the frontend service with:
+
+```bash
+docker compose up -d --build --force-recreate --renew-anon-volumes frontend
+```
+
+Why not `docker compose build frontend` alone:
+- `build` updates image layers, but does not replace the running container
+- the frontend service uses an anonymous `/app/node_modules` volume that can stay stale across rebuilds
+
+Fallback if module resolution errors persist:
+
+```bash
+docker compose down -v
+docker compose up -d --build frontend
+```
+
 **Seeded Data:**
 - ✅ 98 countries (all continents)
 - ✅ 154 borders (connected graph for pathfinding)
@@ -118,6 +135,10 @@ npm install
 # Start development server
 npm run dev
 ```
+
+Important:
+- Run frontend commands from `Rahal/frontend` using `npm`.
+- Do not run the frontend app from repo root with `pnpm dev`; this repository contains another root Next app and can cause module-resolution drift.
 
 ## Project Structure
 

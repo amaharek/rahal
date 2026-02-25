@@ -1,7 +1,7 @@
 # Rahal (رحال) Makefile
 # Common development commands
 
-.PHONY: help install dev start stop logs clean test lint format migrate seed
+.PHONY: help install dev start stop logs clean test lint format migrate seed refresh-frontend-deps
 
 # Default target
 help:
@@ -17,6 +17,7 @@ help:
 	@echo "  make stop         - Stop all services"
 	@echo "  make restart      - Restart all services"
 	@echo "  make logs         - View service logs"
+	@echo "  make refresh-frontend-deps - Rebuild/recreate frontend with fresh node_modules volume"
 	@echo ""
 	@echo "Database:"
 	@echo "  make migrate      - Run database migrations"
@@ -82,6 +83,9 @@ logs-backend:
 logs-frontend:
 	docker-compose logs -f frontend
 
+refresh-frontend-deps:
+	docker compose up -d --build --force-recreate --renew-anon-volumes frontend
+
 # ===========================================
 # Database
 # ===========================================
@@ -95,6 +99,7 @@ migrate-new:
 
 seed:
 	cd backend && uv run python ../scripts/seed_unified.py
+	cd backend && uv run python scripts/seed_achievements.py
 
 seed-legacy:
 	cd backend && uv run python ../scripts/seed_database.py

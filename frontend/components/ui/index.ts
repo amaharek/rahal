@@ -9,3 +9,4 @@ export {
   CardFooter,
 } from './Card';
 export { ThemeToggle, ThemeSelector } from './ThemeToggle';
+export { Skeleton } from './Skeleton';

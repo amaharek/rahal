@@ -48,6 +48,7 @@ vi.mock('next/navigation', () => ({
 vi.mock('@/components/game/GameMap', () => ({
   MapSkeleton: () => <div data-testid="map-skeleton" />,
   MapErrorBoundary: ({ children }: { children: any }) => <>{children}</>,
+  resolveMapVariant: () => 'legacy',
 }));
 
 vi.mock('@/components/game/CountryInput', () => ({
@@ -164,7 +165,7 @@ describe('DailyGamePage integration', () => {
     renderPage();
 
     await waitFor(() => {
-      expect(screen.getByTestId('game-hud')).toBeInTheDocument();
+      expect(screen.getAllByTestId('game-hud').length).toBeGreaterThan(0);
       expect(screen.getByTestId('game-map')).toBeInTheDocument();
       expect(screen.getAllByTestId('game-action-dock').length).toBeGreaterThan(0);
     });
@@ -191,7 +192,7 @@ describe('DailyGamePage integration', () => {
     window.removeEventListener('rahal:telemetry', listener as EventListener);
   });
 
-  it('shows completion grade and routes to practice on retry CTA', async () => {
+  it('shows completion sheet with grade and routes to practice on retry CTA', async () => {
     vi.mocked(submitGuess).mockResolvedValueOnce({
       country: {
         id: '2',
@@ -227,6 +228,7 @@ describe('DailyGamePage integration', () => {
     await user.click(screen.getAllByTestId('integration-commit')[0]);
 
     await waitFor(() => {
+      expect(screen.getByTestId('game-completion-sheet')).toBeInTheDocument();
       expect(screen.getByTestId('completion-grade')).toBeInTheDocument();
       expect(screen.getByTestId('completion-retry-cta')).toBeInTheDocument();
       expect(screen.getByTestId('postgame-recap-card')).toBeInTheDocument();
@@ -257,7 +259,7 @@ describe('DailyGamePage integration', () => {
     window.removeEventListener('rahal:telemetry', listener as EventListener);
   });
 
-  it('hides narrative and recap cards for baseline variant', async () => {
+  it('hides narrative recap card for baseline variant but shows completion sheet', async () => {
     mockSearchParams = 'presentation=baseline';
     const user = userEvent.setup();
 
@@ -297,7 +299,9 @@ describe('DailyGamePage integration', () => {
       expect(screen.getByTestId('completion-grade')).toBeInTheDocument();
     });
 
+    // Share is always available in the new design
+    expect(screen.getByTestId('share-recap-button')).toBeInTheDocument();
+    // But the narrative recap card is hybrid-only
     expect(screen.queryByTestId('postgame-recap-card')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('share-recap-button')).not.toBeInTheDocument();
   });
 });

@@ -155,7 +155,7 @@ describe('useGameTelemetry', () => {
       previousCombo: 0,
       nextCombo: 1,
       momentum: 'up',
-      transition: 'increment',
+      transition: 'increase',
       scoreEmoji: '🟢',
     });
     expect(trackComboStateChanged).toHaveBeenCalledWith(
