@@ -16,7 +16,8 @@
     "share": "مشاركة",
     "copy": "نسخ",
     "copied": "تم النسخ!",
-    "home": "الرئيسية"
+    "home": "الرئيسية",
+    "timeRemaining": "الوقت المتبقي"
   },
   "nav": {
     "home": "الرئيسية",
@@ -219,7 +220,10 @@
     "selectCategory": "اختر فئة",
     "selectDifficulty": "اختر المستوى",
     "startQuiz": "ابدأ الاختبار",
-    "dailyQuiz": "تحدي اليوم"
+    "dailyQuiz": "تحدي اليوم",
+    "option": "خيار {letter}",
+    "enterAnswer": "اكتب إجابتك...",
+    "correctAnswerIs": "الإجابة الصحيحة:"
   },
   "stats": {
     "title": "الإحصائيات",
@@ -260,6 +264,7 @@
       "dark": "داكن",
       "system": "حسب النظام"
     },
+    "currentTheme": "المظهر الحالي: {theme}. انقر للتبديل",
     "notifications": "الإشعارات",
     "dailyReminder": "تذكير يومي",
     "soundEffects": "المؤثرات الصوتية"

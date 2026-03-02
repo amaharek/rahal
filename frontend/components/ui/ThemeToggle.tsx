@@ -11,12 +11,6 @@ const themeIcons = {
   system: Monitor,
 };
 
-const themeLabels = {
-  light: '\u0641\u0627\u062A\u062D',
-  dark: '\u062F\u0627\u0643\u0646',
-  system: '\u062D\u0633\u0628 \u0627\u0644\u0646\u0638\u0627\u0645',
-};
-
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
   const tThemes = useTranslations('settings.themes');
@@ -37,8 +31,8 @@ export function ThemeToggle() {
       variant="outline"
       size="icon"
       onClick={cycleTheme}
-      aria-label={`\u0627\u0644\u0645\u0638\u0647\u0631 \u0627\u0644\u062D\u0627\u0644\u064A: ${themeLabels[theme]}. \u0627\u0646\u0642\u0631 \u0644\u0644\u062A\u0628\u062F\u064A\u0644`}
-      title={themeLabels[theme]}
+      aria-label={tSettings('currentTheme', { theme: currentThemeLabel })}
+      title={currentThemeLabel}
     >
       <Icon className="h-5 w-5" />
     </Button>
@@ -53,15 +47,15 @@ export function ThemeSelector({ className }: ThemeSelectorProps) {
   const { theme, setTheme } = useTheme();
   const tThemes = useTranslations('settings.themes');
 
-  const themes: Array<{ value: 'light' | 'dark' | 'system'; label: string; Icon: typeof Sun }> = [
-    { value: 'light', label: '\u0641\u0627\u062A\u062D', Icon: Sun },
-    { value: 'dark', label: '\u062F\u0627\u0643\u0646', Icon: Moon },
-    { value: 'system', label: '\u062D\u0633\u0628 \u0627\u0644\u0646\u0638\u0627\u0645', Icon: Monitor },
+  const themes: Array<{ value: 'light' | 'dark' | 'system'; Icon: typeof Sun }> = [
+    { value: 'light', Icon: Sun },
+    { value: 'dark', Icon: Moon },
+    { value: 'system', Icon: Monitor },
   ];
 
   return (
     <div className={`flex gap-2 ${className || ''}`}>
-      {themes.map(({ value, label, Icon }) => (
+      {themes.map(({ value, Icon }) => (
         <button
           key={value}
           onClick={() => setTheme(value)}
@@ -72,7 +66,7 @@ export function ThemeSelector({ className }: ThemeSelectorProps) {
           }`}
         >
           <Icon className="h-4 w-4" />
-          <span>{label}</span>
+          <span>{tThemes(value)}</span>
         </button>
       ))}
     </div>

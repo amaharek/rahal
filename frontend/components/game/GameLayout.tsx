@@ -47,7 +47,7 @@ export function GameLayout({
   const resolvedBackHref = backHref ?? `/${locale}`;
 
   return (
-    <div className="min-h-screen pb-[12rem] lg:pb-20">
+    <div className="min-h-screen pb-[var(--dock-height,12rem)] lg:pb-20" style={{ '--dock-height': '12rem' } as React.CSSProperties}>
       <header className="bg-primary text-white py-3 px-4">
         <div className="max-w-7xl mx-auto">
           <Link

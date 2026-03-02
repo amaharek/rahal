@@ -33,11 +33,9 @@ export function GameHUD({ streak, guessCount, combo, momentum, variant = 'card' 
   if (variant === 'compact') {
     return (
       <div
-        className="flex items-center justify-center gap-4 bg-surface/95 backdrop-blur-sm rounded-lg px-4 py-2 shadow-lg"
+        className="flex items-center justify-center gap-4 bg-surface/95 backdrop-blur-sm rounded-lg px-3 py-1.5 shadow-lg"
         data-testid="game-hud"
       >
-        <span className="text-sm font-semibold text-primary">🔥 {streakValue}</span>
-        <span className="text-text-muted">·</span>
         <motion.span
           key={guessCount}
           initial={{ y: -6, opacity: 0 }}

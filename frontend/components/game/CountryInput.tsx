@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Search } from 'lucide-react';
 import { searchCountries } from '@/lib/api/game';
 import { Input } from '@/components/ui/Input';
 import { cn } from '@/lib/utils';
 import { debounce } from '@/lib/utils';
 import { useDirection } from '@/lib/hooks/useDirection';
+import { useTranslations } from 'next-intl';
 
 interface Country {
   id: string;
@@ -30,10 +30,12 @@ export function CountryInput({
   onSelect,
   onFocusStart,
   onCountryCommitted,
-  placeholder = 'اكتب اسم الدولة...',
+  placeholder,
   disabled,
   autoFocus,
 }: CountryInputProps) {
+  const t = useTranslations();
+  const resolvedPlaceholder = placeholder || t('game.enterCountry');
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
@@ -118,7 +120,7 @@ export function CountryInput({
           }
         }}
         onBlur={() => setTimeout(() => setIsOpen(false), 200)}
-        placeholder={placeholder}
+        placeholder={resolvedPlaceholder}
         disabled={disabled}
         autoFocus={autoFocus}
         className="text-lg"

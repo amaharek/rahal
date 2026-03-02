@@ -202,6 +202,7 @@ function toFeatureCollection(
     ...worldFeatures,
     features: worldFeatures.features.map((f) => ({
       ...f,
+      properties: f.properties ?? {},
       geometry: normalizeCoords(f.geometry),
     })),
   };

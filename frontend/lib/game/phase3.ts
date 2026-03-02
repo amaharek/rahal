@@ -150,7 +150,23 @@ export function getNarrativeMilestone(input: NarrativeMilestoneInput): Narrative
   return 'start';
 }
 
-function getQualityTierLabel(qualityTier: QualityTier | null, locale: string): string {
+export type TranslateFunction = (key: string) => string;
+
+export function getQualityTierLabel(
+  qualityTier: QualityTier | null,
+  localeOrT: string | TranslateFunction
+): string {
+  // If a translation function is provided, use message keys
+  if (typeof localeOrT === 'function') {
+    const t = localeOrT;
+    if (!qualityTier) {
+      return t('game.completion.gradeLevels.good_discovery');
+    }
+    return t(`game.completion.gradeLevels.${qualityTier}`);
+  }
+
+  // Legacy fallback: locale-based hardcoded labels (for share text context where t() isn't available)
+  const locale = localeOrT;
   const labelsByLocale: Record<string, Record<QualityTier | 'fallback', string>> = {
     ar: {
       perfect: 'مثالي',

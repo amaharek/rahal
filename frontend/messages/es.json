@@ -16,7 +16,8 @@
     "share": "Compartir",
     "copy": "Copiar",
     "copied": "¡Copiado!",
-    "home": "Inicio"
+    "home": "Inicio",
+    "timeRemaining": "Tiempo restante"
   },
   "nav": {
     "home": "Inicio",
@@ -218,7 +219,10 @@
     "selectCategory": "Seleccionar Categoría",
     "selectDifficulty": "Seleccionar Dificultad",
     "startQuiz": "Comenzar Cuestionario",
-    "dailyQuiz": "Cuestionario Diario"
+    "dailyQuiz": "Cuestionario Diario",
+    "option": "Opción {letter}",
+    "enterAnswer": "Escribe tu respuesta...",
+    "correctAnswerIs": "Respuesta correcta:"
   },
   "stats": {
     "title": "Estadísticas",
@@ -259,6 +263,7 @@
       "dark": "Oscuro",
       "system": "Sistema"
     },
+    "currentTheme": "Tema actual: {theme}. Clic para cambiar",
     "notifications": "Notificaciones",
     "dailyReminder": "Recordatorio Diario",
     "soundEffects": "Efectos de Sonido"

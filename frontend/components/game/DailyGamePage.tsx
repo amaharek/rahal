@@ -7,7 +7,7 @@ import { useDirection } from '@/lib/hooks/useDirection';
 import { useGameSession } from '@/lib/hooks/useGameSession';
 import { useGameTelemetry } from '@/lib/hooks/useGameTelemetry';
 import { useGameNarrative } from '@/lib/hooks/useGameNarrative';
-import { MapSkeleton, MapErrorBoundary, resolveMapVariant } from '@/components/game/GameMap';
+import { MapSkeleton, MapErrorBoundary } from '@/components/game/GameMap';
 import { GameHUD } from '@/components/game/GameHUD';
 import { GameHeaderBar } from '@/components/game/GameHeaderBar';
 import { GameCompletionSheet } from '@/components/game/GameCompletionSheet';
@@ -39,7 +39,6 @@ export function DailyGamePage() {
   const direction = useDirection();
 
   const presentationOverride = searchParams.get('presentation');
-  const mapVariant = resolveMapVariant(searchParams.get('map'));
 
   const session = useGameSession(presentationOverride);
 
@@ -243,12 +242,11 @@ export function DailyGamePage() {
         direction={direction}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-4 mt-3">
+      <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-4 mt-3">
         {/* Left: map hero with HUD overlay */}
         <div className="relative min-h-[50vh] overflow-hidden rounded-lg" data-testid="game-map">
           <MapErrorBoundary>
             <GameMap
-              variant={mapVariant}
               startCountryCode={challenge.start_country.code}
               endCountryCode={challenge.end_country.code}
               startCountryName={getCountryNameByLocale(challenge.start_country)}

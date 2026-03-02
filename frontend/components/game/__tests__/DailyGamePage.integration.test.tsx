@@ -48,7 +48,6 @@ vi.mock('next/navigation', () => ({
 vi.mock('@/components/game/GameMap', () => ({
   MapSkeleton: () => <div data-testid="map-skeleton" />,
   MapErrorBoundary: ({ children }: { children: any }) => <>{children}</>,
-  resolveMapVariant: () => 'legacy',
 }));
 
 vi.mock('@/components/game/CountryInput', () => ({

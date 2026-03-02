@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { cn, formatArabicNumber } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 
 interface TimerProps {
   initialSeconds: number;
@@ -13,6 +14,8 @@ interface TimerProps {
   locale: 'ar' | 'en' | 'es';
   useArabicNumerals?: boolean;
   format?: 'default' | 'compact';
+  /** 'box' = original boxed timer, 'bar' = full-width progress bar (Kahoot-style) */
+  variant?: 'box' | 'bar';
 }
 
 function formatTime(seconds: number, format: 'default' | 'compact' = 'default', useArabicNumerals = false): string {
@@ -47,12 +50,14 @@ export default function Timer({
   locale,
   useArabicNumerals = false,
   format = 'default',
+  variant = 'box',
 }: TimerProps) {
   const [seconds, setSeconds] = useState(initialSeconds);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const hasExpiredRef = useRef(false);
   const onExpireRef = useRef(onExpire);
   const onTickRef = useRef(onTick);
+  const t = useTranslations();
 
   // Keep refs updated
   onExpireRef.current = onExpire;
@@ -104,10 +109,40 @@ export default function Timer({
     };
   }, [isPaused, seconds]);
 
+  const percentage = (seconds / initialSeconds) * 100;
+  const isWarning = seconds <= 5 && seconds > 3;
+  const isCritical = seconds <= 3 && seconds > 0;
+  const ariaLabel = t('common.timeRemaining');
+
+  // Bar variant — full-width progress bar (Kahoot-style)
+  if (variant === 'bar') {
+    const barColor = isCritical
+      ? 'bg-red-500'
+      : isWarning
+      ? 'bg-yellow-500'
+      : 'bg-green-500';
+
+    return (
+      <div
+        role="timer"
+        aria-label={ariaLabel}
+        aria-live={isCritical ? 'assertive' : 'polite'}
+        className="w-full h-1.5 bg-border/50"
+      >
+        <div
+          className={cn(
+            'h-full transition-all duration-1000 ease-linear rounded-r-full',
+            barColor,
+            isCritical && 'animate-pulse'
+          )}
+          style={{ width: `${percentage}%` }}
+        />
+      </div>
+    );
+  }
+
+  // Box variant — original boxed timer
   const displayTime = formatTime(seconds, format, useArabicNumerals);
-  const isWarning = seconds < 10 && seconds > 0;
-  const isCritical = seconds < 5 && seconds > 0;
-  const ariaLabel = locale === 'ar' ? 'الوقت المتبقي' : 'time remaining';
 
   return (
     <div
@@ -117,7 +152,7 @@ export default function Timer({
       className={cn(
         'flex items-center gap-2 p-3 rounded-lg',
         'bg-surface border border-border',
-        isWarning && !isCritical && 'warning danger border-yellow-500 bg-yellow-50',
+        isWarning && 'warning danger border-yellow-500 bg-yellow-50',
         isCritical && 'critical error border-red-500 bg-red-50'
       )}
     >

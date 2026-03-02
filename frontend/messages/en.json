@@ -16,7 +16,8 @@
     "share": "Share",
     "copy": "Copy",
     "copied": "Copied!",
-    "home": "Home"
+    "home": "Home",
+    "timeRemaining": "Time remaining"
   },
   "nav": {
     "home": "Home",
@@ -218,7 +219,10 @@
     "selectCategory": "Select Category",
     "selectDifficulty": "Select Difficulty",
     "startQuiz": "Start Quiz",
-    "dailyQuiz": "Daily Quiz"
+    "dailyQuiz": "Daily Quiz",
+    "option": "Option {letter}",
+    "enterAnswer": "Type your answer...",
+    "correctAnswerIs": "Correct answer:"
   },
   "stats": {
     "title": "Statistics",
@@ -259,6 +263,7 @@
       "dark": "Dark",
       "system": "System"
     },
+    "currentTheme": "Current theme: {theme}. Click to switch",
     "notifications": "Notifications",
     "dailyReminder": "Daily Reminder",
     "soundEffects": "Sound Effects"

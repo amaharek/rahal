@@ -2,7 +2,7 @@
 
 import { useRef, useCallback } from 'react';
 import { cn } from '@/lib/utils';
-import { useIsRTL } from '@/lib/hooks/useDirection';
+import { useTranslations } from 'next-intl';
 
 interface AnswerOption {
   id: string;
@@ -15,9 +15,25 @@ interface AnswerOptionsProps {
   selectedIndex?: number;
   correctIndex?: number;
   isSubmitted?: boolean;
+  showKeyBadges?: boolean;
 }
 
 const OPTION_LETTERS = ['A', 'B', 'C', 'D'];
+
+/** Kahoot-style pastel background colors for each option */
+const OPTION_COLORS = [
+  'bg-blue-50 border-blue-200 hover:border-blue-400',
+  'bg-orange-50 border-orange-200 hover:border-orange-400',
+  'bg-green-50 border-green-200 hover:border-green-400',
+  'bg-rose-50 border-rose-200 hover:border-rose-400',
+];
+
+const OPTION_COLORS_SELECTED = [
+  'bg-blue-100 border-blue-400',
+  'bg-orange-100 border-orange-400',
+  'bg-green-100 border-green-400',
+  'bg-rose-100 border-rose-400',
+];
 
 export default function AnswerOptions({
   options,
@@ -25,9 +41,10 @@ export default function AnswerOptions({
   selectedIndex,
   correctIndex,
   isSubmitted = false,
+  showKeyBadges = false,
 }: AnswerOptionsProps) {
   const optionRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const isRTL = useIsRTL();
+  const t = useTranslations();
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
@@ -68,20 +85,20 @@ export default function AnswerOptions({
     const isWrongSelection = isSubmitted && isSelected && correctIndex !== index;
 
     return cn(
-      'w-full p-3 rounded-lg border-2 transition-all',
+      'w-full min-h-[56px] p-4 rounded-xl border-2 transition-all',
       'flex items-center gap-3',
       'focus:outline-none focus:ring-2 focus:ring-primary',
-      isRTL && 'flex-row-reverse',
-      // Default state
-      !isSubmitted && !isSelected && 'border-border hover:border-primary/50 bg-surface',
-      // Selected state (before submission)
-      !isSubmitted && isSelected && 'border-primary bg-primary/10 selected active',
-      // Submitted: correct answer
-      isSubmitted && isCorrect && 'border-green-500 bg-green-50 correct success',
-      // Submitted: wrong selection
-      isSubmitted && isWrongSelection && 'border-red-500 bg-red-50 incorrect error',
-      // Submitted: unselected wrong option
-      isSubmitted && !isCorrect && !isWrongSelection && 'border-border bg-surface opacity-50'
+      'active:scale-[0.97]',
+      // Default state — Kahoot pastel colors
+      !isSubmitted && !isSelected && OPTION_COLORS[index % 4],
+      // Selected state (before submission) — slightly deeper shade
+      !isSubmitted && isSelected && OPTION_COLORS_SELECTED[index % 4],
+      // Submitted: correct answer — green with scale-up
+      isSubmitted && isCorrect && 'border-green-500 bg-green-100 scale-[1.02] correct success',
+      // Submitted: wrong selection — red with shake
+      isSubmitted && isWrongSelection && 'border-red-500 bg-red-100 animate-shake incorrect error',
+      // Submitted: unselected wrong option — faded
+      isSubmitted && !isCorrect && !isWrongSelection && 'border-border bg-surface opacity-40'
     );
   };
 
@@ -95,7 +112,6 @@ export default function AnswerOptions({
   return (
     <div
       data-testid="answer-options-container"
-      dir={isRTL ? 'rtl' : 'ltr'}
       className="flex flex-col gap-3"
     >
       {options.map((option, index) => (
@@ -106,7 +122,7 @@ export default function AnswerOptions({
           data-correct={getDataCorrect(index)}
           type="button"
           disabled={isSubmitted}
-          aria-label={isRTL ? `خيار ${OPTION_LETTERS[index]}` : `option ${OPTION_LETTERS[index]}`}
+          aria-label={t('quiz.option', { letter: OPTION_LETTERS[index] })}
           aria-selected={selectedIndex === index}
           onClick={() => onSelect(option, index)}
           onKeyDown={(e) => handleKeyDown(e, index)}
@@ -115,17 +131,36 @@ export default function AnswerOptions({
           <span
             data-testid={`option-letter-${index}`}
             className={cn(
-              'w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm',
-              'bg-primary/10 text-primary'
+              'w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shrink-0',
+              'bg-white/80 text-text-primary'
             )}
           >
             {OPTION_LETTERS[index]}
           </span>
-          <span className="flex-1 text-text-primary">
+          <span className="flex-1 text-text-primary font-medium">
             {option.key}
           </span>
+          {/* Desktop keyboard shortcut badge */}
+          {showKeyBadges && !isSubmitted && (
+            <span className="hidden sm:flex w-6 h-6 items-center justify-center rounded-full bg-white/80 text-xs font-bold text-text-secondary shrink-0">
+              {index + 1}
+            </span>
+          )}
         </button>
       ))}
+
+      {/* Shake animation */}
+      <style jsx>{`
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-6px); }
+          50% { transform: translateX(6px); }
+          75% { transform: translateX(-4px); }
+        }
+        .animate-shake {
+          animation: shake 0.4s ease-in-out;
+        }
+      `}</style>
     </div>
   );
 }

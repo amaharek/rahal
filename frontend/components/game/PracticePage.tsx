@@ -13,7 +13,6 @@ import { EmojiScore } from '@/components/game/EmojiScore';
 import {
   MapErrorBoundary,
   MapSkeleton,
-  resolveMapVariant,
 } from '@/components/game/GameMap';
 import { createPracticeSession, submitPracticeGuess, usePracticeHint } from '@/lib/api/game';
 import { calculateMapView } from '@/lib/geo';
@@ -45,7 +44,6 @@ export function PracticePage() {
   const t = useTranslations();
   const locale = useLocale();
   const searchParams = useSearchParams();
-  const mapVariant = resolveMapVariant(searchParams.get('map'));
   const autoSetupTriggeredRef = useRef(false);
   const [startCountry, setStartCountry] = useState<Country | null>(null);
   const [endCountry, setEndCountry] = useState<Country | null>(null);
@@ -342,7 +340,6 @@ export function PracticePage() {
                 <div className={`${showMap ? 'block' : 'hidden'} lg:block`}>
                   <MapErrorBoundary>
                     <GameMap
-                      variant={mapVariant}
                       startCountryCode={session.start_country.code}
                       endCountryCode={session.end_country.code}
                       startCountryName={getCountryName(session.start_country)}

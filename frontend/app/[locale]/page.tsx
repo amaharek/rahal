@@ -37,6 +37,9 @@ export default function HomePage() {
     justExtended,
   } = useHomeStats();
 
+  // First-time detection: no games played and not authenticated
+  const isFirstTime = !isLoading && !isAuthenticated && typeof window !== 'undefined' && !window.localStorage.getItem('rahal:has-played');
+
   return (
     <main className="min-h-screen pb-24">
       {/* Top Navigation Bar */}
@@ -146,6 +149,11 @@ export default function HomePage() {
                       <h3 className="text-xl font-bold text-text-primary">
                         {t('home.dailyChallenge')}
                       </h3>
+                      {isFirstTime && (
+                        <span className="inline-flex items-center text-xs font-semibold text-white bg-primary px-2 py-0.5 rounded-full animate-pulse">
+                          New!
+                        </span>
+                      )}
                       {isAuthenticated && !isLoading && (
                         playedToday ? (
                           <span className="inline-flex items-center gap-1 text-xs font-semibold text-success bg-success/10 px-2 py-0.5 rounded-full">

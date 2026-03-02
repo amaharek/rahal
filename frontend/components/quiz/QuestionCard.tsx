@@ -2,7 +2,7 @@
 
 import { cn } from '@/lib/utils';
 import { QuestionCategory, QuestionDifficulty, QuestionType, DIFFICULTY_COLORS } from '@/types/quiz';
-import { useIsRTL } from '@/lib/hooks/useDirection';
+import { useTranslations } from 'next-intl';
 
 interface QuestionCardProps {
   question: {
@@ -28,7 +28,7 @@ export default function QuestionCard({
   currentQuestion,
   totalQuestions,
 }: QuestionCardProps) {
-  const isRTL = useIsRTL();
+  const t = useTranslations();
 
   return (
     <article
@@ -41,8 +41,8 @@ export default function QuestionCard({
       )}
     >
       {/* Header with question number and badges */}
-      <div className={cn('flex items-center justify-between mb-3', isRTL && 'flex-row-reverse')}>
-        <div className={cn('flex items-center gap-2', isRTL && 'flex-row-reverse')}>
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
           <span data-testid="question-number" className="text-lg font-bold text-text-primary">
             {currentQuestion}
           </span>
@@ -52,7 +52,7 @@ export default function QuestionCard({
           </span>
         </div>
 
-        <div className={cn('flex items-center gap-2', isRTL && 'flex-row-reverse')}>
+        <div className="flex items-center gap-2">
           {/* Category badge */}
           <span
             data-testid="question-category"
@@ -78,17 +78,13 @@ export default function QuestionCard({
       {/* Question text */}
       <div
         data-testid="question-text"
-        dir={isRTL ? 'rtl' : 'ltr'}
-        className={cn(
-          'text-xl font-medium text-text-primary mb-4',
-          isRTL ? 'text-right' : 'text-left'
-        )}
+        className="text-xl font-medium text-text-primary mb-4"
       >
         {question.question_key}
       </div>
 
       {/* Points display */}
-      <div className={cn('flex items-center gap-1', isRTL && 'flex-row-reverse justify-end')}>
+      <div className="flex items-center gap-1">
         <span
           data-testid="question-points"
           className="text-lg font-bold text-primary"
@@ -96,7 +92,7 @@ export default function QuestionCard({
           {question.points}
         </span>
         <span className="text-text-secondary">
-          {isRTL ? 'نقطة' : 'points'}
+          {t('quiz.points')}
         </span>
       </div>
     </article>

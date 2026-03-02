@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { cn, debounce } from '@/lib/utils';
-import { useIsRTL } from '@/lib/hooks/useDirection';
+import { useTranslations } from 'next-intl';
 
 interface Suggestion {
   id: string;
@@ -34,7 +34,7 @@ export default function AutocompleteAnswer({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
-  const isRTL = useIsRTL();
+  const t = useTranslations();
 
   // Normalize suggestions to Suggestion format
   const normalizedSuggestions: Suggestion[] = useMemo(() => {
@@ -131,9 +131,8 @@ export default function AutocompleteAnswer({
             onKeyDown={handleKeyDown}
             onFocus={() => inputValue.trim() && setShowSuggestions(true)}
             disabled={isSubmitted}
-            dir={isRTL ? 'rtl' : 'ltr'}
             aria-autocomplete="list"
-            aria-label={isRTL ? 'أدخل إجابتك' : 'Enter your answer'}
+            aria-label={t('quiz.enterAnswer')}
             aria-expanded={shouldShowSuggestions}
             aria-controls="suggestions-list"
             className={cn(
@@ -144,7 +143,7 @@ export default function AutocompleteAnswer({
               error && 'border-red-500',
               !error && 'border-border'
             )}
-            placeholder={isRTL ? 'اكتب إجابتك...' : 'Type your answer...'}
+            placeholder={t('quiz.enterAnswer')}
           />
 
           {/* Loading indicator */}
@@ -152,11 +151,8 @@ export default function AutocompleteAnswer({
             <div
               data-testid="loading-indicator"
               role="status"
-              aria-label={isRTL ? 'جاري التحميل' : 'Loading'}
-              className={cn(
-                'absolute top-1/2 -translate-y-1/2',
-                isRTL ? 'left-3' : 'right-3'
-              )}
+              aria-label={t('common.loading')}
+              className="absolute top-1/2 -translate-y-1/2 end-3"
             >
               <span className="animate-spin inline-block">⏳</span>
             </div>
@@ -167,10 +163,7 @@ export default function AutocompleteAnswer({
             <div
               data-testid="answer-feedback"
               data-correct={isCorrect ? 'true' : 'false'}
-              className={cn(
-                'absolute top-1/2 -translate-y-1/2',
-                isRTL ? 'left-3' : 'right-3'
-              )}
+              className="absolute top-1/2 -translate-y-1/2 end-3"
             >
               {isCorrect ? (
                 <span role="img" aria-label="success checkmark" className="text-green-500 text-xl">
@@ -184,6 +177,22 @@ export default function AutocompleteAnswer({
             </div>
           )}
         </div>
+
+        {/* Submit button — kept for autocomplete questions */}
+        {!isSubmitted && (
+          <button
+            type="submit"
+            disabled={!inputValue.trim()}
+            className={cn(
+              'w-full mt-3 py-3 rounded-xl font-semibold transition-all',
+              inputValue.trim()
+                ? 'bg-primary text-white hover:bg-primary/90'
+                : 'bg-border text-text-secondary cursor-not-allowed'
+            )}
+          >
+            {t('quiz.submitAnswer')}
+          </button>
+        )}
 
         {/* Suggestions dropdown */}
         {shouldShowSuggestions && !isLoading && (
@@ -228,14 +237,10 @@ export default function AutocompleteAnswer({
       {isSubmitted && isCorrect === false && correctAnswerKey && (
         <div
           data-testid="correct-answer"
-          className={cn(
-            'mt-3 p-3 rounded-lg bg-green-50 border border-green-200',
-            'flex items-center gap-2',
-            isRTL && 'flex-row-reverse'
-          )}
+          className="mt-3 p-3 rounded-lg bg-green-50 border border-green-200 flex items-center gap-2"
         >
           <span className="text-green-600 font-medium">
-            {isRTL ? 'الإجابة الصحيحة:' : 'Correct answer:'}
+            {t('quiz.correctAnswerIs')}
           </span>
           <span className="text-green-800">{correctAnswerKey}</span>
         </div>

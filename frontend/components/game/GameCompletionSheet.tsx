@@ -60,7 +60,7 @@ export function GameCompletionSheet({
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
           transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-          className="fixed bottom-0 left-0 right-0 z-50 max-h-[80vh] overflow-y-auto rounded-t-2xl bg-surface shadow-xl lg:relative lg:rounded-lg lg:shadow-none lg:max-h-none"
+          className="fixed bottom-0 left-0 right-0 z-50 max-h-[85dvh] overflow-y-auto overscroll-contain rounded-t-2xl bg-surface shadow-xl lg:relative lg:rounded-lg lg:shadow-none lg:max-h-none"
           data-testid="game-completion-sheet"
         >
           {/* Drag handle */}
